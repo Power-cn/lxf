@@ -41,7 +41,7 @@
                     </view>
                     <view style="background:#ffffff;" wx:if="{{list!=''}}">
                         <view style="background:#dddddd;height:280rpx;">
-                            <swiper bindchange="changeTabs" duration="300" nextMargin="{{my?'20px':'40rpx'}}" previousMargin="{{my?'30px':'65rpx'}}" style="padding-top:48rpx;height:368rpx;">
+                            <swiper bindchange="changeTabs" duration="300" nextMargin="{{my?'20px':'40rpx'}}" previousMargin="{{my?'30px':'65rpx'}}" style="padding-top:0rpx;height:368rpx;">
                                 <swiper-item itemId="{{item.id}}" wx:for="{{list}}" wx:key="{{item.id}}">
                                     <image src="{{item.image}}" style="height:320rpx;width:620rpx;margin-top:{{my?'32':''}}rpx;" wx:if="{{item.id==current_id||current_id===undefault&&index===0}}"></image>
                                     <image class="{{current}}" src="{{item.image}}" style="height:256rpx;width:620rpx;margin-top:{{my?'64':'32'}}rpx;" wx:else></image>
