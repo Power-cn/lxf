@@ -42,9 +42,6 @@ Page({
     onReachBottom: function(t) {
         getApp().page.onReachBottom(this);
     },
-    onShareAppMessage: function(t) {
-        getApp().page.onShareAppMessage(this);
-    },
     getOrderData: function(a) {
         var o = this, s = "";
         o.data.address && o.data.address.id && (s = o.data.address.id), a.goods_info && (getApp().core.showLoading({
@@ -62,19 +59,21 @@ Page({
             },
             success: function(t) {
                 if (getApp().core.hideLoading(), 0 == t.code) {
-                    if (2 == o.data.offline) var e = parseFloat(t.data.total_price - t.data.colonel > 0 ? t.data.total_price - t.data.colonel : .01), a = 0; else var e = parseFloat(t.data.total_price - t.data.colonel > 0 ? t.data.total_price - t.data.colonel : .01) + t.data.express_price, a = parseFloat(t.data.express_price);
-                    var s = getApp().core.getStorageSync(getApp().const.INPUT_DATA);
-                    getApp().core.removeStorageSync(getApp().const.INPUT_DATA), console.log(s), s || (s = {
+                    var e = 0;
+                    for (var a in t.data.list) e = t.data.list[a].level_price;
+                    if (2 == o.data.offline) var s = parseFloat(e - t.data.colonel > 0 ? e - t.data.colonel : .01), i = 0; else var s = parseFloat(e - t.data.colonel > 0 ? e - t.data.colonel : .01) + t.data.express_price, i = parseFloat(t.data.express_price);
+                    var n = getApp().core.getStorageSync(getApp().const.INPUT_DATA);
+                    getApp().core.removeStorageSync(getApp().const.INPUT_DATA), n || (n = {
                         address: t.data.address,
                         name: t.data.address ? t.data.address.name : "",
                         mobile: t.data.address ? t.data.address.mobile : ""
-                    }, t.data.pay_type_list.length > 0 && (s.payment = t.data.pay_type_list[0].payment, 
-                    t.data.pay_type_list.length > 1 && (s.payment = -1)), t.data.shop && (s.shop = t.data.shop), 
-                    t.data.shop_list && 1 == t.data.shop_list.length && (s.shop = t.data.shop_list[0])), 
-                    s.total_price = t.data.total_price, s.goods_list = t.data.list, s.goods_info = t.data.goods_info, 
-                    s.express_price = a, s.send_type = t.data.send_type, s.total_price_1 = e.toFixed(2), 
-                    s.colonel = t.data.colonel, s.pay_type_list = t.data.pay_type_list, s.shop_list = t.data.shop_list, 
-                    s.res = t.data, s.is_area = t.data.is_area, o.setData(s), o.getInputData();
+                    }, t.data.pay_type_list.length > 0 && (n.payment = t.data.pay_type_list[0].payment, 
+                    t.data.pay_type_list.length > 1 && (n.payment = -1)), t.data.shop && (n.shop = t.data.shop), 
+                    t.data.shop_list && 1 == t.data.shop_list.length && (n.shop = t.data.shop_list[0])), 
+                    n.total_price = t.data.total_price, n.total_price_1 = s.toFixed(2), n.goods_list = t.data.list, 
+                    n.goods_info = t.data.goods_info, n.express_price = i, n.send_type = t.data.send_type, 
+                    n.colonel = t.data.colonel, n.pay_type_list = t.data.pay_type_list, n.shop_list = t.data.shop_list, 
+                    n.res = t.data, n.is_area = t.data.is_area, o.setData(n), o.getInputData();
                 }
                 1 == t.code && getApp().core.showModal({
                     title: "提示",
@@ -127,7 +126,7 @@ Page({
         e.data.goods_info && (a.goods_info = JSON.stringify(e.data.goods_info)), e.data.picker_coupon && (a.user_coupon_id = e.data.picker_coupon.user_coupon_id), 
         e.data.content && (a.content = e.data.content), e.data.type && (a.type = e.data.type), 
         e.data.parent_id && (a.parent_id = e.data.parent_id), a.payment = e.data.payment, 
-        a.formId = t.detail.formId, console.log(e.data.options.goods_info), e.order_submit(a, "pt");
+        a.formId = t.detail.formId, e.order_submit(a, "pt");
     },
     KeyName: function(t) {
         this.setData({

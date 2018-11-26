@@ -176,7 +176,7 @@ Page({
         }), !1);
     },
     onShareAppMessage: function(t) {
-        return {
+        return getApp().page.onShareAppMessage(this), {
             path: "/pages/shop/shop?user_id=" + getApp().core.getStorageSync(getApp().const.USER_INFO).id
         };
     }

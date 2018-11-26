@@ -1,3 +1,5 @@
+@import "../../wxParse/wxParse.wxss";
+
 @import "../../components/goods-header/goods-header.wxss";
 
 @import "../../components/save_qrcode/save_qrcode.wxss";

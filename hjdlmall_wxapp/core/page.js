@@ -5,10 +5,24 @@ module.exports = {
     onLoad: function(e, t) {
         this.currentPage = e, this.currentPageOptions = t;
         var o = this;
-        this.setUserInfo(), this.setWxappImg(), this.setStore(), this.setParentId(t), this.getNavigationBarColor(), 
-        this.setDeviceInfo(), this.setPageClasses(), this.setPageNavbar(), this.setBarTitle(), 
-        "function" == typeof e.onSelfLoad && e.onSelfLoad(t), o._setFormIdSubmit(), "undefined" != typeof my && "pages/login/login" != e.route && t && (e.options || (e.options = t), 
-        getApp().core.setStorageSync("last_page_options", t)), e.navigatorClick = function(t) {
+        if (this.setUserInfo(), this.setWxappImg(), this.setStore(), this.setParentId(t), 
+        this.getNavigationBarColor(), this.setDeviceInfo(), this.setPageClasses(), this.setPageNavbar(), 
+        this.setBarTitle(), "function" == typeof e.onSelfLoad && e.onSelfLoad(t), o._setFormIdSubmit(), 
+        "undefined" != typeof my && "pages/login/login" != e.route && t && (e.options || (e.options = t), 
+        getApp().core.setStorageSync("last_page_options", t)), "lottery/goods/goods" == e.route && t.user_id) {
+            var n = t.user_id, a = t.id;
+            getApp().request({
+                data: {
+                    user_id: n,
+                    lottery_id: a
+                },
+                url: getApp().api.lottery.clerk,
+                success: function(e) {
+                    e.code;
+                }
+            });
+        }
+        e.navigatorClick = function(t) {
             o.navigatorClick(t, e);
         }, e.setData({
             __platform: getApp().platform,
@@ -39,6 +53,10 @@ module.exports = {
             o.bindParent(e);
         }), void 0 === e.closeCouponBox && (e.closeCouponBox = function(e) {
             o.closeCouponBox(e);
+        }), void 0 === e.relevanceSuccess && (e.relevanceSuccess = function(e) {
+            o.relevanceSuccess(e);
+        }), void 0 === e.relevanceError && (e.relevanceError = function(e) {
+            o.relevanceError(e);
         });
     },
     onReady: function(e) {
@@ -60,7 +78,9 @@ module.exports = {
         this.currentPage = e;
     },
     onShareAppMessage: function(e) {
-        this.currentPage = e, getApp().shareSendCoupon(e);
+        this.currentPage = e, setTimeout(function() {
+            getApp().shareSendCoupon(e);
+        }, 1e3);
     },
     imageClick: function(e) {
         console.log("image click", e);
@@ -107,20 +127,23 @@ module.exports = {
         });
     },
     setParentId: function(e) {
-        var t = this.currentPage;
-        if (e) {
-            var o = 0;
-            if (e.user_id) o = e.user_id; else if (e.scene) if (isNaN(e.scene)) {
-                var n = decodeURIComponent(e.scene);
-                n && (n = getApp().helper.scene_decode(n)) && n.uid && (o = n.uid);
-            } else o = e.scene; else if (null !== getApp().query) {
-                var a = getApp().query;
-                o = a.uid;
+        var t = this.currentPage, o = this;
+        if ("/pages/index/index" == t.route && o.setOfficalAccount(), e) {
+            var n = 0;
+            if (e.user_id) n = e.user_id; else if (e.scene) {
+                if (isNaN(e.scene)) {
+                    var a = decodeURIComponent(e.scene);
+                    a && (a = getApp().helper.scene_decode(a)) && a.uid && (n = a.uid);
+                } else -1 == t.route.indexOf("clerk") && (n = e.scene);
+                o.setOfficalAccount();
+            } else if (null !== getApp().query) {
+                var i = getApp().query;
+                n = i.uid;
             }
-            o && (getApp().core.setStorageSync(getApp().const.PARENT_ID, o), getApp().trigger.remove(getApp().trigger.events.login, "TRY_TO_BIND_PARENT"), 
+            n && (getApp().core.setStorageSync(getApp().const.PARENT_ID, n), getApp().trigger.remove(getApp().trigger.events.login, "TRY_TO_BIND_PARENT"), 
             getApp().trigger.add(getApp().trigger.events.login, "TRY_TO_BIND_PARENT", function() {
                 t.bindParent({
-                    parent_id: o,
+                    parent_id: n,
                     condition: 0
                 });
             }));
@@ -157,8 +180,15 @@ module.exports = {
     },
     setPageNavbar: function() {
         function e(e) {
-            var t = !1, n = o.route || o.__route__ || null;
-            for (var a in e.navs) e.navs[a].url === "/" + n ? (e.navs[a].active = !0, t = !0) : e.navs[a].active = !1;
+            var t = !1;
+            for (var n in e.navs) {
+                var a = e.navs[n].url, i = o.route || o.__route__ || null;
+                if (e.navs[n].params) {
+                    a = e.navs[n].new_url;
+                    for (var r in o.options) -1 == i.indexOf("?") ? i += "?" : i += "&", i += r + "=" + o.options[r];
+                }
+                console.log(i), a === "/" + i ? (e.navs[n].active = !0, t = !0) : e.navs[n].active = !1;
+            }
             t && o.setData({
                 _navbar: e
             });
@@ -285,13 +315,15 @@ module.exports = {
     _setFormIdSubmit: function(e) {
         var t = this.currentPage;
         t._formIdSubmit || (t._formIdSubmit = function(e) {
-            console.log("_formIdSubmit e --\x3e", e);
             var o = e.currentTarget.dataset, n = e.detail.formId, a = o.bind || null, i = o.type || null, r = o.url || null, s = getApp().core.getStorageSync(getApp().const.FORM_ID_LIST);
-            switch (s && s.length || (s = []), s.push({
+            s && s.length || (s = []);
+            var c = [];
+            for (var p in s) c.push(s[p].form_id);
+            switch ("the formId is a mock one" === n || getApp().helper.inArray(n, c) || (s.push({
                 time: getApp().helper.time(),
                 form_id: n
-            }), getApp().core.setStorageSync(getApp().const.FORM_ID_LIST, s), console.log("self[bindtap]--\x3e", t[a]), 
-            t[a] && "function" == typeof t[a] && t[a](e), i) {
+            }), getApp().core.setStorageSync(getApp().const.FORM_ID_LIST, s)), t[a] && "function" == typeof t[a] && t[a](e), 
+            i) {
               case "navigate":
                 r && getApp().core.navigateTo({
                     url: r
@@ -363,6 +395,11 @@ module.exports = {
                 e.unionLogin({
                     code: t.authCode
                 });
+            },
+            fail: function(e) {
+                getApp().login_complete = !1, getApp().core.redirectTo({
+                    url: "/pages/index/index"
+                });
             }
         })));
     },
@@ -382,11 +419,8 @@ module.exports = {
                     }), getApp().setUser(e.data), getApp().core.setStorageSync(getApp().const.ACCESS_TOKEN, e.data.access_token), 
                     getApp().trigger.run(getApp().trigger.events.login);
                     var n = getApp().core.getStorageSync(getApp().const.STORE);
-                    e.data.binding || !n.option.phone_auth || n.option.phone_auth && 0 == n.option.phone_auth ? getApp().core.redirectTo({
-                        url: "/" + t.route + "?" + getApp().helper.objectToUrlParams(t.options)
-                    }) : ("undefined" == typeof wx && getApp().core.redirectTo({
-                        url: "/" + t.route + "?" + getApp().helper.objectToUrlParams(t.options)
-                    }), o.setPhone(), o.setUserInfoShowFalse());
+                    e.data.binding || !n.option.phone_auth || n.option.phone_auth && 0 == n.option.phone_auth ? o.loadRoute() : ("undefined" == typeof wx && o.loadRoute(), 
+                    o.setPhone()), o.setUserInfoShowFalse();
                 } else getApp().login_complete = !1, getApp().core.showModal({
                     title: "提示",
                     content: e.msg,
@@ -426,9 +460,7 @@ module.exports = {
                                     __user_info: o,
                                     binding: !0,
                                     binding_num: e.data.dataObj
-                                }), getApp().core.redirectTo({
-                                    url: "/" + t.route + "?" + getApp().helper.objectToUrlParams(t.options)
-                                });
+                                }), _this.loadRoute();
                             } else getApp().core.showToast({
                                 title: "授权失败,请重试"
                             });
@@ -464,5 +496,22 @@ module.exports = {
         this.currentPage.setData({
             get_coupon_list: ""
         });
+    },
+    relevanceSuccess: function(e) {
+        console.log(e);
+    },
+    relevanceError: function(e) {
+        console.log(e);
+    },
+    setOfficalAccount: function(e) {
+        this.currentPage.setData({
+            __is_offical_account: !0
+        });
+    },
+    loadRoute: function() {
+        var e = this.currentPage, t = this;
+        "pages/index/index" == e.route || getApp().core.redirectTo({
+            url: "/" + e.route + "?" + getApp().helper.objectToUrlParams(e.options)
+        }), t.setUserInfoShowFalse();
     }
 };

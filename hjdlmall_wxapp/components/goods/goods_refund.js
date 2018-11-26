@@ -92,23 +92,31 @@ module.exports = {
         }
     },
     refundSubmit: function(e) {
-        var a = this.currentPage, i = e.currentTarget.dataset.type, o = e.detail.formId;
+        var a = this.currentPage, i = e.currentTarget.dataset.type, o = e.detail.formId, c = [], n = 0, d = a.data.pageType, r = getApp().api.order.refund, s = "", u = "";
+        if ("STORE" === d) s = "/pages/order/order?status=4", u = "STORE"; else if ("PINTUAN" === d) s = "/pages/pt/order/order?status=4", 
+        u = "PINTUAN"; else {
+            if ("MIAOSHA" !== d) return void getApp().core.showModal({
+                title: "提示",
+                content: "pageType变量未定义或变量值不是预期的"
+            });
+            s = "/pages/miaosha/order/order?status=4", u = "MIAOSHA";
+        }
         if (1 == i) {
-            var c, n, d, r, s = function() {
+            var p = function() {
                 var t = function() {
                     getApp().core.showLoading({
                         title: "正在提交",
                         mask: !0
                     }), getApp().request({
-                        url: n,
+                        url: r,
                         method: "post",
                         data: {
                             type: 1,
                             order_detail_id: a.data.goods.order_detail_id,
-                            desc: u,
-                            pic_list: JSON.stringify(p),
+                            desc: l,
+                            pic_list: JSON.stringify(c),
                             form_id: o,
-                            orderType: r
+                            orderType: u
                         },
                         success: function(t) {
                             getApp().core.hideLoading(), 0 == t.code && getApp().core.showModal({
@@ -117,7 +125,7 @@ module.exports = {
                                 showCancel: !1,
                                 success: function(t) {
                                     t.confirm && getApp().core.redirectTo({
-                                        url: d
+                                        url: s
                                     });
                                 }
                             }), 1 == t.code && getApp().core.showModal({
@@ -133,23 +141,12 @@ module.exports = {
                         }
                     });
                 };
-                if (0 == (u = a.data.refund_data_1.desc || "").length) return getApp().core.showToast({
+                if (0 == (l = a.data.refund_data_1.desc || "").length) return getApp().core.showToast({
                     title: "请填写退款原因",
                     image: "/images/icon-warning.png"
                 }), {
                     v: void 0
                 };
-                if (p = [], l = 0, c = a.data.pageType, n = getApp().api.order.refund, d = "", r = "", 
-                "STORE" === c) d = "/pages/order/order?status=4", r = "STORE"; else if ("PINTUAN" === c) d = "/pages/pt/order/order?status=4", 
-                r = "PINTUAN"; else {
-                    if ("MIAOSHA" !== c) return getApp().core.showModal({
-                        title: "提示",
-                        content: "pageType变量未定义或变量值不是预期的"
-                    }), {
-                        v: void 0
-                    };
-                    d = "/pages/miaosha/order/order?status=4", r = "MIAOSHA";
-                }
                 if (a.data.refund_data_1.pic_list && a.data.refund_data_1.pic_list.length > 0) {
                     getApp().core.showLoading({
                         title: "正在上传图片",
@@ -162,29 +159,29 @@ module.exports = {
                             name: "image",
                             success: function(t) {},
                             complete: function(i) {
-                                l++, 200 == i.statusCode && 0 == (i = JSON.parse(i.data)).code && (p[e] = i.data.url), 
-                                l == a.data.refund_data_1.pic_list.length && (getApp().core.hideLoading(), t());
+                                n++, 200 == i.statusCode && 0 == (i = JSON.parse(i.data)).code && (c[e] = i.data.url), 
+                                n == a.data.refund_data_1.pic_list.length && (getApp().core.hideLoading(), t());
                             }
                         });
                     }(f);
                 } else t();
             }();
-            if ("object" === (void 0 === s ? "undefined" : t(s))) return s.v;
+            if ("object" === (void 0 === p ? "undefined" : t(p))) return p.v;
         }
         if (2 == i) {
-            var u, p, l, f, g = function() {
+            var l, f, g = function() {
                 var t = function() {
                     getApp().core.showLoading({
                         title: "正在提交",
                         mask: !0
                     }), getApp().request({
-                        url: n,
+                        url: r,
                         method: "post",
                         data: {
                             type: 2,
                             order_detail_id: a.data.goods.order_detail_id,
-                            desc: u,
-                            pic_list: JSON.stringify(p)
+                            desc: l,
+                            pic_list: JSON.stringify(c)
                         },
                         success: function(t) {
                             getApp().core.hideLoading(), 0 == t.code && getApp().core.showModal({
@@ -193,7 +190,7 @@ module.exports = {
                                 showCancel: !1,
                                 success: function(t) {
                                     t.confirm && getApp().core.redirectTo({
-                                        url: d
+                                        url: s
                                     });
                                 }
                             }), 1 == t.code && getApp().core.showModal({
@@ -209,13 +206,13 @@ module.exports = {
                         }
                     });
                 };
-                if (0 == (u = a.data.refund_data_2.desc || "").length) return getApp().core.showToast({
+                if (0 == (l = a.data.refund_data_2.desc || "").length) return getApp().core.showToast({
                     title: "请填写换货说明",
                     image: "/images/icon-warning.png"
                 }), {
                     v: void 0
                 };
-                if (p = [], l = 0, a.data.refund_data_2.pic_list && a.data.refund_data_2.pic_list.length > 0) {
+                if (c = [], n = 0, a.data.refund_data_2.pic_list && a.data.refund_data_2.pic_list.length > 0) {
                     getApp().core.showLoading({
                         title: "正在上传图片",
                         mask: !0
@@ -227,8 +224,8 @@ module.exports = {
                             name: "image",
                             success: function(t) {},
                             complete: function(i) {
-                                l++, 200 == i.statusCode && 0 == (i = JSON.parse(i.data)).code && (p[e] = i.data.url), 
-                                l == a.data.refund_data_2.pic_list.length && (getApp().core.hideLoading(), t());
+                                n++, 200 == i.statusCode && 0 == (i = JSON.parse(i.data)).code && (c[e] = i.data.url), 
+                                n == a.data.refund_data_2.pic_list.length && (getApp().core.hideLoading(), t());
                             }
                         });
                     }(f);

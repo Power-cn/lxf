@@ -18,6 +18,5 @@ Page({
         getApp().page.onUnload(this);
     },
     onPullDownRefresh: function() {},
-    onReachBottom: function() {},
-    onShareAppMessage: function() {}
+    onReachBottom: function() {}
 });

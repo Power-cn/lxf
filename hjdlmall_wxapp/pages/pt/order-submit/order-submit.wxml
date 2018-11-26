@@ -105,6 +105,7 @@
                             <view class="flex-grow-1 num">×{{item.num}}</view>
                             <view class="flex-grow-0 price">￥:{{item.price}}</view>
                         </view>
+                        <view style="color:#ff4544;text-align:right;margin-bottom:22rpx;" wx:if="{{type!=='ONLY_BUY'&&item.is_level===true}}">会员折扣价：￥{{item.level_price}}</view>
                     </view>
                 </view>
             </view>

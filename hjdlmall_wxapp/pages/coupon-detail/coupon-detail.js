@@ -61,6 +61,5 @@ Page({
         this.setData({
             get_coupon_list: ""
         });
-    },
-    onShareAppMessage: function() {}
+    }
 });

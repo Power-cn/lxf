@@ -21,8 +21,5 @@ Page({
     onReachBottom: function(n) {
         getApp().page.onReachBottom(this);
     },
-    onShareAppMessage: function(n) {
-        getApp().page.onShareAppMessage(this);
-    },
     lower: function(n) {}
 });

@@ -5,7 +5,9 @@ function e(e) {
 var t = getApp(), o = {
     init: function(o, a) {
         var r = this, p = getApp().api;
-        r.page = o, t = a, r.page.orderPay = function(o) {
+        r.page = o, t = a;
+        var s = getApp().core.getStorageSync(getApp().const.PARENT_ID);
+        s || (s = 0), r.page.orderPay = function(o) {
             function a(o, a, r) {
                 o.pay_type = "WECHAT_PAY", t.request({
                     url: a,
@@ -24,12 +26,9 @@ var t = getApp(), o = {
                             success: function(e) {},
                             fail: function(e) {},
                             complete: function(e) {
-                                "requestPayment:fail" != e.errMsg && "requestPayment:fail cancel" != e.errMsg ? (getApp().page.bindParent({
-                                    parent_id: getApp().core.getStorageSync(getApp().const.PARENT_ID),
-                                    condition: 2
-                                }), getApp().core.redirectTo({
+                                "requestPayment:fail" != e.errMsg && "requestPayment:fail cancel" != e.errMsg ? getApp().core.redirectTo({
                                     url: "/" + r + "?status=1"
-                                })) : getApp().core.showModal({
+                                }) : getApp().core.showModal({
                                     title: "提示",
                                     content: "订单尚未支付",
                                     showCancel: !1,
@@ -65,12 +64,9 @@ var t = getApp(), o = {
                                 getApp().core.hideLoading();
                             },
                             success: function(e) {
-                                0 == e.code && (getApp().page.bindParent({
-                                    parent_id: getApp().core.getStorageSync(getApp().const.PARENT_ID),
-                                    condition: 2
-                                }), getApp().core.redirectTo({
+                                0 == e.code && getApp().core.redirectTo({
                                     url: "/" + a + "?status=1"
-                                })), 1 == e.code && getApp().core.showModal({
+                                }), 1 == e.code && getApp().core.showModal({
                                     title: "提示",
                                     content: e.msg,
                                     showCancel: !1
@@ -80,22 +76,22 @@ var t = getApp(), o = {
                     }
                 });
             }
-            var n = o.currentTarget.dataset.index, s = r.page.data.order_list[n], c = new Array();
-            if (void 0 !== r.page.data.pay_type_list) c = r.page.data.pay_type_list; else if (void 0 !== s.pay_type_list) c = s.pay_type_list; else if (void 0 !== s.goods_list[0].pay_type_list) c = s.goods_list[0].pay_type_list; else {
-                var d = {};
-                d.payment = 0, c.push(d);
+            var n = o.currentTarget.dataset.index, c = r.page.data.order_list[n], d = new Array();
+            if (void 0 !== r.page.data.pay_type_list) d = r.page.data.pay_type_list; else if (void 0 !== c.pay_type_list) d = c.pay_type_list; else if (void 0 !== c.goods_list[0].pay_type_list) d = c.goods_list[0].pay_type_list; else {
+                var g = {};
+                g.payment = 0, d.push(g);
             }
-            var g = getCurrentPages(), u = g[g.length - 1].route, l = {};
-            if (-1 != u.indexOf("pt")) _ = p.group.pay_data, l.order_id = s.order_id; else if (-1 != u.indexOf("miaosha")) _ = p.miaosha.pay_data, 
-            l.order_id = s.order_id; else if (-1 != u.indexOf("book")) _ = p.book.order_pay, 
-            l.id = s.id; else {
-                var _ = p.order.pay_data;
-                l.order_id = s.order_id;
+            var u = getCurrentPages(), l = u[u.length - 1].route, _ = {};
+            if (-1 != l.indexOf("pt")) m = p.group.pay_data, _.order_id = c.order_id; else if (-1 != l.indexOf("miaosha")) m = p.miaosha.pay_data, 
+            _.order_id = c.order_id; else if (-1 != l.indexOf("book")) m = p.book.order_pay, 
+            _.id = c.id; else {
+                var m = p.order.pay_data;
+                _.order_id = c.order_id;
             }
-            1 == c.length ? (getApp().core.showLoading({
+            _.parent_id = s, _.condition = 2, 1 == d.length ? (getApp().core.showLoading({
                 title: "正在提交",
                 mask: !0
-            }), 0 == c[0].payment && a(l, _, u), 3 == c[0].payment && i(l, _, u)) : getApp().core.showModal({
+            }), 0 == d[0].payment && a(_, m, l), 3 == d[0].payment && i(_, m, l)) : getApp().core.showModal({
                 title: "提示",
                 content: "选择支付方式",
                 cancelText: "余额支付",
@@ -104,7 +100,7 @@ var t = getApp(), o = {
                     e.confirm ? (getApp().core.showLoading({
                         title: "正在提交",
                         mask: !0
-                    }), a(l, _, u)) : e.cancel && i(l, _, u);
+                    }), a(_, m, l)) : e.cancel && i(_, m, l);
                 }
             });
         }, r.page.order_submit = function(a, i) {
@@ -113,19 +109,21 @@ var t = getApp(), o = {
                     title: "正在提交",
                     mask: !0
                 }), t.request({
-                    url: s,
+                    url: c,
                     method: "post",
                     data: a,
                     success: function(p) {
                         if (0 == p.code) {
                             var n = function() {
                                 t.request({
-                                    url: c,
+                                    url: d,
                                     data: {
-                                        order_id: s,
-                                        order_id_list: g,
-                                        pay_type: u,
-                                        form_id: a.formId
+                                        order_id: c,
+                                        order_id_list: u,
+                                        pay_type: l,
+                                        form_id: a.formId,
+                                        parent_user_id: s,
+                                        condition: 2
                                     },
                                     success: function(e) {
                                         if (0 != e.code) return getApp().core.hideLoading(), void getApp().core.showModal({
@@ -135,44 +133,48 @@ var t = getApp(), o = {
                                             confirmText: "确认",
                                             success: function(e) {
                                                 e.confirm && getApp().core.redirectTo({
-                                                    url: d + "?status=0"
+                                                    url: g + "?status=0"
                                                 });
                                             }
                                         });
                                         setTimeout(function() {
                                             getApp().core.hideLoading();
                                         }, 1e3), "pt" == i ? "ONLY_BUY" == r.page.data.type ? getApp().core.redirectTo({
-                                            url: d + "?status=2"
+                                            url: g + "?status=2"
                                         }) : getApp().core.redirectTo({
-                                            url: "/pages/pt/group/details?oid=" + s
+                                            url: "/pages/pt/group/details?oid=" + c
                                         }) : void 0 !== r.page.data.goods_card_list && r.page.data.goods_card_list.length > 0 && 2 != a.payment ? r.page.setData({
                                             show_card: !0
                                         }) : getApp().core.redirectTo({
-                                            url: d + "?status=-1"
+                                            url: g + "?status=-1"
                                         });
                                     }
                                 });
                             };
                             if (getApp().page.bindParent({
-                                parent_id: getApp().core.getStorageSync(getApp().const.PARENT_ID),
+                                parent_id: s,
                                 condition: 1
                             }), void 0 != p.data.p_price && 0 === p.data.p_price) return o.showToast({
                                 title: "提交成功"
                             }), void setTimeout(function() {
-                                getApp().core.navigateBack();
+                                getApp().core.redirectTo({
+                                    url: "/pages/order/order?status=1"
+                                });
                             }, 2e3);
                             setTimeout(function() {
                                 r.page.setData({
                                     options: {}
                                 });
                             }, 1);
-                            var s = p.data.order_id || "", g = p.data.order_id_list ? JSON.stringify(p.data.order_id_list) : "", u = "";
+                            var c = p.data.order_id || "", u = p.data.order_id_list ? JSON.stringify(p.data.order_id_list) : "", l = "";
                             0 == a.payment ? t.request({
-                                url: c,
+                                url: d,
                                 data: {
-                                    order_id: s,
-                                    order_id_list: g,
-                                    pay_type: "WECHAT_PAY"
+                                    order_id: c,
+                                    order_id_list: u,
+                                    pay_type: "WECHAT_PAY",
+                                    parent_user_id: s,
+                                    condition: 2
                                 },
                                 success: function(t) {
                                     if (0 != t.code) {
@@ -186,7 +188,7 @@ var t = getApp(), o = {
                                         }, 1e3), e("pay"), t.data && 0 == t.data.price ? void 0 !== r.page.data.goods_card_list && r.page.data.goods_card_list.length > 0 ? r.page.setData({
                                             show_card: !0
                                         }) : getApp().core.redirectTo({
-                                            url: d + "?status=1"
+                                            url: g + "?status=1"
                                         }) : getApp().core.requestPayment({
                                             _res: t,
                                             timeStamp: t.data.timeStamp,
@@ -197,26 +199,22 @@ var t = getApp(), o = {
                                             success: function(e) {},
                                             fail: function(e) {},
                                             complete: function(e) {
-                                                if ("requestPayment:fail" != e.errMsg && "requestPayment:fail cancel" != e.errMsg) return "requestPayment:ok" == e.errMsg ? (getApp().page.bindParent({
-                                                    parent_id: getApp().core.getStorageSync(getApp().const.PARENT_ID),
-                                                    condition: 2
-                                                }), void (void 0 !== r.page.data.goods_card_list && r.page.data.goods_card_list.length > 0 ? r.page.setData({
+                                                "requestPayment:fail" != e.errMsg && "requestPayment:fail cancel" != e.errMsg ? "requestPayment:ok" != e.errMsg || (void 0 !== r.page.data.goods_card_list && r.page.data.goods_card_list.length > 0 ? r.page.setData({
                                                     show_card: !0
                                                 }) : "pt" == i ? "ONLY_BUY" == r.page.data.type ? getApp().core.redirectTo({
-                                                    url: d + "?status=2"
+                                                    url: g + "?status=2"
                                                 }) : getApp().core.redirectTo({
-                                                    url: "/pages/pt/group/details?oid=" + s
+                                                    url: "/pages/pt/group/details?oid=" + c
                                                 }) : getApp().core.redirectTo({
-                                                    url: d + "?status=1"
-                                                }))) : void 0;
-                                                getApp().core.showModal({
+                                                    url: g + "?status=1"
+                                                })) : getApp().core.showModal({
                                                     title: "提示",
                                                     content: "订单尚未支付",
                                                     showCancel: !1,
                                                     confirmText: "确认",
                                                     success: function(e) {
                                                         e.confirm && getApp().core.redirectTo({
-                                                            url: d + "?status=0"
+                                                            url: g + "?status=0"
                                                         });
                                                     }
                                                 });
@@ -224,10 +222,10 @@ var t = getApp(), o = {
                                         });
                                         var a = getApp().core.getStorageSync(getApp().const.QUICK_LIST);
                                         if (a) {
-                                            for (var p = a.length, n = 0; n < p; n++) for (var c = a[n].goods, g = c.length, u = 0; u < g; u++) c[u].num = 0;
+                                            for (var p = a.length, s = 0; s < p; s++) for (var n = a[s].goods, d = n.length, u = 0; u < d; u++) n[u].num = 0;
                                             getApp().core.setStorageSync(getApp().const.QUICK_LISTS, a);
-                                            for (var l = getApp().core.getStorageSync(getApp().const.CARGOODS), p = l.length, n = 0; n < p; n++) l[n].num = 0, 
-                                            l[n].goods_price = 0, o.setData({
+                                            for (var l = getApp().core.getStorageSync(getApp().const.CARGOODS), p = l.length, s = 0; s < p; s++) l[s].num = 0, 
+                                            l[s].goods_price = 0, o.setData({
                                                 carGoods: l
                                             });
                                             getApp().core.setStorageSync(getApp().const.CARGOODS, l);
@@ -235,15 +233,15 @@ var t = getApp(), o = {
                                             _ && (_.total_num = 0, _.total_price = 0, getApp().core.setStorageSync(getApp().const.TOTAL, _));
                                             getApp().core.getStorageSync(getApp().const.CHECK_NUM);
                                             0, getApp().core.setStorageSync(getApp().const.CHECK_NUM, 0);
-                                            for (var A = getApp().core.getStorageSync(getApp().const.QUICK_HOT_GOODS_LISTS), p = A.length, n = 0; n < p; n++) A[n].num = 0, 
+                                            for (var m = getApp().core.getStorageSync(getApp().const.QUICK_HOT_GOODS_LISTS), p = m.length, s = 0; s < p; s++) m[s].num = 0, 
                                             o.setData({
-                                                quick_hot_goods_lists: A
+                                                quick_hot_goods_lists: m
                                             });
-                                            getApp().core.setStorageSync(getApp().const.QUICK_HOT_GOODS_LISTS, A);
+                                            getApp().core.setStorageSync(getApp().const.QUICK_HOT_GOODS_LISTS, m);
                                         }
                                     }
                                 }
-                            }) : 2 == a.payment ? (u = "HUODAO_PAY", n()) : 3 == a.payment && (u = "BALANCE_PAY", 
+                            }) : 2 == a.payment ? (l = "HUODAO_PAY", n()) : 3 == a.payment && (l = "BALANCE_PAY", 
                             n());
                         }
                         if (1 == p.code) return getApp().core.hideLoading(), void r.page.showToast({
@@ -253,16 +251,16 @@ var t = getApp(), o = {
                     }
                 });
             }
-            var s = p.order.submit, c = p.order.pay_data, d = "/pages/order/order";
-            if ("pt" == i ? (s = p.group.submit, c = p.group.pay_data, d = "/pages/pt/order/order") : "ms" == i ? (s = p.miaosha.submit, 
-            c = p.miaosha.pay_data, d = "/pages/miaosha/order/order") : "pond" == i ? (s = p.pond.submit, 
-            c = p.order.pay_data, d = "/pages/order/order") : "scratch" == i ? (s = p.scratch.submit, 
-            c = p.order.pay_data, d = "/pages/order/order") : "lottery" == i ? (s = p.lottery.submit, 
-            c = p.order.pay_data, d = "/pages/order/order") : "s" == i && (s = p.order.new_submit, 
-            c = p.order.pay_data, d = "/pages/order/order"), 3 == a.payment) {
-                var g = getApp().getUser();
+            var c = p.order.submit, d = p.order.pay_data, g = "/pages/order/order";
+            if ("pt" == i ? (c = p.group.submit, d = p.group.pay_data, g = "/pages/pt/order/order") : "ms" == i ? (c = p.miaosha.submit, 
+            d = p.miaosha.pay_data, g = "/pages/miaosha/order/order") : "pond" == i ? (c = p.pond.submit, 
+            d = p.order.pay_data, g = "/pages/order/order") : "scratch" == i ? (c = p.scratch.submit, 
+            d = p.order.pay_data, g = "/pages/order/order") : "lottery" == i ? (c = p.lottery.submit, 
+            d = p.order.pay_data, g = "/pages/order/order") : "s" == i && (c = p.order.new_submit, 
+            d = p.order.pay_data, g = "/pages/order/order"), 3 == a.payment) {
+                var u = getApp().getUser();
                 getApp().core.showModal({
-                    title: "当前账户余额：" + g.money,
+                    title: "当前账户余额：" + u.money,
                     content: "是否确定使用余额支付",
                     success: function(e) {
                         e.confirm && n();

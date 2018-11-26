@@ -198,10 +198,13 @@ Page({
         });
     },
     onShareAppMessage: function() {
+        getApp().page.onShareAppMessage(this);
         var e = this;
         return {
             path: "/bargain/list/list?goods_id=" + e.data.goods.id + "&user_id=" + e.data.__user_info.id,
-            success: function(e) {}
+            success: function(e) {},
+            title: e.data.goods.name,
+            imageUrl: e.data.goods.pic_list[0].pic_url
         };
     },
     showShareModal: function() {

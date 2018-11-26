@@ -53,11 +53,11 @@ Page({
                     var e = t.data.list, s = [], i = [];
                     for (var c in e) if (e[c].goods.length > 0) {
                         i.push(e[c]);
-                        for (var d in e[c].goods) {
-                            var n = o.data.carGoods;
-                            for (var r in n) a.carGoods[r].goods_id === parseInt(e[c].goods[d].id) && (e[c].goods[d].num = e[c].goods[d].num ? e[c].goods[d].num : 0, 
-                            e[c].goods[d].num += a.carGoods[r].num);
-                            parseInt(e[c].goods[d].hot_cakes) && s.push(e[c].goods[d]);
+                        for (var n in e[c].goods) {
+                            var d = o.data.carGoods;
+                            for (var r in d) a.carGoods[r].goods_id === parseInt(e[c].goods[n].id) && (e[c].goods[n].num = e[c].goods[n].num ? e[c].goods[n].num : 0, 
+                            e[c].goods[n].num += a.carGoods[r].num);
+                            parseInt(e[c].goods[n].hot_cakes) && s.push(e[c].goods[n]);
                         }
                     }
                     o.setData({
@@ -77,9 +77,9 @@ Page({
             quick_list: i
         };
         getApp().core.setStorageSync(getApp().const.ITEM, c);
-        var d = t.currentTarget.dataset.id;
+        var n = t.currentTarget.dataset.id;
         getApp().core.navigateTo({
-            url: "/pages/goods/goods?id=" + d + "&quick=1"
+            url: "/pages/goods/goods?id=" + n + "&quick=1"
         });
     },
     selectMenu: function(t) {
@@ -113,24 +113,5 @@ Page({
         this.setData({
             showModal: !1
         });
-    },
-    buynow: function(o) {
-        var a = this, e = a.data.carGoods;
-        a.data.goodsModel;
-        a.setData({
-            goodsModel: !1
-        });
-        for (var s = e.length, i = [], c = [], d = 0; d < s; d++) 0 != e[d].num && (c = {
-            goods_id: e[d].goods_id,
-            num: e[d].num,
-            attr: e[d].attr
-        }, i.push(c));
-        var n = [];
-        n.push({
-            mch_id: 0,
-            goods_list: i
-        }), getApp().core.navigateTo({
-            url: "/pages/new-order-submit/new-order-submit?mch_list=" + JSON.stringify(n)
-        }), t.clearShoppingCart();
     }
 });

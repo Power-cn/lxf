@@ -26,7 +26,8 @@ var e = require("../siteinfo.js"), r = "", o = {
         goods_recommend: r + "default/goods-recommend",
         search: r + "default/search",
         cats: r + "default/cats",
-        topic_qrcode: r + "default/topic-qrcode"
+        topic_qrcode: r + "default/topic-qrcode",
+        form_id: r + "default/form-id"
     },
     cart: {
         list: r + "cart/list",
@@ -250,7 +251,8 @@ var e = require("../siteinfo.js"), r = "", o = {
         explain: r + "integralmall/integralmall/explain",
         exchange: r + "integralmall/integralmall/exchange",
         register: r + "integralmall/integralmall/register",
-        integral_detail: r + "integralmall/integralmall/integral-detail"
+        integral_detail: r + "integralmall/integralmall/integral-detail",
+        goods_list: r + "integralmall/integralmall/goods-list"
     },
     pond: {
         index: r + "pond/pond/index",
@@ -287,7 +289,10 @@ var e = require("../siteinfo.js"), r = "", o = {
         detail: r + "lottery/default/detail",
         goods: r + "lottery/default/goods",
         submit: r + "lottery/default/submit",
-        qrcode: r + "lottery/default/qrcode"
+        qrcode: r + "lottery/default/qrcode",
+        setting: r + "lottery/default/setting",
+        lucky_code: r + "lottery/default/lucky-code",
+        clerk: r + "lottery/default/clerk"
     }
 };
 

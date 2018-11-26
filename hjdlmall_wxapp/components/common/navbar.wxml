@@ -4,14 +4,14 @@
             <view>
                 <image class="navbar-icon" src="{{item.active?item.active_icon:item.icon}}"></image>
                 <view class="navbar-text" style="color: {{item.active?item.active_color:item.color}};">{{item.text}}
-          </view>
+                    </view>
             </view>
         </navigator>
         <navigator bindtap="navigatorClick" class="flex-grow-1 flex-y-center" data-open_type="{{item.open_type}}" data-tel="{{item.params.tel}}" openType="tel" url="{{item.url}}" wx:elif="{{item.open_type=='tel'}}">
             <view>
                 <image class="navbar-icon" src="{{item.active?item.active_icon:item.icon}}"></image>
                 <view class="navbar-text" style="color: {{item.active?item.active_color:item.color}};">{{item.text}}
-          </view>
+                    </view>
             </view>
         </navigator>
         <view class="flex-grow-1 flex-y-center" style="width:1%;padding-top:8rpx;" wx:elif="{{item.open_type=='contact'}}">
@@ -19,7 +19,7 @@
                 <button openType="contact" sessionFrom="{{_user_info.nickname}}|">
                     <image class="navbar-icon" src="{{item.active?item.active_icon:item.icon}}"></image>
                     <view class="navbar-text" style="color: {{item.active?item.active_color:item.color}};">{{item.text}}
-              </view>
+                            </view>
                 </button>
             </view>
         </view>
@@ -27,14 +27,14 @@
             <view>
                 <image class="navbar-icon" src="{{item.active?item.active_icon:item.icon}}"></image>
                 <view class="navbar-text" style="color: {{item.active?item.active_color:item.color}};">{{item.text}}
-          </view>
+                    </view>
             </view>
         </navigator>
         <navigator class="flex-grow-1 flex-y-center" data-open_type="{{item.open_type}}" openType="redirect" url="{{item.new_url}}" wx:else>
             <view>
                 <image class="navbar-icon" src="{{item.active?item.active_icon:item.icon}}"></image>
                 <view class="navbar-text" style="color: {{item.active?item.active_color:item.color}};">{{item.text}}
-          </view>
+                    </view>
             </view>
         </navigator>
     </block>

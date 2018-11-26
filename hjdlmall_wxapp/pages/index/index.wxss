@@ -134,6 +134,7 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    font-size: 9pt;
 }
 
 .nav-block {
@@ -484,6 +485,11 @@
 
 .nav-icon-1 {
     width: 20%;
+    text-align: center;
+    font-size: 9pt;
+}
+
+.nav-icon-1 view {
     text-align: center;
     font-size: 9pt;
 }

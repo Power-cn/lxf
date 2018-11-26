@@ -49,17 +49,18 @@ var t = [ {
         this.getStoreData();
     },
     onShow: function(e) {
-        e.scene && (this.onShowData = e), e && e.query && (this.query = e.query);
+        e.scene && (this.onShowData = e), e && e.query && (this.query = e.query), this.getUser() && this.trigger.run(this.trigger.events.login);
     },
     is_login: !1,
-    login_complete: !1
+    login_complete: !1,
+    is_form_id_request: !0
 };
 
 for (var o in t) n[t[o].name] = require("" + t[o].file);
 
-var a = n.api.index.substr(0, n.api.index.indexOf("/index.php"));
+var s = n.api.index.substr(0, n.api.index.indexOf("/index.php"));
 
-n.webRoot = a, n.getauth = function(e) {
+n.webRoot = s, n.getauth = function(e) {
     var t = this;
     t.core.showModal({
         title: "是否打开设置页面重新授权",

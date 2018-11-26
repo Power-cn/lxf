@@ -18,10 +18,10 @@ Page({
     },
     onLoad: function(t) {
         getApp().page.onLoad(this, t);
-        var e = this, o = a.formatData(new Date());
+        var e = this, i = a.formatData(new Date());
         getApp().core.removeStorageSync(getApp().const.INPUT_DATA), e.setData({
             options: t,
-            time: o
+            time: i
         });
     },
     bindkeyinput: function(t) {
@@ -40,22 +40,22 @@ Page({
         });
     },
     getOffline: function(t) {
-        var e = this, a = this.data.express_price, o = this.data.express_price_1;
+        var e = this, a = this.data.express_price, i = this.data.express_price_1;
         1 == t.target.dataset.index ? this.setData({
             offline: 1,
             express_price: 0,
             express_price_1: a
         }) : this.setData({
             offline: 0,
-            express_price: o
+            express_price: i
         }), e.getPrice();
     },
     dingwei: function() {
         var a = this;
         getApp().core.chooseLocation({
-            success: function(o) {
-                t = o.longitude, e = o.latitude, a.setData({
-                    location: o.address
+            success: function(i) {
+                t = i.longitude, e = i.latitude, a.setData({
+                    location: i.address
                 });
             },
             fail: function(t) {
@@ -72,40 +72,40 @@ Page({
         });
     },
     orderSubmit: function(t) {
-        var e = this, a = e.data.offline, o = {};
+        var e = this, a = e.data.offline, i = {};
         if (0 == a) {
             if (!e.data.address || !e.data.address.id) return void getApp().core.showToast({
                 title: "请选择收货地址",
                 image: "/images/icon-warning.png"
             });
-            o.address_id = e.data.address.id;
+            i.address_id = e.data.address.id;
         } else {
-            if (o.address_name = e.data.name, o.address_mobile = e.data.mobile, !e.data.shop.id) return void getApp().core.showModal({
+            if (i.address_name = e.data.name, i.address_mobile = e.data.mobile, !e.data.shop.id) return void getApp().core.showModal({
                 title: "警告",
                 content: "请选择门店",
                 showCancel: !1
             });
-            if (o.shop_id = e.data.shop.id, !o.address_name || void 0 == o.address_name) return void e.showToast({
+            if (i.shop_id = e.data.shop.id, !i.address_name || void 0 == i.address_name) return void e.showToast({
                 title: "请填写收货人",
                 image: "/images/icon-warning.png"
             });
-            if (!o.address_mobile || void 0 == o.address_mobile) return void e.showToast({
+            if (!i.address_mobile || void 0 == i.address_mobile) return void e.showToast({
                 title: "请填写联系方式",
                 image: "/images/icon-warning.png"
             });
-            if (!/^\+?\d[\d -]{8,12}\d/.test(o.address_mobile)) return void getApp().core.showModal({
+            if (!/^\+?\d[\d -]{8,12}\d/.test(i.address_mobile)) return void getApp().core.showModal({
                 title: "提示",
                 content: "手机号格式不正确",
                 showCancel: !1
             });
         }
-        if (o.offline = a, -1 == e.data.payment) return e.setData({
+        if (i.offline = a, -1 == e.data.payment) return e.setData({
             show_payment: !0
         }), !1;
-        e.data.cart_id_list && (o.cart_id_list = JSON.stringify(e.data.cart_id_list)), e.data.goods_info && (o.goods_info = JSON.stringify(e.data.goods_info)), 
-        e.data.picker_coupon && (o.user_coupon_id = e.data.picker_coupon.user_coupon_id), 
-        e.data.content && (o.content = e.data.content), 1 == e.data.integral_radio ? o.use_integral = 1 : o.use_integral = 2, 
-        o.payment = e.data.payment, o.formId = t.detail.formId, e.order_submit(o, "ms");
+        e.data.cart_id_list && (i.cart_id_list = JSON.stringify(e.data.cart_id_list)), e.data.goods_info && (i.goods_info = JSON.stringify(e.data.goods_info)), 
+        e.data.picker_coupon && (i.user_coupon_id = e.data.picker_coupon.user_coupon_id), 
+        e.data.content && (i.content = e.data.content), 1 == e.data.integral_radio ? i.use_integral = 1 : i.use_integral = 2, 
+        i.payment = e.data.payment, i.formId = t.detail.formId, e.order_submit(i, "ms");
     },
     onReady: function(t) {
         getApp().page.onReady(this);
@@ -121,15 +121,15 @@ Page({
         e.getOrderData(e.data.options);
     },
     getOrderData: function(a) {
-        var o = this, i = "";
-        o.data.address && o.data.address.id && (i = o.data.address.id), a.goods_info && (getApp().core.showLoading({
+        var i = this, o = "";
+        i.data.address && i.data.address.id && (o = i.data.address.id), a.goods_info && (getApp().core.showLoading({
             title: "正在加载",
             mask: !0
         }), getApp().request({
             url: getApp().api.miaosha.submit_preview,
             data: {
                 goods_info: a.goods_info,
-                address_id: i,
+                address_id: o,
                 longitude: t,
                 latitude: e
             },
@@ -137,24 +137,25 @@ Page({
                 if (getApp().core.hideLoading(), 0 == t.code) {
                     var e = t.data.shop_list, a = {};
                     1 == e.length && (a = e[0]);
-                    var i = getApp().core.getStorageSync(getApp().const.INPUT_DATA);
-                    i || (i = {
+                    var o = getApp().core.getStorageSync(getApp().const.INPUT_DATA);
+                    o || (o = {
                         address: t.data.address,
                         name: t.data.address ? t.data.address.name : "",
                         mobile: t.data.address ? t.data.address.mobile : "",
                         shop: a
-                    }, t.data.pay_type_list.length > 0 && (i.payment = t.data.pay_type_list[0].payment, 
-                    t.data.pay_type_list.length > 1 && (i.payment = -1))), i.total_price = t.data.total_price, 
-                    i.goods_list = t.data.list, i.goods_info = t.data.goods_info, i.express_price = parseFloat(t.data.express_price), 
-                    i.coupon_list = t.data.coupon_list, i.shop_list = t.data.shop_list, i.send_type = t.data.send_type, 
-                    i.level = t.data.level, i.integral = t.data.integral, i.new_total_price = t.data.total_price, 
-                    i.is_payment = t.data.is_payment, i.is_coupon = t.data.list[0].coupon, i.is_discount = t.data.list[0].is_discount, 
-                    i.is_area = t.data.is_area, i.pay_type_list = t.data.pay_type_list, o.setData(i), 
-                    o.getInputData(), 1 == t.data.send_type && o.setData({
+                    }, t.data.pay_type_list.length > 0 && (o.payment = t.data.pay_type_list[0].payment, 
+                    t.data.pay_type_list.length > 1 && (o.payment = -1))), o.total_price = t.data.total_price, 
+                    o.level_price = t.data.level_price, o.is_level = t.data.is_level, o.goods_list = t.data.list, 
+                    o.goods_info = t.data.goods_info, o.express_price = parseFloat(t.data.express_price), 
+                    o.coupon_list = t.data.coupon_list, o.shop_list = t.data.shop_list, o.send_type = t.data.send_type, 
+                    o.level = t.data.level, o.integral = t.data.integral, o.new_total_price = t.data.level_price, 
+                    o.is_payment = t.data.is_payment, o.is_coupon = t.data.list[0].coupon, o.is_discount = t.data.list[0].is_discount, 
+                    o.is_area = t.data.is_area, o.pay_type_list = t.data.pay_type_list, i.setData(o), 
+                    i.getInputData(), 1 == t.data.send_type && i.setData({
                         offline: 0
-                    }), 2 == t.data.send_type && o.setData({
+                    }), 2 == t.data.send_type && i.setData({
                         offline: 1
-                    }), o.getPrice();
+                    }), i.getPrice();
                 }
                 1 == t.code && getApp().core.showModal({
                     title: "提示",
@@ -198,8 +199,8 @@ Page({
     pickCoupon: function(t) {
         var e = this, a = getApp().core.getStorageSync(getApp().const.INPUT_DATA);
         getApp().core.removeStorageSync(getApp().const.INPUT_DATA);
-        var o = t.currentTarget.dataset.index;
-        a.show_coupon_picker = !1, a.picker_coupon = "-1" != o && -1 != o && e.data.coupon_list[o], 
+        var i = t.currentTarget.dataset.index;
+        a.show_coupon_picker = !1, a.picker_coupon = "-1" != i && -1 != i && e.data.coupon_list[i], 
         e.setData(a), e.getPrice();
     },
     numSub: function(t, e, a) {
@@ -212,9 +213,9 @@ Page({
         });
     },
     pickShop: function(t) {
-        var e = this, a = t.currentTarget.dataset.index, o = getApp().core.getStorageSync(getApp().const.INPUT_DATA);
-        getApp().core.removeStorageSync(getApp().const.INPUT_DATA), o.show_shop = !1, o.shop = "-1" != a && -1 != a && e.data.shop_list[a], 
-        e.setData(o), e.getPrice();
+        var e = this, a = t.currentTarget.dataset.index, i = getApp().core.getStorageSync(getApp().const.INPUT_DATA);
+        getApp().core.removeStorageSync(getApp().const.INPUT_DATA), i.show_shop = !1, i.shop = "-1" != a && -1 != a && e.data.shop_list[a], 
+        e.setData(i), e.getPrice();
     },
     integralSwitchChange: function(t) {
         var e = this;
@@ -238,9 +239,10 @@ Page({
         });
     },
     getPrice: function() {
-        var t = this, e = t.data.total_price, a = t.data.express_price, o = t.data.picker_coupon, i = t.data.integral, s = t.data.integral_radio, n = t.data.level, r = t.data.offline;
-        o && (e -= o.sub_price), i && 1 == s && (e -= parseFloat(i.forehead)), n && (e = e * n.discount / 10), 
-        e <= .01 && (e = .01), 0 == r && (e += a), t.setData({
+        var t = this, e = (t.data.total_price, t.data.level_price), a = t.data.express_price, i = t.data.picker_coupon, o = t.data.integral, s = t.data.integral_radio, n = (t.data.level, 
+        t.data.is_level, t.data.offline);
+        i && (e -= i.sub_price), o && 1 == s && (e -= parseFloat(o.forehead)), e <= .01 && (e = .01), 
+        0 == n && (e += a), t.setData({
             new_total_price: e.toFixed(2)
         });
     },
@@ -259,21 +261,21 @@ Page({
         });
     },
     formInput: function(t) {
-        var e = this, a = t.currentTarget.dataset.index, o = e.data.form, i = o.list;
-        i[a].default = t.detail.value, o.list = i, e.setData({
-            form: o
+        var e = this, a = t.currentTarget.dataset.index, i = e.data.form, o = i.list;
+        o[a].default = t.detail.value, i.list = o, e.setData({
+            form: i
         });
     },
     selectForm: function(t) {
-        var e = this, a = t.currentTarget.dataset.index, o = t.currentTarget.dataset.k, i = e.data.form, s = i.list;
+        var e = this, a = t.currentTarget.dataset.index, i = t.currentTarget.dataset.k, o = e.data.form, s = o.list;
         if ("radio" == s[a].type) {
             var n = s[a].default_list;
-            for (var r in n) r == o ? n[o].is_selected = 1 : n[r].is_selected = 0;
+            for (var r in n) r == i ? n[i].is_selected = 1 : n[r].is_selected = 0;
             s[a].default_list = n;
         }
-        "checkbox" == s[a].type && (1 == (n = s[a].default_list)[o].is_selected ? n[o].is_selected = 0 : n[o].is_selected = 1, 
-        s[a].default_list = n), i.list = s, e.setData({
-            form: i
+        "checkbox" == s[a].type && (1 == (n = s[a].default_list)[i].is_selected ? n[i].is_selected = 0 : n[i].is_selected = 1, 
+        s[a].default_list = n), o.list = s, e.setData({
+            form: o
         });
     },
     showPayment: function() {

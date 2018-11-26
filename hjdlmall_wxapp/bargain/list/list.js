@@ -84,7 +84,7 @@ Page({
         });
     },
     onShareAppMessage: function() {
-        return {
+        return getApp().page.onShareAppMessage(this), {
             path: "/bargain/list/list?user_id=" + this.data.__user_info.id,
             success: function(t) {}
         };

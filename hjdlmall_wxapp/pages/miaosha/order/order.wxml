@@ -110,7 +110,7 @@
                             </view>
                             <view class="flex-grow-1 flex-row" wx:if="{{order.is_send==1&&order.is_confirm==0}}">
                                 <view class="flex-grow-0" wx:if="{{order.express}}">
-                                    <navigator class="order-option-btn" url="/pages/express-detail/express-detail?id={{order.order_id}}">物流
+                                    <navigator class="order-option-btn" url="/pages/miaosha/express-detail/express-detail?id={{order.order_id}}">物流
                             </navigator>
                                 </view>
                                 <view class="flex-grow-0">
@@ -119,7 +119,7 @@
                                 </view>
                             </view>
                             <view class="flex-grow-1" wx:if="{{order.is_send==1&&order.is_confirm==1&&order.is_comment==0&&__is_comment}}">
-                                <navigator class="order-option-btn" url="/pages/order-comment/order-comment?id={{order.order_id}}" wx:if="{{__is_comment}}">评价
+                                <navigator class="order-option-btn" url="/pages/miaosha/order-comment/order-comment?id={{order.order_id}}" wx:if="{{__is_comment}}">评价
                         </navigator>
                             </view>
                         </block>

@@ -1,4 +1,4 @@
-var t = require("../../../utils/helper.js"), e = require("../../../wxParse/wxParse.js"), a = require("../../../components/goods/specifications_model.js"), i = require("../../../components/goods/goods_banner.js"), r = require("../../../components/goods/goods_info.js"), o = require("../../../components/goods/goods_buy.js"), n = require("../../../components/quick-navigation/quick-navigation.js");
+var t = require("../../../utils/helper.js"), e = require("../../../wxParse/wxParse.js"), a = require("../../../components/goods/specifications_model.js"), i = require("../../../components/goods/goods_banner.js"), r = require("../../../components/goods/goods_info.js"), o = require("../../../components/goods/goods_buy.js"), s = require("../../../components/quick-navigation/quick-navigation.js");
 
 Page({
     data: {
@@ -24,9 +24,9 @@ Page({
             oid: e.oid ? e.oid : 0,
             group_checked: e.group_id ? e.group_id : 0
         }), this.getGoodsInfo(e);
-        var n = getApp().core.getStorageSync(getApp().const.STORE);
+        var s = getApp().core.getStorageSync(getApp().const.STORE);
         this.setData({
-            store: n
+            store: s
         });
     },
     onReady: function() {
@@ -34,7 +34,7 @@ Page({
     },
     onShow: function() {
         getApp().page.onShow(this), a.init(this), i.init(this), r.init(this), o.init(this), 
-        n.init(this);
+        s.init(this);
     },
     onHide: function() {
         getApp().page.onHide(this);
@@ -132,14 +132,14 @@ Page({
     countDownRun: function(t) {
         var e = this;
         setInterval(function() {
-            var a = new Date(t[0], t[1] - 1, t[2], t[3], t[4], t[5]) - new Date(), i = parseInt(a / 1e3 / 60 / 60 / 24, 10), r = parseInt(a / 1e3 / 60 / 60 % 24, 10), o = parseInt(a / 1e3 / 60 % 60, 10), n = parseInt(a / 1e3 % 60, 10);
-            i = e.checkTime(i), r = e.checkTime(r), o = e.checkTime(o), n = e.checkTime(n), 
+            var a = new Date(t[0], t[1] - 1, t[2], t[3], t[4], t[5]) - new Date(), i = parseInt(a / 1e3 / 60 / 60 / 24, 10), r = parseInt(a / 1e3 / 60 / 60 % 24, 10), o = parseInt(a / 1e3 / 60 % 60, 10), s = parseInt(a / 1e3 % 60, 10);
+            i = e.checkTime(i), r = e.checkTime(r), o = e.checkTime(o), s = e.checkTime(s), 
             e.setData({
                 limit_time: {
                     days: i < 0 ? "00" : i,
                     hours: r < 0 ? "00" : r,
                     mins: o < 0 ? "00" : o,
-                    secs: n < 0 ? "00" : n
+                    secs: s < 0 ? "00" : s
                 }
             });
         }, 1e3);
@@ -179,24 +179,24 @@ Page({
             image: "/images/icon-warning.png"
         }), !0;
         var r = a.data.attr_group_list, o = [];
-        for (var n in r) {
-            var s = !1;
-            for (var d in r[n].attr_list) if (r[n].attr_list[d].checked) {
-                s = {
-                    attr_id: r[n].attr_list[d].attr_id,
-                    attr_name: r[n].attr_list[d].attr_name
+        for (var s in r) {
+            var n = !1;
+            for (var d in r[s].attr_list) if (r[s].attr_list[d].checked) {
+                n = {
+                    attr_id: r[s].attr_list[d].attr_id,
+                    attr_name: r[s].attr_list[d].attr_name
                 };
                 break;
             }
-            if (!s) return getApp().core.showToast({
-                title: "请选择" + r[n].attr_group_name,
+            if (!n) return getApp().core.showToast({
+                title: "请选择" + r[s].attr_group_name,
                 image: "/images/icon-warning.png"
             }), !0;
             o.push({
-                attr_group_id: r[n].attr_group_id,
-                attr_group_name: r[n].attr_group_name,
-                attr_id: s.attr_id,
-                attr_name: s.attr_name
+                attr_group_id: r[s].attr_group_id,
+                attr_group_name: r[s].attr_group_name,
+                attr_id: n.attr_id,
+                attr_name: n.attr_name
             });
         }
         a.setData({
@@ -220,13 +220,13 @@ Page({
         setInterval(function() {
             var e = t.data.group_list;
             for (var a in e) {
-                var i = new Date(e[a].limit_time_ms[0], e[a].limit_time_ms[1] - 1, e[a].limit_time_ms[2], e[a].limit_time_ms[3], e[a].limit_time_ms[4], e[a].limit_time_ms[5]) - new Date(), r = parseInt(i / 1e3 / 60 / 60 / 24, 10), o = parseInt(i / 1e3 / 60 / 60 % 24, 10), n = parseInt(i / 1e3 / 60 % 60, 10), s = parseInt(i / 1e3 % 60, 10);
-                r = t.checkTime(r), o = t.checkTime(o), n = t.checkTime(n), s = t.checkTime(s), 
+                var i = new Date(e[a].limit_time_ms[0], e[a].limit_time_ms[1] - 1, e[a].limit_time_ms[2], e[a].limit_time_ms[3], e[a].limit_time_ms[4], e[a].limit_time_ms[5]) - new Date(), r = parseInt(i / 1e3 / 60 / 60 / 24, 10), o = parseInt(i / 1e3 / 60 / 60 % 24, 10), s = parseInt(i / 1e3 / 60 % 60, 10), n = parseInt(i / 1e3 % 60, 10);
+                r = t.checkTime(r), o = t.checkTime(o), s = t.checkTime(s), n = t.checkTime(n), 
                 e[a].limit_time = {
                     days: r,
                     hours: o > 0 ? o : "00",
-                    mins: n > 0 ? n : "00",
-                    secs: s > 0 ? s : "00"
+                    mins: s > 0 ? s : "00",
+                    secs: n > 0 ? n : "00"
                 }, t.setData({
                     group_list: e
                 });
@@ -249,19 +249,19 @@ Page({
             group_checked: 0,
             attr_group_num: e
         });
-        var r = t.data.attr_group_list, o = [], n = !0;
+        var r = t.data.attr_group_list, o = [], s = !0;
         for (var i in r) {
-            var s = !1;
+            var n = !1;
             for (var d in r[i].attr_list) if (r[i].attr_list[d].checked) {
-                o.push(r[i].attr_list[d].attr_id), s = !0;
+                o.push(r[i].attr_list[d].attr_id), n = !0;
                 break;
             }
-            if (!s) {
-                n = !1;
+            if (!n) {
+                s = !1;
                 break;
             }
         }
-        n && (getApp().core.showLoading({
+        s && (getApp().core.showLoading({
             title: "正在加载",
             mask: !0
         }), getApp().request({
@@ -275,7 +275,7 @@ Page({
                 if (getApp().core.hideLoading(), 0 == e.code) {
                     var a = t.data.goods;
                     a.price = e.data.price, a.num = e.data.num, a.attr_pic = e.data.pic, a.single_price = e.data.single_price ? e.data.single_price : 0, 
-                    a.group_price = e.data.price, t.setData({
+                    a.group_price = e.data.price, a.is_member_price = e.data.is_member_price, t.setData({
                         goods: a
                     });
                 }
@@ -289,11 +289,11 @@ Page({
             attr_group_num: i,
             group_checked: a
         });
-        var n = e.data.attr_group_list, s = [], d = !0;
-        for (var o in n) {
+        var s = e.data.attr_group_list, n = [], d = !0;
+        for (var o in s) {
             var p = !1;
-            for (var g in n[o].attr_list) if (n[o].attr_list[g].checked) {
-                s.push(n[o].attr_list[g].attr_id), p = !0;
+            for (var g in s[o].attr_list) if (s[o].attr_list[g].checked) {
+                n.push(s[o].attr_list[g].attr_id), p = !0;
                 break;
             }
             if (!p) {
@@ -309,13 +309,13 @@ Page({
             data: {
                 goods_id: e.data.goods.id,
                 group_id: e.data.group_checked,
-                attr_list: JSON.stringify(s)
+                attr_list: JSON.stringify(n)
             },
             success: function(t) {
                 if (getApp().core.hideLoading(), 0 == t.code) {
                     var a = e.data.goods;
                     a.price = t.data.price, a.num = t.data.num, a.attr_pic = t.data.pic, a.single_price = t.data.single_price ? t.data.single_price : 0, 
-                    a.group_price = t.data.price, e.setData({
+                    a.group_price = t.data.price, a.is_member_price = t.data.is_member_price, e.setData({
                         goods: a
                     });
                 }

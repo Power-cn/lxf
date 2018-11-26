@@ -65,7 +65,7 @@ Page({
         getApp().page.onShareAppMessage(this);
         var t = this;
         return {
-            path: "/mch/shop/shop?user_id=" + getApp().getUser().id + "mch_id=" + t.data.mch_id,
+            path: "/mch/shop/shop?user_id=" + getApp().getUser().id + "&mch_id=" + t.data.mch_id,
             title: t.data.shop ? t.data.shop.name : "商城首页"
         };
     },

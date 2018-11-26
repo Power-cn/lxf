@@ -1,4 +1,4 @@
-var t = require("../../wxParse/wxParse.js"), e = require("../../components/shopping_cart/shopping_cart.js"), o = require("../../components/specifications_model/specifications_model.js"), a = require("../../components/goods/specifications_model.js"), i = require("../../components/goods/goods_banner.js"), s = require("../../components/goods/goods_info.js"), n = require("../../components/goods/goods_buy.js"), d = require("../../components/goods/goods_recommend.js"), r = require("../../components/quick-navigation/quick-navigation.js"), c = 1, p = !1, g = !0, u = 0;
+var t = require("../../wxParse/wxParse.js"), e = require("../../components/shopping_cart/shopping_cart.js"), o = require("../../components/specifications_model/specifications_model.js"), a = require("../../components/goods/specifications_model.js"), i = require("../../components/goods/goods_banner.js"), s = require("../../components/goods/goods_info.js"), n = require("../../components/goods/goods_buy.js"), d = require("../../components/goods/goods_recommend.js"), c = require("../../components/quick-navigation/quick-navigation.js"), r = 1, p = !1, g = !0, u = 0;
 
 Page({
     data: {
@@ -37,7 +37,7 @@ Page({
     onLoad: function(t) {
         getApp().page.onLoad(this, t);
         var e = this;
-        u = 0, c = 1, p = !1, g = !0;
+        u = 0, r = 1, p = !1, g = !0;
         var o = t.quick;
         if (o) {
             var a = getApp().core.getStorageSync(getApp().const.ITEM);
@@ -60,8 +60,8 @@ Page({
                 d.uid && d.gid && (t.id = d.gid);
             }
         } else if (null !== getApp().query) {
-            var r = app.query;
-            getApp().query = null, t.id = r.gid;
+            var c = app.query;
+            getApp().query = null, t.id = c.gid;
         }
         e.setData({
             id: t.id
@@ -72,9 +72,9 @@ Page({
     },
     onShow: function() {
         getApp().page.onShow(this), e.init(this), o.init(this, e), a.init(this), i.init(this), 
-        s.init(this), n.init(this), d.init(this), r.init(this);
-        var t = this, c = getApp().core.getStorageSync(getApp().const.ITEM);
-        if (c) var p = c.total, g = c.carGoods, u = t.data.goods_num; else var p = {
+        s.init(this), n.init(this), d.init(this), c.init(this);
+        var t = this, r = getApp().core.getStorageSync(getApp().const.ITEM);
+        if (r) var p = r.total, g = r.carGoods, u = t.data.goods_num; else var p = {
             total_price: 0,
             total_num: 0
         }, g = [], u = 0;
@@ -110,7 +110,7 @@ Page({
                 1 == ++u && t.shareSendCoupon(t);
             },
             title: t.data.goods.name,
-            imageUrl: t.data.goods.pic_list[0].pic_url
+            imageUrl: t.data.goods.pic_list[0]
         };
     },
     play: function(t) {
@@ -185,25 +185,16 @@ Page({
             }
         });
     },
-    selectDefaultAttr: function() {
-        var t = this;
-        if (t.data.goods && 0 === t.data.goods.use_attr) {
-            for (var e in t.data.attr_group_list) for (var o in t.data.attr_group_list[e].attr_list) 0 == e && 0 == o && (t.data.attr_group_list[e].attr_list[o].checked = !0);
-            t.setData({
-                attr_group_list: t.data.attr_group_list
-            });
-        }
-    },
     getCommentList: function(t) {
         var e = this;
         t && "active" != e.data.tab_comment || p || g && (p = !0, getApp().request({
             url: getApp().api.default.comment_list,
             data: {
                 goods_id: e.data.id,
-                page: c
+                page: r
             },
             success: function(o) {
-                0 == o.code && (p = !1, c++, e.setData({
+                0 == o.code && (p = !1, r++, e.setData({
                     comment_count: o.data.comment_count,
                     comment_list: t ? e.data.comment_list.concat(o.data.list) : o.data.list
                 }), 0 == o.data.list.length && (g = !1));

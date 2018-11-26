@@ -56,7 +56,7 @@ Page({
         return {
             title: e.data.goods.name,
             path: "/pages/book/details/details?id=" + e.data.goods.id + "&user_id=" + a.id,
-            imageUrl: e.data.goods.cover_pic,
+            imageUrl: e.data.goods.pic_list[0],
             success: function(t) {}
         };
     },
@@ -107,15 +107,6 @@ Page({
                 getApp().core.hideLoading();
             }
         });
-    },
-    selectDefaultAttr: function() {
-        var t = this;
-        if (t.data.goods && 0 == t.data.goods.use_attr) {
-            for (var e in t.data.attr_group_list) for (var a in t.data.attr_group_list[e].attr_list) 0 == e && 0 == a && (t.data.attr_group_list[e].attr_list[a].checked = !0);
-            t.setData({
-                attr_group_list: t.data.attr_group_list
-            });
-        }
     },
     tabSwitch: function(t) {
         var e = this;

@@ -90,8 +90,8 @@ module.exports = {
             s -= 55), r.show_customer_service && 1 == r.show_customer_service && r.service && (a.translateY(s).opacity(1).step(), 
             s -= 55), r.option && r.option.web_service && (i.translateY(s).opacity(1).step(), 
             s -= 55), 1 == r.dial && r.dial_pic && (o.translateY(s).opacity(1).step(), s -= 55), 
-            r.option && r.option.quick_map && (p.translateY(s).opacity(1).step(), s -= 55), 
-            e.translateY(s).opacity(1).step()) : (e.opacity(0).step(), i.opacity(0).step(), 
+            r.option && 1 == r.option.quick_map.status && (p.translateY(s).opacity(1).step(), 
+            s -= 55), e.translateY(s).opacity(1).step()) : (e.opacity(0).step(), i.opacity(0).step(), 
             o.opacity(0).step(), a.opacity(0).step(), n.opacity(0).step(), p.opacity(0).step()), 
             t.setData({
                 animationPlus: e.export(),

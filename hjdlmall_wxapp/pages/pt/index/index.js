@@ -29,18 +29,26 @@ Page({
                 url: getApp().api.group.index,
                 method: "get",
                 success: function(a) {
-                    o.switchNav({
+                    if (o.switchNav({
                         currentTarget: {
                             dataset: {
                                 id: t.cid
                             }
                         }
-                    }), 0 == a.code && o.setData({
-                        banner: a.data.banner,
-                        ad: a.data.ad,
-                        page: a.data.goods.page,
-                        page_count: a.data.goods.page_count
-                    });
+                    }), 0 == a.code) {
+                        var e = {
+                            data: {
+                                pic_list: a.data.ad
+                            }
+                        };
+                        o.setData({
+                            banner: a.data.banner,
+                            ad: a.data.ad,
+                            page: a.data.goods.page,
+                            page_count: a.data.goods.page_count,
+                            block: e
+                        });
+                    }
                 }
             });
         }
@@ -76,9 +84,6 @@ Page({
             show_loading_bar: 0
         });
     },
-    onShareAppMessage: function(a) {
-        getApp().page.onShareAppMessage(this);
-    },
     loadIndexInfo: function(a) {
         var t = a;
         getApp().core.showLoading({
@@ -91,16 +96,25 @@ Page({
                 page: t.data.page
             },
             success: function(a) {
-                0 == a.code && (getApp().core.hideLoading(), t.setData({
-                    cat: a.data.cat,
-                    banner: a.data.banner,
-                    ad: a.data.ad,
-                    goods: a.data.goods.list,
-                    page: a.data.goods.page,
-                    page_count: a.data.goods.page_count
-                }), a.data.goods.row_count <= 0 && t.setData({
-                    emptyGoods: 1
-                }));
+                if (0 == a.code) {
+                    getApp().core.hideLoading();
+                    var e = {
+                        data: {
+                            pic_list: a.data.ad
+                        }
+                    };
+                    t.setData({
+                        cat: a.data.cat,
+                        banner: a.data.banner,
+                        ad: a.data.ad,
+                        goods: a.data.goods.list,
+                        page: a.data.goods.page,
+                        page_count: a.data.goods.page_count,
+                        block: e
+                    }), a.data.goods.row_count <= 0 && t.setData({
+                        emptyGoods: 1
+                    });
+                }
             }
         });
     },
@@ -137,14 +151,14 @@ Page({
         if (t.setData({
             cid: e
         }), "undefined" == typeof my) {
-            var o = this.systemInfo.windowWidth, p = a.currentTarget.offsetLeft, d = this.data.scrollLeft;
-            d = p > o / 2 ? p : 0, t.setData({
-                scrollLeft: d
+            var o = this.systemInfo.windowWidth, d = a.currentTarget.offsetLeft, p = this.data.scrollLeft;
+            p = d > o / 2 ? d : 0, t.setData({
+                scrollLeft: p
             });
         } else {
-            for (var n = t.data.cat, s = !0, g = 0; g < n.length; ++g) if (n[g].id === a.currentTarget.id) {
-                s = !1, g >= 1 ? t.setData({
-                    toView: n[g - 1].id
+            for (var n = t.data.cat, s = !0, i = 0; i < n.length; ++i) if (n[i].id === a.currentTarget.id) {
+                s = !1, i >= 1 ? t.setData({
+                    toView: n[i - 1].id
                 }) : t.setData({
                     toView: "0"
                 });
@@ -219,7 +233,7 @@ Page({
         var t = a.currentTarget.dataset.open_type, e = a.currentTarget.dataset.url;
         return "wxapp" != t || (e = function(a) {
             var t = /([^&=]+)=([\w\W]*?)(&|$|#)/g, e = /^[^\?]+\?([\w\W]+)$/.exec(a), o = {};
-            if (e && e[1]) for (var p, d = e[1]; null != (p = t.exec(d)); ) o[p[1]] = p[2];
+            if (e && e[1]) for (var d, p = e[1]; null != (d = t.exec(p)); ) o[d[1]] = d[2];
             return o;
         }(e), e.path = e.path ? decodeURIComponent(e.path) : "", getApp().core.navigateToMiniProgram({
             appId: e.appId,

@@ -29,14 +29,14 @@ Page({
         getApp().page.onShareAppMessage(this);
     },
     checkboxChange: function(t) {
-        var e = this, a = t.target.dataset.pid, o = t.target.dataset.id, s = e.data.form_list, i = s[a].default[o].selected;
-        s[a].default[o].selected = 1 != i, e.setData({
-            form_list: s
+        var e = this, a = t.target.dataset.pid, o = t.target.dataset.id, i = e.data.form_list, s = i[a].default[o].selected;
+        i[a].default[o].selected = 1 != s, e.setData({
+            form_list: i
         });
     },
     radioChange: function(t) {
         var e = this, a = t.target.dataset.pid, o = e.data.form_list;
-        for (var s in o[a].default) t.target.dataset.id == s ? o[a].default[s].selected = !0 : o[a].default[s].selected = !1;
+        for (var i in o[a].default) t.target.dataset.id == i ? o[a].default[i].selected = !0 : o[a].default[i].selected = !1;
         e.setData({
             form_list: o
         });
@@ -52,25 +52,25 @@ Page({
         a.setData({
             attr: o.attr
         });
-        var s = o.id;
+        var i = o.id;
         getApp().core.showLoading({
             title: "正在加载",
             mask: !0
         });
-        var i = JSON.stringify(o.attr);
+        var s = JSON.stringify(o.attr);
         getApp().request({
             url: getApp().api.book.submit_preview,
             method: "get",
             data: {
-                gid: s,
-                attr: i
+                gid: i,
+                attr: s
             },
             success: function(e) {
                 if (0 == e.code) {
                     for (var o in e.data.form_list) "date" == e.data.form_list[o].type && (e.data.form_list[o].default = e.data.form_list[o].default ? e.data.form_list[o].default : t.formatData(new Date())), 
                     "time" == e.data.form_list[o].type && (e.data.form_list[o].default = e.data.form_list[o].default ? e.data.form_list[o].default : "00:00");
-                    var s = e.data.option;
-                    s ? (1 == s.balance && (a.setData({
+                    var i = e.data.option;
+                    i ? (1 == i.balance && (a.setData({
                         balance: !0,
                         pay_type: "BALANCE_PAY"
                     }), getApp().request({
@@ -78,7 +78,7 @@ Page({
                         success: function(t) {
                             0 == t.code && getApp().core.setStorageSync(getApp().const.USER_INFO, t.data.user_info);
                         }
-                    })), 1 == s.wechat && a.setData({
+                    })), 1 == i.wechat && a.setData({
                         wechat: !0,
                         pay_type: "WECHAT_PAY"
                     })) : a.setData({
@@ -86,7 +86,8 @@ Page({
                         pay_type: "WECHAT_PAY"
                     }), a.setData({
                         goods: e.data.goods,
-                        form_list: e.data.form_list
+                        form_list: e.data.form_list,
+                        level_price: e.data.level_price
                     });
                 } else getApp().core.showModal({
                     title: "提示",
@@ -123,7 +124,7 @@ Page({
         } else e.submit(t);
     },
     submit: function(t) {
-        var e = t.detail.formId, a = this, o = a.data.goods.id, s = JSON.stringify(a.data.attr), i = JSON.stringify(a.data.form_list), r = a.data.pay_type;
+        var e = t.detail.formId, a = this, o = a.data.goods.id, i = JSON.stringify(a.data.attr), s = JSON.stringify(a.data.form_list), r = a.data.pay_type;
         getApp().core.showLoading({
             title: "正在提交",
             mask: !0
@@ -132,10 +133,10 @@ Page({
             method: "post",
             data: {
                 gid: o,
-                form_list: i,
+                form_list: s,
                 form_id: e,
                 pay_type: r,
-                attr: s
+                attr: i
             },
             success: function(t) {
                 if (0 == t.code) {

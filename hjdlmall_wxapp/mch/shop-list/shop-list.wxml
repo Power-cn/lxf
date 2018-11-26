@@ -44,12 +44,12 @@
                     </view>
                 </view>
                 <view class="goods-list">
-                    <block wx:if="{{item.goods_list&&item.goods_list.length}}">
+                    <scroll-view scrollX style="width:100%;white-space: nowrap;" wx:if="{{item.goods_list&&item.goods_list.length}}">
                         <navigator class="goods-item" url="/pages/goods/goods?id={{item.id}}" wx:for="{{item.goods_list}}" wx:key="{{item.id}}">
                             <image src="{{item.cover_pic}}" style="width: 220rpx;height: 220rpx;"></image>
                             <view>￥{{item.price}}</view>
                         </navigator>
-                    </block>
+                    </scroll-view>
                     <view style="padding: 24rpx;color: #888;font-size: 9pt;text-align: center;" wx:else>暂无商品</view>
                 </view>
             </view>

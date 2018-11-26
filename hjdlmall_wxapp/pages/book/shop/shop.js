@@ -192,6 +192,5 @@ Page({
             path: a.path,
             complete: function(t) {}
         }), !1);
-    },
-    onShareAppMessage: function(t) {}
+    }
 });

@@ -55,7 +55,7 @@ Page({
             url: getApp().api.order.list,
             data: {
                 status: o.data.status,
-                self: a
+                page: a
             },
             success: function(e) {
                 if (0 == e.code) {

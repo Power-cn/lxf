@@ -1,21 +1,7 @@
 <view class="page">
     <include src="/components/common/common"></include>
     <include src="/components/header/header"></include>
-    <view class="body after-navber">
-        <view class="bottom-bar flex-row" wx:if="{{is_area==1}}">
-            <view class="is_area">所选地区自营商品暂时无货</view>
-        </view>
-        <form bindsubmit="orderSubmit" reportSubmit="true" wx:else>
-            <view class="bottom-bar flex-row">
-                <view class="flex-y-center flex-grow-1" style="padding: 0 24rpx">
-                    <view class="flex-grow-1" style="color:#ff4544 ">
-                            总计：￥{{new_total_price}}
-                        </view>
-                </view>
-                <view class="flex-y-center flex-grow-0 flex-x-center submit-btn" style="background-color:#ccc;" wx:if="{{offer_rule&&offer_rule.is_allowed==1}}">{{offer_rule.msg}}</view>
-                <button class="flex-y-center flex-grow-0 flex-x-center submit-btn" formType="submit" wx:else>提交</button>
-            </view>
-        </form>
+    <view class="body after-navber" wx:if="{{mch_list}}">
         <view class="{{show_card?'no-scroll':''}} {{show_shop||show_coupon_picker||show_card?'hidden':''}}" style="padding-bottom: 129rpx;">
             <view class="block" wx:if="{{mch_offline}}">
                 <view bindtap="goToAddress" class="address-picker flex-row" hoverClass="none">
@@ -275,6 +261,26 @@
                 </view>
             </view>
         </view>
+        <cover-view class="bottom-bar flex-row" wx:if="{{is_area==1}}">
+            <cover-view class="is_area">
+                <cover-view>所选地区自营商品暂时无货</cover-view>
+            </cover-view>
+        </cover-view>
+        <form bindsubmit="orderSubmit" reportSubmit="true" wx:else>
+            <cover-view class="bottom-bar flex-row">
+                <cover-view class="flex-y-center flex-grow-1" style="padding: 0 24rpx">
+                    <cover-view class="flex-grow-1" style="color:#ff4544 ">
+                            总计：￥{{new_total_price}}
+                        </cover-view>
+                </cover-view>
+                <cover-view class="flex-y-center flex-grow-0 flex-x-center submit-btn" style="background-color:#ccc;" wx:if="{{offer_rule&&offer_rule.is_allowed==1}}">
+                    <cover-view style="white-space:normal;">{{offer_rule.msg}}</cover-view>
+                </cover-view>
+                <cover-view class="" style="background-color:#FF4544" wx:else>
+                    <button class="flex-y-center flex-grow-0 flex-x-center submit-btn" formType="submit">提交</button>
+                </cover-view>
+            </cover-view>
+        </form>
         <include src="/components/get-card/get-card.wxml"></include>
     </view>
     <include src="/components/footer/footer"></include>

@@ -116,7 +116,7 @@ Page({
             break;
         }
         t.setData({
-            top_bar_scroll: 64 * (a - 2)
+            top_bar_scroll: a >= 2 ? a - 2 : 0
         });
     },
     topBarItemClick: function(t) {
@@ -178,8 +178,5 @@ Page({
         getApp().page.onReachBottom(this);
         var a = this;
         -1 != a.data.page && a.loadGoodsList(!0);
-    },
-    onShareAppMessage: function(t) {
-        getApp().page.onShareAppMessage(this);
     }
 });

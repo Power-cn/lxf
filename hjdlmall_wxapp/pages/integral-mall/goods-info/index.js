@@ -37,7 +37,7 @@ Page({
                     a.setData({
                         goods: e.data.goods,
                         attr_group_list: e.data.attr_group_list
-                    });
+                    }), a.selectDefaultAttr();
                 } else getApp().core.showModal({
                     title: "提示",
                     content: e.msg,

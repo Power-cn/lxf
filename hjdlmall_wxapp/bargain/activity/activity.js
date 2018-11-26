@@ -1,4 +1,4 @@
-var t = require("../commons/time.js"), a = (getApp(), getApp().api, null), i = !1, e = !0;
+var t = require("../commons/time.js"), a = (getApp(), getApp().api, null), e = !1, i = !0;
 
 Page({
     data: {
@@ -12,10 +12,10 @@ Page({
     },
     onLoad: function(a) {
         getApp().page.onLoad(this, a);
-        var i = this;
-        i.setData({
+        var e = this;
+        e.setData({
             order_id: a.order_id
-        }), i.joinBargain(), t.init(i);
+        }), e.joinBargain(), t.init(e);
     },
     joinBargain: function() {
         var t = this;
@@ -45,7 +45,7 @@ Page({
                     show: !0
                 }), t.data.bargain_status && t.setData({
                     show_modal: !0
-                }), t.setTimeOver(), e = !1, t.animationCr()) : t.showToast({
+                }), t.setTimeOver(), i = !1, t.animationCr()) : t.showToast({
                     title: a.msg
                 });
             },
@@ -67,6 +67,7 @@ Page({
         getApp().page.onUnload(this), clearInterval(a), a = null;
     },
     onShareAppMessage: function() {
+        getApp().page.onShareAppMessage(this);
         var t = this;
         return {
             path: "/bargain/activity/activity?order_id=" + t.data.order_id + "&user_id=" + t.data.__user_info.id,
@@ -77,8 +78,8 @@ Page({
         var t = this;
         if (getApp().core.showLoading({
             title: "加载中"
-        }), !i) {
-            i = !0, getApp().core.showNavigationBarLoading();
+        }), !e) {
+            e = !0, getApp().core.showNavigationBarLoading();
             var a = t.data.p + 1;
             getApp().request({
                 url: getApp().api.bargain.activity,
@@ -86,29 +87,29 @@ Page({
                     order_id: t.data.order_id,
                     page: a
                 },
-                success: function(i) {
-                    if (0 == i.code) {
+                success: function(e) {
+                    if (0 == e.code) {
                         var o = t.data.bargain_info;
-                        o = o.concat(i.data.bargain_info), t.setData(i.data), t.setData({
+                        o = o.concat(e.data.bargain_info), t.setData(e.data), t.setData({
                             bargain_info: o,
                             p: a
-                        }), 0 == i.data.bargain_info.length && (e = !0, t.setData({
+                        }), 0 == e.data.bargain_info.length && (i = !0, t.setData({
                             show_more_btn: !1,
                             show_more: !0
                         }));
                     } else t.showToast({
-                        title: i.msg
+                        title: e.msg
                     });
                 },
                 complete: function(t) {
-                    getApp().core.hideLoading(), getApp().core.hideNavigationBarLoading(), i = !1;
+                    getApp().core.hideLoading(), getApp().core.hideNavigationBarLoading(), e = !1;
                 }
             });
         }
     },
     showMore: function(t) {
         var a = this;
-        a.data.show_more_btn && (e = !1), e || a.loadData();
+        a.data.show_more_btn && (i = !1), i || a.loadData();
     },
     hideMore: function() {
         this.setData({
@@ -130,12 +131,12 @@ Page({
         });
     },
     buyNow: function() {
-        var t = this, a = [], i = [];
-        i.push({
+        var t = this, a = [], e = [];
+        e.push({
             bargain_order_id: t.data.order_id
         }), a.push({
             mch_id: 0,
-            goods_list: i
+            goods_list: e
         }), getApp().core.showModal({
             title: "提示",
             content: "是否确认购买？",
@@ -163,11 +164,11 @@ Page({
         var t = getApp().core.createAnimation({
             duration: 500,
             transformOrigin: "50% 50%"
-        }), a = this, i = 0;
+        }), a = this, e = 0;
         setInterval(function() {
-            i % 2 == 0 ? t.scale(.9).step() : t.scale(1).step(), a.setData({
+            e % 2 == 0 ? t.scale(.9).step() : t.scale(1).step(), a.setData({
                 animationData: t.export()
-            }), 500 == ++i && (i = 0);
+            }), 500 == ++e && (e = 0);
         }, 500);
     },
     animationS: function() {

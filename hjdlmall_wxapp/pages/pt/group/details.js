@@ -38,6 +38,7 @@ Page((e = {
     onPullDownRefresh: function() {},
     onReachBottom: function() {},
     onShareAppMessage: function(t) {
+        getApp().page.onShareAppMessage(this);
         var e = this, o = getApp().core.getStorageSync(getApp().const.USER_INFO), a = "/pages/pt/group/details?oid=" + e.data.oid + "&user_id=" + o.id;
         return {
             title: "快来" + e.data.goods.price + "元拼  " + e.data.goods.name,

@@ -51,6 +51,12 @@
                     <view>新品上架</view>
                 </view>
             </navigator>
+            <navigator class="tab-item flex-grow-1 flex-y-center flex-x-center {{tab==4?'active':''}}" openType="redirect" url="/mch/shop-summary/shop-summary?mch_id={{mch_id}}">
+                <view>
+                    <image src="/mch/images/icon-summary.png"></image>
+                    <view>店铺简介</view>
+                </view>
+            </navigator>
         </view>
         <block wx:if="{{tab==1}}">
             <scroll-view class="shop-coupon-list" scrollX="true" wx:if="{{coupon_list&&coupon_list.length}}">

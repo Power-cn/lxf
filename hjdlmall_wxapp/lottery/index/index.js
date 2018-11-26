@@ -1,4 +1,4 @@
-var t = !1, a = !0, o = require("../../components/quick-navigation/quick-navigation.js");
+var t = !1, e = !0, a = !1, i = require("../../components/quick-navigation/quick-navigation.js");
 
 Page({
     data: {
@@ -6,58 +6,100 @@ Page({
         naver: "index"
     },
     onLoad: function(t) {
-        getApp().page.onLoad(this, t), o.init(this);
+        getApp().page.onLoad(this, t), i.init(this);
     },
     onShow: function() {
         getApp().page.onShow(this), getApp().core.showLoading({
             title: "加载中"
         });
         var t = this;
-        getApp().request({
+        t.data.p = 1, getApp().request({
             url: getApp().api.lottery.index,
-            success: function(o) {
-                0 == o.code && (t.setData(o.data), null != o.data.goods_list && o.data.goods_list.length > 0 && (a = !1));
+            success: function(a) {
+                if (0 == a.code) {
+                    t.setData(a.data), null != a.data.new_list && a.data.new_list.length > 0 && (e = !1);
+                    var i = [];
+                    a.data.new_list.forEach(function(t, e, a) {
+                        i.push(t.end_time);
+                    }), t.setTimeStart(i);
+                }
             },
             complete: function(t) {
                 getApp().core.hideLoading();
             }
+        }), getApp().request({
+            url: getApp().api.lottery.setting,
+            success: function(t) {
+                if (0 == t.code) {
+                    var e = t.data.title;
+                    e && getApp().core.setNavigationBarTitle({
+                        title: e
+                    });
+                }
+            }
         });
     },
+    onHide: function() {
+        getApp().page.onHide(this), clearInterval(a);
+    },
+    onUnload: function() {
+        getApp().page.onUnload(this), clearInterval(a);
+    },
+    setTimeStart: function(t) {
+        var e = this, i = [];
+        clearInterval(a), a = setInterval(function() {
+            t.forEach(function(t, e, a) {
+                var n = new Date(), o = parseInt(t - n.getTime() / 1e3);
+                if (o > 0) var r = Math.floor(o / 86400), s = Math.floor(o / 3600) - 24 * r, l = Math.floor(o / 60) - 24 * r * 60 - 60 * s, p = Math.floor(o) - 24 * r * 60 * 60 - 60 * s * 60 - 60 * l;
+                var c = {
+                    day: r,
+                    hour: s,
+                    minute: l,
+                    second: p
+                };
+                i[e] = c;
+            }), e.setData({
+                time_list: i
+            });
+        }, 1e3);
+    },
     submit: function(t) {
-        var a = t.detail.formId, o = t.currentTarget.dataset.lottery_id;
+        var e = t.detail.formId, a = t.currentTarget.dataset.lottery_id;
         getApp().core.navigateTo({
-            url: "/lottery/detail/detail?lottery_id=" + o + "&form_id=" + a
+            url: "/lottery/detail/detail?lottery_id=" + a + "&form_id=" + e
         });
     },
     onReachBottom: function() {
-        a || this.loadData();
+        e || this.loadData();
     },
     loadData: function() {
         if (!t) {
             t = !0, getApp().core.showLoading({
                 title: "加载中"
             });
-            var o = this, e = o.data.p + 1;
+            var a = this, i = a.data.p + 1;
             getApp().request({
                 url: getApp().api.lottery.index,
                 data: {
-                    page: e
+                    page: i
                 },
                 success: function(t) {
                     if (0 == t.code) {
-                        var i = o.data.goods_list, s = o.data.list;
-                        if (null == t.data.goods_list || 0 == t.data.goods_list.length) return void (a = !0);
-                        s.num = s.num.concat(t.data.list.num), s.status = s.status.concat(t.data.list.status), 
-                        i = i.concat(t.data.goods_list), o.setData({
-                            goods_list: i,
-                            list: s,
-                            p: e
+                        var n = a.data.new_list;
+                        if (null == t.data.new_list || 0 == t.data.new_list.length) return void (e = !0);
+                        n = n.concat(t.data.new_list), a.setData({
+                            new_list: n,
+                            p: i
                         });
-                    } else o.showToast({
+                        var o = [];
+                        n.forEach(function(t, e, a) {
+                            o.push(t.end_time);
+                        }), a.setTimeStart(o);
+                    } else a.showToast({
                         title: t.msg
                     });
                 },
-                complete: function(a) {
+                complete: function(e) {
                     getApp().core.hideLoading(), t = !1;
                 }
             });

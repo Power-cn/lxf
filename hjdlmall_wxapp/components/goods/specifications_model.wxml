@@ -18,12 +18,18 @@
                             <block wx:if="{{goods.price>0}}">+￥{{goods.price}}</block>
                     </block>
                 </view>
-                <view style="color:#ff4544;margin-bottom: 12rpx;font-weight: bold" wx:else>￥{{goods.price}} 
-                    <text class="is_member_price" wx:if="{{goods.is_member_price}}">会员价</text>
-                </view>
-                <view style="font-size:9pt">
-                    库存{{goods.num}}
-                </view>
+                <block wx:else>
+                    <view style="color:#ff4544;margin-bottom: 12rpx;font-weight: bold" wx:if="{{pageType==='PINTUAN'}}">
+                            ￥{{groupNum?goods.group_price:goods.single_price}}
+                            <text class="is_member_price" wx:if="{{goods.is_member_price===true&&groupNum===true}}">会员价</text>
+                    </view>
+                    <view style="color:#ff4544;margin-bottom: 12rpx;font-weight: bold" wx:else>￥{{goods.price}}
+                            <text class="is_member_price" wx:if="{{goods.is_member_price===true}}">会员价</text>
+                    </view>
+                    <view style="font-size:9pt">
+                        库存{{goods.num}}
+                    </view>
+                </block>
             </view>
             <view class="flex-grow-0">
                 <view bindtap="hideAttrPicker" class="flex-x-center flex-y-center" style="width: 100rpx;height: 100rpx">

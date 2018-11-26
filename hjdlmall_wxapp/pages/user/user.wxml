@@ -162,7 +162,7 @@
                         </view>
                     </view>
                 </view>
-                <view class="option-list" wx:if="{{style.menu==0}}">
+                <view class="option-list" wx:if="{{style.menu==0&&wallet.is_menu==1}}">
                     <block wx:for="{{menus}}" wx:key="{{item.id}}">
                         <block wx:if="{{item.open_type=='navigator'}}">
                             <block wx:if="{{item.id=='fenxiao'}}">
@@ -203,19 +203,23 @@
                                     </view>
                                 </block>
                             </block>
-                            <navigator class="option-item" url="{{item.url}}" wx:else>
-                                <view class="flex-row option-content">
-                                    <view class="flex-grow-1 flex-row">
-                                        <view class="flex-grow-0 flex-y-center">
-                                            <image class="option-icon" src="{{item.icon}}"></image>
+                            <form bindsubmit="_formIdSubmit" data-bind="myBtnClick" data-type="navigate" data-url="{{item.url}}" reportSubmit="true" wx:else>
+                                <button formType="submit" id="_formIdSubmit">
+                                    <view class="option-item">
+                                        <view class="flex-row option-content">
+                                            <view class="flex-grow-1 flex-row">
+                                                <view class="flex-grow-0 flex-y-center">
+                                                    <image class="option-icon" src="{{item.icon}}"></image>
+                                                </view>
+                                                <view class="flex-grow-1 flex-y-center">{{item.name}}</view>
+                                            </view>
+                                            <view class="flex-grow-0 flex-y-center">
+                                                <image class="option-jisntou" src="{{__wxapp_img.store.jiantou_r.url}}"></image>
+                                            </view>
                                         </view>
-                                        <view class="flex-grow-1 flex-y-center">{{item.name}}</view>
                                     </view>
-                                    <view class="flex-grow-0 flex-y-center">
-                                        <image class="option-jisntou" src="{{__wxapp_img.store.jiantou_r.url}}"></image>
-                                    </view>
-                                </view>
-                            </navigator>
+                                </button>
+                            </form>
                         </block>
                         <view bindtap="callTel" class="option-item" data-tel="{{item.tel}}" wx:elif="{{item.open_type=='tel'}}">
                             <view class="flex-row option-content">
@@ -231,7 +235,7 @@
                             </view>
                         </view>
                         <block wx:elif="{{item.open_type=='contact'}}">
-                            <button class="option-item" openType="contact" plain="true" sessionFrom='{{__user_info.nickname}}|' wx:if="{{__platform=='wx'}}">
+                            <button class="option-item" openType="contact" plain="true" sessionFrom="{{__user_info.nickname}}|" wx:if="{{__platform=='wx'}}">
                                 <view class="flex-row option-content">
                                     <view class="flex-grow-1 flex-row">
                                         <view class="flex-grow-0 flex-y-center">
@@ -262,7 +266,7 @@
                         </block>
                     </block>
                 </view>
-                <view class="options-list" style="background-color: #fff;" wx:if="{{style.menu==1}}">
+                <view class="options-list" style="background-color: #fff;" wx:if="{{style.menu==1&&wallet.is_menu==1}}">
                     <view class="flex-row" style="flex-wrap: wrap">
                         <block wx:for="{{menus}}" wx:key="{{item.id}}">
                             <block wx:if="{{item.open_type=='navigator'}}">
@@ -292,14 +296,18 @@
                                         </navigator>
                                     </block>
                                 </block>
-                                <navigator class="option-item flex-grow-0 style" url="{{item.url}}" wx:else>
-                                    <view>
-                                        <view class="flex-x-center">
-                                            <image class="option-icon" src="{{item.icon}}"></image>
+                                <form bindsubmit="_formIdSubmit" data-bind="myBtnClick" data-type="navigate" data-url="{{item.url}}" reportSubmit="true" style="width:25%;" wx:else>
+                                    <button formType="submit" id="_formIdSubmit" style="width:100%;">
+                                        <view class="option-item flex-grow-0 style" style="width:100%;">
+                                            <view>
+                                                <view class="flex-x-center">
+                                                    <image class="option-icon" src="{{item.icon}}"></image>
+                                                </view>
+                                                <view class="text-more-2" style="text-align: center">{{item.name}}</view>
+                                            </view>
                                         </view>
-                                        <view class="text-more-2" style="text-align: center">{{item.name}}</view>
-                                    </view>
-                                </navigator>
+                                    </button>
+                                </form>
                             </block>
                             <navigator bindtap="callTel" class="option-item flex-grow-0 style" data-tel="{{item.tel}}" wx:elif="{{item.open_type=='tel'}}">
                                 <view>

@@ -9,7 +9,7 @@
                             <image class="quick-dial" src="{{setnavi.home_img}}"></image>
                         </navigator>
                     </view>
-                    <view animation="{{animationMapPlus}}" bindtap="map_power" class="quick-dial quick-zfb" style="background-image:url('{{store.option.quick_map.icon}}'); background-size: 100rpx 100rpx;" wx:if="{{store.option.quick_map}}"></view>
+                    <view animation="{{animationMapPlus}}" bindtap="map_power" class="quick-dial quick-zfb" style="background-image:url('{{store.option.quick_map.icon}}'); background-size: 100rpx 100rpx;" wx:if="{{store.option.quick_map.status==1}}"></view>
                     <view animation="{{animationPic}}" bindtap="to_dial" class="quick-dial quick-zfb" style="background-image:url('{{store.dial_pic}}'); background-size: 100rpx 100rpx;" wx:if="{{store.dial==1&&store.dial_pic}}"></view>
                     <navigator hoverClass="none" openType="navigate" url="/pages/web/web?url={{store.option.web_service_url}}" wx:if="{{store.option.web_service}}">
                         <view animation="{{animationcollect}}" class="quick-zfb">
@@ -59,7 +59,7 @@
     <navigator hoverClass="none" openType="reLaunch" url="/pages/index/index" wx:if="{{!home_icon}}">
         <image class="dial" src="{{setnavi.home_img}}"></image>
     </navigator>
-    <view bindtap="map_power" class="dial" style="background-image:url('{{store.option.quick_map.icon}}'); background-size: 100rpx 100rpx;" wx:if="{{store.option.quick_map}}"></view>
+    <view bindtap="map_power" class="dial" style="background-image:url('{{store.option.quick_map.icon}}'); background-size: 100rpx 100rpx;" wx:if="{{store.option.quick_map.status==1}}"></view>
     <view bindtap="to_dial" class="dial" style="background-image:url('{{store.dial_pic}}'); background-size: 100rpx 100rpx;" wx:if="{{store.dial==1&&store.dial_pic}}"></view>
     <navigator hoverClass="none" openType="navigate" url="/pages/web/web?url={{store.option.web_service_url}}" wx:if="{{store.option.web_service}}">
         <image class="dial" src="{{store.option.web_service}}"></image>

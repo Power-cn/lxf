@@ -260,7 +260,7 @@ Page({
             1 == c.is_area && (o = 1)), i += parseFloat(p);
         }
         i = i >= 0 ? i : 0, t.setData({
-            new_total_price: parseFloat(i.toFixed(2)),
+            new_total_price: i.toFixed(2),
             offer_rule: n,
             is_area: o
         });

@@ -1,47 +1,36 @@
-var t = 0, e = -1;
+var t = 0, e = -1, a = 1;
 
 Page({
-    data: {},
-    onLoad: function(t) {
-        getApp().page.onLoad(this, t), getApp().page.onLoad(this, t), getApp().core.showLoading({
-            title: "加载中"
-        });
+    data: {
+        goods_list: []
+    },
+    onLoad: function(e) {
+        getApp().page.onLoad(this, e), a = 1, this.getGoodsList(t);
     },
     onReady: function(t) {
-        getApp().page.onReady(this), getApp().page.onReady(this);
+        getApp().page.onReady(this);
     },
     onShow: function(a) {
-        getApp().page.onShow(this), getApp().page.onShow(this);
+        getApp().page.onShow(this);
         var n = this;
         getApp().request({
             url: getApp().api.integral.index,
-            data: {
-                page: 1
-            },
+            data: {},
             success: function(a) {
-                if (0 == a.code) {
-                    var o = [], i = a.data.goods_list, s = [];
-                    if (i) for (var p in i) i[p].goods.length > 0 && s.push(i[p]);
-                    if (s.length > 0) for (var r in s) {
-                        var g = s[r].goods;
-                        for (var c in g) 1 == g[c].is_index && o.push(g[c]);
-                    }
-                    if (a.data.today && n.setData({
-                        register_day: 1
-                    }), n.setData({
-                        banner_list: a.data.banner_list,
-                        coupon_list: a.data.coupon_list,
-                        goods_list: s,
-                        index_goods: o,
-                        integral: a.data.user.integral
-                    }), -1 != e) {
-                        var d = [];
-                        d.index = e, d.catId = t, n.catGoods({
-                            currentTarget: {
-                                dataset: d
-                            }
-                        });
-                    }
+                if (0 == a.code && (a.data.today && n.setData({
+                    register_day: 1
+                }), n.setData({
+                    banner_list: a.data.banner_list,
+                    coupon_list: a.data.coupon_list,
+                    integral: a.data.user.integral,
+                    catList: a.data.cat_list
+                }), -1 != e)) {
+                    var o = [];
+                    o.index = e, o.catId = t, n.catGoods({
+                        currentTarget: {
+                            dataset: o
+                        }
+                    });
                 }
             },
             complete: function(t) {
@@ -159,17 +148,48 @@ Page({
             goods_list: e
         });
     },
-    catGoods: function(a) {
-        var n = a.currentTarget.dataset, o = this, i = o.data.goods_list, s = i.find(function(t) {
-            return t.id == n.catId;
-        });
-        t = n.catId, e = n.index;
-        var p = n.index;
-        for (var r in i) i[r].id == i[p].id ? i[r].cat_checked = !0 : i[r].cat_checked = !1;
-        o.setData({
-            index_goods: s.goods,
-            goods_list: i,
-            cat_checked: !1
+    catGoods: function(n) {
+        var o = n.currentTarget.dataset, i = this, s = i.data.catList;
+        t = o.catId, e = o.index;
+        var r = o.index;
+        if (-1 === r) {
+            var p = !0;
+            for (var c in s) s[c].cat_checked = !1;
+        }
+        if (r >= 0) for (var c in s) s[c].id == s[r].id ? (s[c].cat_checked = !0, p = !1) : s[c].cat_checked = !1;
+        i.setData({
+            cat_checked: p,
+            catList: s,
+            goods_list: []
+        }), a = 1, i.getGoodsList(t);
+    },
+    getGoodsList: function(t) {
+        var n = this;
+        -1 === e && n.setData({
+            cat_checked: !0
+        }), getApp().core.showLoading({
+            title: "加载中"
+        }), getApp().request({
+            url: getApp().api.integral.goods_list,
+            data: {
+                page: a,
+                cat_id: t
+            },
+            success: function(t) {
+                if (0 === t.code) {
+                    var e = n.data.goods_list;
+                    t.data.list.length > 0 && (e.length > 0 && (e = e.concat(t.data.list)), 0 === e.length && (e = t.data.list), 
+                    a += 1), 0 === t.data.list.length && getApp().core.showToast({
+                        title: "没有更多啦",
+                        icon: "none"
+                    }), n.setData({
+                        goods_list: e
+                    });
+                }
+            },
+            complete: function() {
+                getApp().core.hideLoading();
+            }
         });
     },
     goodsInfo: function(t) {
@@ -179,13 +199,13 @@ Page({
         });
     },
     onHide: function(t) {
-        getApp().page.onHide(this), getApp().page.onHide(this);
+        getApp().page.onHide(this);
     },
     onUnload: function(t) {
-        getApp().page.onUnload(this), getApp().page.onUnload(this);
+        getApp().page.onUnload(this);
     },
     onPullDownRefresh: function(t) {
-        getApp().page.onPullDownRefresh(this), getApp().page.onPullDownRefresh(this);
+        getApp().page.onPullDownRefresh(this);
     },
     onShareAppMessage: function() {
         getApp().page.onShareAppMessage(this);
@@ -195,12 +215,12 @@ Page({
             break;
         }
         return {
-            path: "/pages/integral-mall/integral-mall?user_id=" + t.id,
+            path: "/pages/integral-mall/index/index?user_id=" + t.id,
             title: e || "积分商城"
         };
     },
-    onReachBottom: function(t) {
-        getApp().page.onReachBottom(this), getApp().page.onReachBottom(this);
+    onReachBottom: function(e) {
+        getApp().page.onReachBottom(this), this.getGoodsList(t);
     },
     shuoming: function() {
         getApp().core.navigateTo({

@@ -18,11 +18,11 @@ Page({
     },
     onShow: function(t) {
         getApp().page.onShow(this);
-        var e = this;
+        var o = this;
         getApp().core.getStorage({
             key: "history_info",
             success: function(t) {
-                t.data.length > 0 && e.setData({
+                t.data.length > 0 && o.setData({
                     history_info: t.data,
                     history_show: !0
                 });
@@ -38,31 +38,28 @@ Page({
     onPullDownRefresh: function(t) {
         getApp().page.onPullDownRefresh(this);
     },
-    onReachBottom: function(e) {
+    onReachBottom: function(o) {
         getApp().page.onReachBottom(this);
-        var o = this;
-        o.data.emptyGoods || (o.data.page_count <= t && o.setData({
+        var a = this;
+        a.data.emptyGoods || (a.data.page_count <= t && a.setData({
             emptyGoods: !0
-        }), t++, o.getSearchGoods());
-    },
-    onShareAppMessage: function(t) {
-        getApp().page.onShareAppMessage(this);
+        }), t++, a.getSearchGoods());
     },
     toSearch: function(t) {
-        var e = t.detail.value, o = this;
-        if (e) {
-            var a = o.data.history_info;
-            a.unshift(e);
-            for (var s in a) {
-                if (a.length <= 20) break;
-                a.splice(s, 1);
+        var o = t.detail.value, a = this;
+        if (o) {
+            var e = a.data.history_info;
+            e.unshift(o);
+            for (var s in e) {
+                if (e.length <= 20) break;
+                e.splice(s, 1);
             }
-            getApp().core.setStorageSync(getApp().const.HISTORY_INFO, a), o.setData({
-                history_info: a,
+            getApp().core.setStorageSync(getApp().const.HISTORY_INFO, e), a.setData({
+                history_info: e,
                 history_show: !1,
-                keyword: e,
+                keyword: o,
                 list: []
-            }), o.getSearchGoods();
+            }), a.getSearchGoods();
         }
     },
     cancelSearchValue: function(t) {
@@ -70,41 +67,41 @@ Page({
             delta: 1
         });
     },
-    newSearch: function(e) {
-        var o = this, a = !1;
-        o.data.history_info.length > 0 && (a = !0), t = 1, o.setData({
-            history_show: a,
+    newSearch: function(o) {
+        var a = this, e = !1;
+        a.data.history_info.length > 0 && (e = !0), t = 1, a.setData({
+            history_show: e,
             list: [],
             newSearch: [],
             emptyGoods: !1
         });
     },
     clearHistoryInfo: function(t) {
-        var e = this, o = [];
-        getApp().core.setStorageSync(getApp().const.HISTORY_INFO, o), e.setData({
-            history_info: o,
+        var o = this, a = [];
+        getApp().core.setStorageSync(getApp().const.HISTORY_INFO, a), o.setData({
+            history_info: a,
             history_show: !1
         });
     },
     getSearchGoods: function() {
-        var e = this, o = e.data.keyword;
-        o && (e.setData({
+        var o = this, a = o.data.keyword;
+        a && (o.setData({
             show_loading_bar: !0
         }), getApp().request({
             url: getApp().api.group.search,
             data: {
-                keyword: o,
+                keyword: a,
                 page: t
             },
-            success: function(o) {
-                if (0 == o.code) {
-                    if (e.data.newSearch) a = o.data.list; else var a = e.data.list.concat(o.data.list);
-                    e.setData({
-                        list: a,
-                        page_count: o.data.page_count,
+            success: function(a) {
+                if (0 == a.code) {
+                    if (o.data.newSearch) e = a.data.list; else var e = o.data.list.concat(a.data.list);
+                    o.setData({
+                        list: e,
+                        page_count: a.data.page_count,
                         emptyGoods: !0,
                         show_loading_bar: !1
-                    }), o.data.page_count > t && e.setData({
+                    }), a.data.page_count > t && o.setData({
                         newSearch: !1,
                         emptyGoods: !1
                     });
@@ -114,10 +111,10 @@ Page({
         }));
     },
     historyItem: function(t) {
-        var e = t.currentTarget.dataset.keyword, o = this;
-        o.setData({
-            keyword: e,
+        var o = t.currentTarget.dataset.keyword, a = this;
+        a.setData({
+            keyword: o,
             history_show: !1
-        }), o.getSearchGoods();
+        }), a.getSearchGoods();
     }
 });

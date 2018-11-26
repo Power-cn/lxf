@@ -15,9 +15,9 @@ Page({
         });
         var i = this;
         t = !1, e = !1, a = 2, i.loadOrderList(o.status || -1);
-        var s = 0;
-        s = o.status >= 2 ? 600 : 0, i.setData({
-            scrollLeft: s
+        var n = 0;
+        n = o.status >= 2 ? 600 : 0, i.setData({
+            scrollLeft: n
         });
     },
     onReady: function(t) {
@@ -34,15 +34,6 @@ Page({
     },
     onPullDownRefresh: function(t) {
         getApp().page.onPullDownRefresh(this);
-    },
-    onShareAppMessage: function(t) {
-        var e = this, a = t.target.dataset.index, o = "/pages/pt/group/details?oid=" + t.target.dataset.id;
-        return {
-            title: e.data.order_list[a].goods_list[0].goods_name,
-            path: o,
-            imageUrl: e.data.order_list[a].goods_list[0].goods_pic,
-            success: function(t) {}
-        };
     },
     loadOrderList: function(t) {
         void 0 == t && (t = -1);
@@ -74,13 +65,13 @@ Page({
         setInterval(function() {
             var e = t.data.order_list;
             for (var a in e) {
-                var o = new Date(e[a].limit_time_ms[0], e[a].limit_time_ms[1] - 1, e[a].limit_time_ms[2], e[a].limit_time_ms[3], e[a].limit_time_ms[4], e[a].limit_time_ms[5]) - new Date(), r = parseInt(o / 1e3 / 60 / 60 / 24, 10), i = parseInt(o / 1e3 / 60 / 60 % 24, 10), s = parseInt(o / 1e3 / 60 % 60, 10), n = parseInt(o / 1e3 % 60, 10);
-                r = t.checkTime(r), i = t.checkTime(i), s = t.checkTime(s), n = t.checkTime(n), 
+                var o = new Date(e[a].limit_time_ms[0], e[a].limit_time_ms[1] - 1, e[a].limit_time_ms[2], e[a].limit_time_ms[3], e[a].limit_time_ms[4], e[a].limit_time_ms[5]) - new Date(), r = parseInt(o / 1e3 / 60 / 60 / 24, 10), i = parseInt(o / 1e3 / 60 / 60 % 24, 10), n = parseInt(o / 1e3 / 60 % 60, 10), s = parseInt(o / 1e3 % 60, 10);
+                r = t.checkTime(r), i = t.checkTime(i), n = t.checkTime(n), s = t.checkTime(s), 
                 e[a].limit_time = {
                     days: r,
                     hours: i > 0 ? i : "00",
-                    mins: s > 0 ? s : "00",
-                    secs: n > 0 ? n : "00"
+                    mins: n > 0 ? n : "00",
+                    secs: s > 0 ? s : "00"
                 }, t.setData({
                     order_list: e
                 });

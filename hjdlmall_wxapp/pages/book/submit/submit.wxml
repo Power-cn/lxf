@@ -23,7 +23,7 @@
                                 ¥{{goods.original_price}}
                             </view>
                             <view class="price flex-grow-0">
-                                ¥{{goods.price}}
+                                ¥{{level_price}}
                             </view>
                         </view>
                     </view>

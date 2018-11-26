@@ -3,20 +3,23 @@
     <view class="quick_goods_info" wx:if="{{quick==1}}">
         <view class="view1">
             <view class="flex-grow-0 flex-y-center" wx:if="{{__is_member_price&&goods.min_member_price>0&&goods.is_negotiable!=1&&__user_info.level>-1}}">
-                <text class="renminbi">￥</text>
-                <text class="goods_price">{{goods.min_member_price}}</text>
-                <image class="img" src="{{__wxapp_img.store.member_price.url}}"></image>
+                <text class="renminbi is_member">￥</text>
+                <text class="goods_price is_member">{{goods.min_member_price}}</text>
+                <image class="img" src="{{__wxapp_img.store.member_price.url}}" wx:if="{{goods.is_level===true}}"></image>
             </view>
             <view class="flex-grow-0 flex-y-center" wx:else>
-                <text class="renminbi">￥</text>
-                <text class="goods_price">{{goods.min_price}}</text>
+                <text class="renminbi {{__user_info.level!=-1||goods.is_level===false?'is_member':''}}">￥</text>
+                <text class="goods_price {{__user_info.level!=-1||goods.is_level===false?'is_member':''}}">{{goods.min_price>0?goods.min_price:goods.price}}</text>
             </view>
-            <view class="flex-row flex-y-center">
+            <view class="flex-row flex-y-center" style="margin-top:14rpx;">
                 <view class="flex-grow-0 view2">
-                    <text class="original_price" wx:if="{{__user_info.level>-1||!goods.min_member_price}}">￥{{goods.original_price}}</text>
+                    <text class="original_price" wx:if="{{__user_info.level>-1||!goods.min_member_price||goods.is_level===false}}">￥{{goods.original_price}}</text>
                     <view class="member_price_box" wx:else>
-                        <text class="member_price_title">会员价</text>
-                        <text>￥{{goods.min_member_price>0?goods.min_member_price:goods.price}}</text>
+                        <block wx:if="{{__is_member_price===1}}">
+                            <text class="member_price_title">会员价</text>
+                            <text>￥{{goods.min_member_price>0?goods.min_member_price:goods.price}}</text>
+                        </block>
+                        <text class="original_price" wx:else>￥{{goods.price}}</text>
                     </view>
                 </view>
                 <view class="flex-grow-0 view3" wx:if="{{__is_sales}}">
@@ -41,23 +44,35 @@
     <view class="flex-row flex-y-center store_goods_info" wx:else>
         <view class="flex-grow-1 flex-col">
             <view class="flex-grow-0 flex-y-center view1" wx:if="{{__is_member_price&&goods.min_member_price>0&&goods.is_negotiable!=1&&__user_info.level>-1}}">
-                <text class="renminbi" wx:if="{{!goods.is_negotiable}}">￥</text>
-                <text class="min_price">{{goods.min_member_price}}</text>
-                <image class="img" src="{{__wxapp_img.store.member_price.url}}"></image>
+                <text class="renminbi is_member" wx:if="{{!goods.is_negotiable}}">￥</text>
+                <text class="min_price is_member" wx:if="{{goods.mch}}">{{goods.min_price}}</text>
+                <block wx:else>
+                    <text class="min_price is_member">{{goods.min_member_price}}</text>
+                    <image class="img" src="{{__wxapp_img.store.member_price.url}}" wx:if="{{goods.is_level===true}}"></image>
+                </block>
             </view>
             <view class="flex-grow-0 flex-y-center view1" wx:else>
-                <text class="renminbi" wx:if="{{!goods.is_negotiable}}">￥</text>
-                <text class="min_price">{{goods.min_price}}</text>
+                <block wx:if="{{!goods.is_negotiable}}">
+                    <text class="renminbi {{__user_info.level!=-1||goods.is_level===false?'is_member':''}}">￥</text>
+                    <text class="min_price {{__user_info.level!=-1||goods.is_level===false?'is_member':''}}">{{goods.min_price>0?goods.min_price:goods.price}}</text>
+                </block>
+                <text class="min_price" wx:else>{{goods.min_price}}</text>
             </view>
-            <view class="flex-row flex-y-center" wx:if="{{pageType!=='PINTUAN'}}">
+            <view class="flex-row flex-y-center" style="margin-top:14rpx;" wx:if="{{pageType!=='PINTUAN'}}">
                 <view class="flex-grow-0 view2" wx:if="{{!goods.is_negotiable}}">
-                    <text class="original_price" wx:if="{{__user_info.level>-1||!goods.min_member_price}}">￥{{goods.original_price}}</text>
+                    <text class="original_price" wx:if="{{__user_info.level>-1||!goods.min_member_price||goods.is_level===false}}">￥{{goods.original_price}}</text>
                     <view class="member_price_box" wx:else>
-                        <text class="member_price_title">会员价</text>
-                        <text>￥{{goods.min_member_price>0?goods.min_member_price:goods.price}}</text>
+                        <text wx:if="{{goods.mch}}">￥{{goods.price}}</text>
+                        <block wx:else>
+                            <block wx:if="{{__is_member_price===1}}">
+                                <text class="member_price_title">会员价</text>
+                                <text>￥{{goods.min_member_price>0?goods.min_member_price:goods.price}}</text>
+                            </block>
+                            <text class="original_price" wx:else>￥{{goods.price}}</text>
+                        </block>
                     </view>
                 </view>
-                <view class="flex-grow-0 view2" wx:if="{{__is_sales&&pageType!=='INTEGRAL'}}">
+                <view class="flex-grow-0 view2" wx:if="{{__is_sales&&pageType!=='INTEGRAL'&&goods.is_negotiable!=1}}">
                     <text class="sales" wx:if="{{pageType==='MIAOSHA'}}">已抢：</text>
                     <text class="sales" wx:else>销量：</text>
                     <text class="sales">{{goods.sales_volume}} {{goods.unit}}</text>
@@ -65,10 +80,13 @@
             </view>
             <view class="flex-row flex-y-center" style="margin-top:14rpx;height:60rpx;" wx:if="{{pageType==='PINTUAN'}}">
                 <view class="flex-grow-0 flex-row original-price">
-                    <view class="flex-grow-0" style="text-decoration: line-through;" wx:if="{{__user_info.level>-1||!goods.min_member_price}}">¥ {{goods.original_price}}</view>
+                    <view class="flex-grow-0" style="text-decoration: line-through;" wx:if="{{__user_info.level>-1||!goods.min_member_price||goods.is_level===false}}">¥ {{goods.original_price}}</view>
                     <view class="member_price_box" wx:else>
-                        <text class="member_price_title">会员价</text>
-                        <text>￥{{goods.min_member_price>0?goods.min_member_price:goods.price}}</text>
+                        <block wx:if="{{__is_member_price===1}}">
+                            <text class="member_price_title">会员价</text>
+                            <text>￥{{goods.min_member_price>0?goods.min_member_price:goods.price}}</text>
+                        </block>
+                        <text class="original_price" wx:else>￥{{goods.price}}</text>
                     </view>
                 </view>
                 <view class="flex-row flex-grow-0 group-descount" style="margin-left:16rpx">
@@ -125,7 +143,7 @@
     <view class="share-modal-body">
         <view class="flex-row">
             <view class="flex-grow-1 flex-x-center">
-                <button class="share-bottom" openType="share" style="height:100%; s">
+                <button class="share-bottom" openType="share" style="height:100%;">
                     <image src="{{__wxapp_img.share.friend.url}}"></image>
                     <view>分享给朋友</view>
                 </button>
@@ -157,7 +175,7 @@
                             <view style="color: #888">海报生成中</view>
                         </view>
                     </view>
-                    <image bindtap="goodsQrcodeClick" class="goods-qrcode {{goods_qrcode?'active':''}}" data-src="{{goods_qrcode}}" mode="aspectFill" src="{{goods_qrcode}}"></image>
+                    <image bindtap="goodsQrcodeClick" class="goods-qrcode {{goods_qrcode?'active':''}}" data-src="{{goods_qrcode}}" mode="widthFix" src="{{goods_qrcode}}"></image>
                 </view>
             </view>
         </view>

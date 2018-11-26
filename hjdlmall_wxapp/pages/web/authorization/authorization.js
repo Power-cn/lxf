@@ -90,8 +90,5 @@ Page({
     },
     onReachBottom: function(e) {
         getApp().page.onReachBottom(this);
-    },
-    onShareAppMessage: function(e) {
-        getApp().page.onShareAppMessage(this);
     }
 });

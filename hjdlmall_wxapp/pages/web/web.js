@@ -29,7 +29,7 @@ Page({
         getApp().page.onUnload(this);
     },
     onShareAppMessage: function(e) {
-        return {
+        return getApp().page.onShareAppMessage(this), {
             path: "pages/web/web?url=" + encodeURIComponent(e.webViewUrl)
         };
     }

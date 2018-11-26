@@ -1,19 +1,19 @@
-var t = !1, e = !1, a = 2;
+var t = !1, e = !1, o = 2;
 
 Page({
     data: {},
-    onLoad: function(o) {
-        getApp().page.onLoad(this, o), t = !1, e = !1, a = 2;
+    onLoad: function(a) {
+        getApp().page.onLoad(this, a), t = !1, e = !1, o = 2;
         var n = this;
         n.setData({
-            gid: o.id
+            gid: a.id
         }), getApp().core.showLoading({
             title: "正在加载",
             mask: !0
         }), getApp().request({
             url: getApp().api.group.comment,
             data: {
-                gid: o.id
+                gid: a.id
             },
             success: function(t) {
                 getApp().core.hideLoading(), 1 == t.code && getApp().core.showModal({
@@ -53,31 +53,28 @@ Page({
     onPullDownRefresh: function(t) {
         getApp().page.onPullDownRefresh(this);
     },
-    onReachBottom: function(o) {
+    onReachBottom: function(a) {
         getApp().page.onReachBottom(this);
         var n = this;
         e || t || (e = !0, getApp().request({
             url: getApp().api.group.comment,
             data: {
                 gid: n.data.gid,
-                page: a
+                page: o
             },
             success: function(e) {
                 if (0 == e.code) {
-                    var o = n.data.comment.concat(e.data.comment);
+                    var a = n.data.comment.concat(e.data.comment);
                     n.setData({
-                        comment: o
+                        comment: a
                     }), 0 == e.data.comment.length && (t = !0);
                 }
-                a++;
+                o++;
             },
             complete: function() {
                 e = !1;
             }
         }));
-    },
-    onShareAppMessage: function(t) {
-        getApp().page.onShareAppMessage(this);
     },
     bigToImage: function(t) {
         var e = this.data.comment[t.target.dataset.index].pic_list;
