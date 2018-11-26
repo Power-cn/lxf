@@ -74,7 +74,7 @@ $this->params['active_nav_group'] = 1;
                         </span>
                         </div>
                         <div class="upload-preview text-center upload-preview">
-                            <span class="upload-preview-tip">750&times;360</span>
+                            <span class="upload-preview-tip">750&times;280</span>
                             <img class="upload-preview-img" src="<?= $list['pic_url'] ?>">
                         </div>
                     </div>

@@ -106,32 +106,30 @@ Page({
     },
     dingwei: function () {
         var self = this;
-        getApp().core.chooseLocation({
+        getApp().getauth({
+            content: "需要获取您的地理位置授权，请到小程序设置中打开授权",
+            author: "scope.userLocation",
             success: function (e) {
-                longitude = e.longitude;
-                latitude = e.latitude;
-                self.setData({
-                    location: e.address,
-                });
-            },
-            fail: function (res) {
-                getApp().getauth({
-                    content: "需要获取您的地理位置授权，请到小程序设置中打开授权",
-                    success: function (e) {
-                        if (e) {
-                            if (e.authSetting["scope.userLocation"]) {
-                                self.dingwei();
-                            } else {
-                                getApp().core.showToast({
-                                    title: '您取消了授权',
-                                    image: "/images/icon-warning.png",
-                                })
+                if (e) {
+                    if (e.authSetting["scope.userLocation"]) {
+                        getApp().core.chooseLocation({
+                            success: function (e) {
+                                longitude = e.longitude;
+                                latitude = e.latitude;
+                                self.setData({
+                                    location: e.address,
+                                });
                             }
-                        }
+                        })
+                    } else {
+                        getApp().core.showToast({
+                            title: '您取消了授权',
+                            image: "/images/icon-warning.png",
+                        })
                     }
-                });
+                }
             }
-        })
+        });
     },
 
     orderSubmit: function (e) {

@@ -30,6 +30,7 @@ class IntegralmallController extends Controller
             ],
         ]);
     }
+
     public function actionIndex()
     {
         $form = new IntegralForm();
@@ -37,6 +38,7 @@ class IntegralmallController extends Controller
         $form->user_id = \Yii::$app->user->id;
         return new \app\hejiang\BaseApiResponse($form->index());
     }
+
     public function actionExplain()
     {
         $form = new IntegralForm();
@@ -45,6 +47,7 @@ class IntegralmallController extends Controller
         $form->today = \Yii::$app->request->get('today');
         return new \app\hejiang\BaseApiResponse($form->explain());
     }
+
     //我的兑换
     public function actionExchange()
     {
@@ -53,6 +56,7 @@ class IntegralmallController extends Controller
         $form->user_id = \Yii::$app->user->id;
         return new \app\hejiang\BaseApiResponse($form->exchange());
     }
+
     //积分明细
     public function actionIntegralDetail()
     {
@@ -80,9 +84,16 @@ class IntegralmallController extends Controller
         $get = \Yii::$app->request->get();
         $form->id = $get['id'];
         $form->user = \Yii::$app->user->identity;
-        $form->type = $get['type']; 
+        $form->type = $get['type'];
         $form->store_id = $this->store_id;
         return new \app\hejiang\BaseApiResponse($form->exchangeCoupon());
+    }
+
+    public function actionGoodsList()
+    {
+        $form = new IntegralForm();
+        $form->attributes = \Yii::$app->request->get();
+        return new \app\hejiang\BaseApiResponse($form->getGoodsList());
     }
 
     //商品详情
@@ -163,9 +174,9 @@ class IntegralmallController extends Controller
         $form = new QrcodeForm();
         $form->page = "pages/integral-mall/clerk/clerk";
         $form->width = 100;
-        if(\Yii::$app->fromAlipayApp()){
+        if (\Yii::$app->fromAlipayApp()) {
             $form->scene = "order_no={$order_no}";
-        }else{
+        } else {
             $form->scene = "{$order_no}";
         }
         $form->store = $this->store;
@@ -182,16 +193,16 @@ class IntegralmallController extends Controller
             $order = IntegralOrder::find()
                 ->where([
                     'store_id' => $this->store_id,
-                    'order_no'=>$id,
+                    'order_no' => $id,
                 ])->with(['user' => function ($query) {
                     $query->where([
                         'store_id' => $this->store_id,
                     ]);
-                }])->with(['shop'=>function ($query) {
+                }])->with(['shop' => function ($query) {
                     $query->where([
                         'is_delete' => 0,
                     ]);
-                }])->with(['detail'=>function ($query) {
+                }])->with(['detail' => function ($query) {
                     $query->where([
                         'is_delete' => 0,
                     ]);
@@ -202,17 +213,17 @@ class IntegralmallController extends Controller
                 ->where([
                     'store_id' => $this->store_id,
                     'is_delete' => 0,
-                    'order_no'=>$id,
+                    'order_no' => $id,
                 ])->with(['user' => function ($query) {
                     $query->where([
                         'store_id' => $this->store_id,
                         'is_delete' => 0,
                     ]);
-                }])->with(['shop'=>function ($query) {
+                }])->with(['shop' => function ($query) {
                     $query->where([
                         'is_delete' => 0,
                     ]);
-                }])->with(['detail'=>function ($query) {
+                }])->with(['detail' => function ($query) {
                     $query->where([
                         'is_delete' => 0,
                     ]);
@@ -242,7 +253,7 @@ class IntegralmallController extends Controller
             ->where([
                 'store_id' => $this->store_id,
                 'is_delete' => 0,
-            ])->andWhere(['or',['id'=>$id],['order_no'=>$id]])->one();
+            ])->andWhere(['or', ['id' => $id], ['order_no' => $id]])->one();
         if (!$integralOrder) {
             return new \app\hejiang\ApiResponse(1, '订单不存在');
         }

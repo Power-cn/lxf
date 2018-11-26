@@ -2,16 +2,15 @@
 defined('YII_ENV') or exit('Access Denied');
 
 use yii\widgets\LinkPager;
-
 $urlManager = Yii::$app->urlManager;
 $imgurl = Yii::$app->request->baseUrl;
-$this->title = '奖品列表';
+$this->title = '抽奖列表';
 ?>
 
 <div class="panel mb-3">
     <div class="panel-header"><?= $this->title ?></div>
     <div class="panel-body">
-        <a class="btn btn-primary mb-3" href="<?= $urlManager->createUrl(['mch/lottery/default/goods-edit']) ?>">添加奖品</a>
+        <a class="btn btn-primary mb-3" href="<?= $urlManager->createUrl(['mch/lottery/default/goods-edit']) ?>">添加抽奖</a>
         <table class="table table-bordered bg-white">
             <thead>
             <tr>
@@ -21,6 +20,7 @@ $this->title = '奖品列表';
                 <th>中奖数量</th>
                 <th>活动时间</th>
                 <th>状态</th>
+                <th>排序</th>
                 <th>操作</th>
             </tr>
             </thead>
@@ -31,29 +31,50 @@ $this->title = '奖品列表';
                     <td class="nowrap text-left"><?= $item['goods']['name'] ?></td>
                     <td class="nowrap"><?= $item['attrs']; ?></td>
                     <td class="nowrap"> 
-                        <a href="#" data-toggle="modal" data-target="#myModal" onclick="edit_stock(<?= $item['id'] ?>,<?= $item['stock'] ?>)"><?= $item['stock']; ?></a>
+                        <?php if ($item['type'] == 1) : ?>
+                            <?= $item['stock']; ?>
+                        <?php else : ?>
+                            <a href="#" data-toggle="modal" data-target="#myModal" onclick="edit_stock(<?= $item['id'] ?>,<?= $item['stock'] ?>)"><?= $item['stock']; ?></a>
+                        <?php endif ?>
                     </td>
                     <td><?= date('Y:m:d H:i', $item['start_time']) ?>--<?= date('Y:m:d H:i', $item['end_time']) ?></td>
        
-                    <td classs="nowrap">
-                        <?php if ($item['status'] == 1) : ?>
-                            <span class="badge badge-success">已开启</span>
-                            |
-                            <a href="javascript:" onclick="upDown(<?= $item['id'] ?>,'down');">关闭</a>
-                        <?php else : ?>
+                    <td class="nowrap">
+                        <?php if ($item['type'] == 1) : ?>
+                            <span class="badge badge-danger">已开奖</span>
+                        <?php elseif ($item['type'] == 0 && $item['status']==0) : ?>
                             <span class="badge badge-default">已关闭</span>
                             |
                             <a href="javascript:" onclick="upDown(<?= $item['id'] ?>,'up');">开启</a>
+                        <?php elseif ($item['type'] == 0 && $item['status']==1 && $item['start_time']>time()) : ?>
+                            <span class="badge badge-success">已开启</span>
+                            |
+                            <a href="javascript:" onclick="upDown(<?= $item['id'] ?>,'down');">关闭</a>
+                            |
+                            <span class="badge badge-info">未开始</span>
+                        <?php elseif($item['type'] == 0 && $item['status']==1 && $item['end_time']<time()) : ?>
+                            <span class="badge badge-success">已开启</span>
+                            |
+                            <a href="javascript:" onclick="upDown(<?= $item['id'] ?>,'down');">关闭</a>
+                            |
+                            <span class="badge badge-info">已结束</span>
+                        <?php elseif($item['type'] == 0 && $item['status']==1) : ?>
+                            <span class="badge badge-success">已开启</span>
+                            |
+                            <a href="javascript:" onclick="upDown(<?= $item['id'] ?>,'down');">关闭</a>
+                            |
+                            <span class="badge badge-info">进行中</span>
                         <?php endif ?>
                     </td>
+                    <td><a href="#" data-toggle="modal" data-target="#myModalSort" onclick="edit_sort(<?= $item['id'] ?>,<?= $item['sort'] ?>)"><?= $item['sort']; ?></a></td>
                     <td>
-                        <!-- <a class="btn btn-sm btn-primary "
-                            href="<?= $urlManager->createUrl(['mch/lottery/default/goods-edit', 'id' =>$item['id']]) ?>">修改</a> -->
+                        <a class="btn btn-sm btn-success"
+                       href="<?= $urlManager->createUrl(['mch/lottery/default/partake-list', 'id' =>$item['id']]) ?>">参与详情</a>
                         <a class="btn btn-sm btn-danger del" href="javascript:"
                             data-content="是否删除？"
                             data-url="<?= $urlManager->createUrl(['mch/lottery/default/goods-destroy', 'id' => $item['id']]) ?>">删除</a>
                         <a class="btn btn-sm btn-info"
-                       href="<?= $urlManager->createUrl(['mch/lottery/default/detail', 'id' =>$item['id']]) ?>">详情</a>
+                       href="<?= $urlManager->createUrl(['mch/lottery/default/detail', 'id' =>$item['id']]) ?>">预中奖设置</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -91,12 +112,32 @@ $this->title = '奖品列表';
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header" style="height:40px;">
-                    <h5 class="modal-title" id="myModalLabel">
+                    <h5 class="modal-title">
                         修改中奖数量
                     </h5>
                 </div>
                 <div class="modal-body">
                      中奖数量：<input style="width:400px" type="number" step="1" name="stock" min="0" id="stock" value="">
+                    <input type="hidden" value="" name="s_id" id="s_id">
+                </div>
+                <div class="modal-footer" style="height:60px;">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="close">关闭</button>
+                    <button type="button" class="btn btn-primary member">修改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" aria-labelledby="myModalLabel" aria-hidden="true" id="myModalSort" style="margin-top:200px;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="height:40px;">
+                    <h5 class="modal-title">
+                        修改排序
+                    </h5>
+                </div>
+                <div class="modal-body">
+                     排序：<input style="width:400px" type="number" step="1" name="sort" min="0" id="sort" value="">
                     <input type="hidden" value="" name="s_id" id="s_id">
                 </div>
                 <div class="modal-footer" style="height:60px;">
@@ -136,10 +177,16 @@ $this->title = '奖品列表';
 </script>
 
 <script>
+    function edit_sort($id,$sort){
+        $("#s_id").val($id);
+        $("#sort").val($sort);
+    }
+
     function edit_stock($id,$stock){
         $("#s_id").val($id);
         $("#stock").val($stock);
     }
+
     function upDown(id,status){
         if(status=='down'){
             var text = '关闭';
@@ -180,7 +227,7 @@ $this->title = '奖品列表';
 
         var id = $("#s_id").val();
         var stock = $("#stock").val();
-
+        var sort = $("#sort").val();
         $.ajax({
             url: "<?= $urlManager->createUrl(['mch/lottery/default/edit']) ?>",
             type: 'post',
@@ -188,6 +235,7 @@ $this->title = '奖品列表';
             data: {
                 id:id,
                 stock:stock,
+                sort:sort,
                 _csrf:_csrf
             },
             success: function (res) {

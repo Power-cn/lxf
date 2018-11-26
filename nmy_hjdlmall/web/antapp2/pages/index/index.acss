@@ -131,6 +131,7 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    font-size: 9pt;
 }
 
 .nav-block {
@@ -275,7 +276,7 @@
 
 .goods-list .goods-item image {
     width: 100%;
-    height: 242rpx;
+    height: 246rpx;
     /* height: calc(width); */
     display: block;
 }
@@ -488,6 +489,11 @@
     font-size: 9pt;
 }
 
+.nav-icon-1 view{
+    text-align: center;
+    font-size: 9pt;
+}
+
 .nav-icon-list .nav-icon-1 navigator {
     display: block;
     padding: 26rpx 0;
@@ -616,8 +622,8 @@
 }
 
 .miaosha-goods image {
-    width: 224rpx;
-    height: 224rpx;
+    width: 208rpx;
+    height: 208rpx;
     display: block;
     margin-bottom: 16rpx;
 }

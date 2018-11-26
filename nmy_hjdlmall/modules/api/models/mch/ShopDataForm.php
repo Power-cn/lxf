@@ -115,7 +115,13 @@ class ShopDataForm extends ApiModel
             'goods_num' => $this->getGoodsNum(),
             'sale_num' => $this->getSaleNum(),
             'tel' => $mch->tel,
+            'service_tel' => $mch->service_tel,
             'wechat_name' => $mch->wechat_name,
+            'address' => $mch->address,
+            'longitude' => $mch->longitude,
+            'latitude' => $mch->latitude,
+            'main_content' => $mch->main_content,
+            'summary' => $mch->summary,
             'cs_icon' => $data['cs_icon'] == 1 ? true : false,
         ];
         return $shop;

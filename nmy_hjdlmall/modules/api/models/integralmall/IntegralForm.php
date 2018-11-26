@@ -6,10 +6,13 @@
  * Date: 2018/5/14
  * Time: 17:20
  */
+
 namespace app\modules\api\models\integralmall;
 
+use app\models\IntegralGoods;
 use app\models\IntegralOrderDetail;
 use app\models\IntegralSetting;
+use app\models\Model;
 use app\models\MsOrder;
 use app\models\Order;
 use app\models\Register;
@@ -19,7 +22,6 @@ use app\models\Coupon;
 use app\models\IntegralCat;
 use app\models\IntegralCouponOrder;
 use app\models\User;
-use app\models\IntegralOrder;
 use yii\data\Pagination;
 
 class IntegralForm extends ApiModel
@@ -30,6 +32,7 @@ class IntegralForm extends ApiModel
     public $limit;
     public $page;
     public $status;
+    public $cat_id;
 
     public function rules()
     {
@@ -37,9 +40,10 @@ class IntegralForm extends ApiModel
             [['today'], 'string'],
             [['page', 'limit'], 'integer'],
             [['limit'], 'default', 'value' => 10],
-            [['status'], 'integer']
+            [['status', 'cat_id'], 'integer']
         ];
     }
+
     public function attributeLabels()
     {
         return [
@@ -49,7 +53,7 @@ class IntegralForm extends ApiModel
 
     public function index()
     {
-        $banner_list = Banner::find()->where(['store_id' => $this->store_id, 'is_delete' => 0,'type'=>3])->orderBy('sort ASC')->asArray()->all();
+        $banner_list = Banner::find()->where(['store_id' => $this->store_id, 'is_delete' => 0, 'type' => 3])->orderBy('sort ASC')->asArray()->all();
         foreach ($banner_list as $i => $banner) {
             if (!$banner['open_type']) {
                 $banner_list[$i]['open_type'] = 'navigate';
@@ -60,12 +64,12 @@ class IntegralForm extends ApiModel
                 $banner_list[$i]['path'] = urldecode($res[4]);
             }
         }
-        $coupon_list = Coupon::find()->where(['store_id' => $this->store_id, 'is_delete' => 0,'is_integral'=>2])->orderBy('sort ASC')->asArray()->all();
-        $user = User::find()->select(['integral'])->where(['id'=>$this->user_id,'store_id'=>$this->store_id])->asArray()->one();
+        $coupon_list = Coupon::find()->where(['store_id' => $this->store_id, 'is_delete' => 0, 'is_integral' => 2])->orderBy('sort ASC')->asArray()->all();
+        $user = User::find()->select(['integral'])->where(['id' => $this->user_id, 'store_id' => $this->store_id])->asArray()->one();
         $date = date('Y/n/j', time());
-        $today = Register::find()->where(['register_time'=>$date,'store_id'=>$this->store_id,'user_id'=>$this->user_id])->asArray()->one();
+        $today = Register::find()->where(['register_time' => $date, 'store_id' => $this->store_id, 'user_id' => $this->user_id])->asArray()->one();
         foreach ($coupon_list as $key => &$value) {
-            $count = IntegralCouponOrder::find()->where(['user_id'=>$this->user_id,'is_pay'=>1,'store_id'=>$this->store_id,'coupon_id' => $value['id']])->count();
+            $count = IntegralCouponOrder::find()->where(['user_id' => $this->user_id, 'is_pay' => 1, 'store_id' => $this->store_id, 'coupon_id' => $value['id']])->count();
             if ($count >= $value['user_num']) {
                 $value['type'] = 1;
                 $value['num'] = $count;
@@ -86,17 +90,35 @@ class IntegralForm extends ApiModel
                     'is_delete' => 0,
                 ])->orderBy('sort ASC');
             }])
-        ->orderBy('sort ASC')
-        ->asArray()->all();
+            ->orderBy('sort ASC')
+            ->asArray()->all();
+
+        $catList = IntegralCat::find()->alias('c')
+            ->where([
+                'c.store_id' => $this->getCurrentStoreId(),
+                'c.is_delete' => Model::IS_DELETE_FALSE,
+            ])
+            ->leftJoin(['g' => IntegralGoods::tableName()], 'c.id=g.cat_id')
+            ->orderBy('sort')
+            ->select('c.*, g.id as goods_id')
+            ->asArray()->all();
+
+        foreach ($catList as $k => $item) {
+            if (empty($item['goods_id'])) {
+                unset($catList[$k]);
+            }
+        }
+        $catList = array_values($catList);
 
         return [
             'code' => 0,
             'data' => [
-                'banner_list'=>$banner_list,
-                'coupon_list'=>$coupon_list,
-                'goods_list' => $goods_list,
-                'user'=>$user,
-                'today'=>$today,
+                'banner_list' => $banner_list,
+                'coupon_list' => $coupon_list,
+                'goods_list' => $goods_list,// TODO 下个版本可删除相关代码
+                'cat_list' => $catList,
+                'user' => $user,
+                'today' => $today,
             ],
         ];
     }
@@ -104,16 +126,16 @@ class IntegralForm extends ApiModel
     public function explain()
     {
         $setting = IntegralSetting::find()->where(['store_id' => $this->store_id])->asArray()->one();
-        $setting['integral_shuoming'] = $setting['integral_shuoming']?\Yii::$app->serializer->decode($setting['integral_shuoming']):[];
+        $setting['integral_shuoming'] = $setting['integral_shuoming'] ? \Yii::$app->serializer->decode($setting['integral_shuoming']) : [];
         $setting['register_rule'] = explode('，', $setting['register_rule']);
         if ($setting && is_array($setting['integral_shuoming'])) {
             foreach ($setting['integral_shuoming'] as $k => &$v) {
                 $v['content'] = explode('，', $v['content']);
             }
         }
-        $today = Register::find()->where(['register_time'=>$this->today,'store_id'=>$this->store_id,'user_id'=>$this->user_id,'type'=>1])->asArray()->one();
-        $register = Register::find()->where(['store_id'=>$this->store_id,'user_id'=>$this->user_id,'type'=>1])->orderBy('addtime DESC')->asArray()->one();
-        $registerTime = Register::find()->where(['store_id'=>$this->store_id,'user_id'=>$this->user_id,'type'=>1])->asArray()->all();
+        $today = Register::find()->where(['register_time' => $this->today, 'store_id' => $this->store_id, 'user_id' => $this->user_id, 'type' => 1])->asArray()->one();
+        $register = Register::find()->where(['store_id' => $this->store_id, 'user_id' => $this->user_id, 'type' => 1])->orderBy('addtime DESC')->asArray()->one();
+        $registerTime = Register::find()->where(['store_id' => $this->store_id, 'user_id' => $this->user_id, 'type' => 1])->asArray()->all();
         $time = [];
         if ($registerTime) {
             foreach ($registerTime as $key => &$value) {
@@ -123,10 +145,10 @@ class IntegralForm extends ApiModel
         return [
             'code' => 0,
             'data' => [
-                'setting'=>$setting,
-                'today'=>$today,
-                'register'=>$register,
-                'registerTime'=>$time
+                'setting' => $setting,
+                'today' => $today,
+                'register' => $register,
+                'registerTime' => $time
             ],
         ];
     }
@@ -138,22 +160,24 @@ class IntegralForm extends ApiModel
             ->where([
                 'store_id' => $this->store_id,
                 'is_delete' => 0,
-                'id'=>$this->user_id,
+                'id' => $this->user_id,
             ])->with(['userCoupon' => function ($query) {
                 $query->where([
                     'store_id' => $this->store_id,
                     'type' => 3,
-                ])->with(['coupon'=>function ($query) {
+                ])->with(['coupon' => function ($query) {
                     $query->where([
                         'store_id' => $this->store_id,
                     ]);
                 }]);
-            }])->with(['goodsDetail'=>function ($query) {
+            }])->with(['goodsDetail' => function ($query) {
                 $query->where([
                     'store_id' => $this->store_id,
-                ])->with(['order'=>function ($query) {
+                    'is_delete' => 0,
+                ])->with(['order' => function ($query) {
                     $query->where([
                         'store_id' => $this->store_id,
+                        'is_delete' => 0,
                     ]);
                 }]);
             }])
@@ -162,7 +186,7 @@ class IntegralForm extends ApiModel
         return [
             'code' => 0,
             'data' => [
-                'list'=>$list,
+                'list' => $list,
             ],
         ];
     }
@@ -280,5 +304,35 @@ class IntegralForm extends ApiModel
     {
         preg_match('/^[^\?+]\?([\w|\W]+)=([\w|\W]*?)&([\w|\W]+)=([\w|\W]*?)$/', $url, $res);
         return $res;
+    }
+
+    public function getGoodsList()
+    {
+        if (!$this->validate()) {
+            return $this->errorResponse;
+        }
+        $query = IntegralGoods::find()->where([
+            'store_id' => $this->getCurrentStoreId(),
+            'is_delete' => Model::IS_DELETE_FALSE,
+            'status' => 1,
+        ]);
+
+        if ($this->cat_id) {
+            $query->andWhere(['cat_id' => $this->cat_id]);
+        }
+
+        $count = $query->count();
+        $pagination = new Pagination(['totalCount' => $count, 'pageSize' => $this->limit, 'page' => $this->page - 1]);
+
+        $list = $query->orderBy('sort')->limit($pagination->limit)->offset($pagination->offset)->asArray()->all();
+
+        return [
+            'code' => 0,
+            'msg' => '请求成功',
+            'data' => [
+                'list' => $list,
+                'pagination' => $pagination,
+            ]
+        ];
     }
 }

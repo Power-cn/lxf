@@ -150,7 +150,7 @@ class CashWechatTplSender
             if (!$this->wechat_template_message['apply_tpl']) {
                 return;
             }
-            $status = $this->share->status == 1 ? "通过" : "不通过";
+            $status = $this->share->status == 1 ? "分销商审核通过" : "分销商审核不通过";
             $data = [
                 'touser' => $this->user->wechat_open_id,
                 'template_id' => $this->wechat_template_message['apply_tpl'],

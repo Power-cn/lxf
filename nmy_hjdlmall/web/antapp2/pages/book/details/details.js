@@ -129,7 +129,7 @@ Page({
         return {
             title: self.data.goods.name,
             path: '/pages/book/details/details?id=' + self.data.goods.id + '&user_id=' + user_info.id,
-            imageUrl: self.data.goods.cover_pic,
+            imageUrl: self.data.goods.pic_list[0],
             success: function (res) {
                 // 转发成功
             }
@@ -199,20 +199,6 @@ Page({
         });
     },
 
-    selectDefaultAttr: function () {
-        var self = this;
-        if (!self.data.goods || self.data.goods.use_attr != 0)
-            return;
-        for (var i in self.data.attr_group_list) {
-            for (var j in self.data.attr_group_list[i].attr_list) {
-                if (i == 0 && j == 0)
-                    self.data.attr_group_list[i].attr_list[j]['checked'] = true;
-            }
-        }
-        self.setData({
-            attr_group_list: self.data.attr_group_list,
-        });
-    },
     tabSwitch: function (e) {
         var self = this;
         var tab = e.currentTarget.dataset.tab;
@@ -285,67 +271,7 @@ Page({
             url: '/pages/book/submit/submit?goods_info=' + JSON.stringify(goods_info),
         })
     },
-
-    // hideAttrPicker: function () {
-    //     this.setData({
-    //         show_attr_picker: false,
-    //     });
-    // },
-
-    // attrGoodsClick: function (e) {
-    //     var self = this;
-    //     var attr_group_id = e.target.dataset.groupId;
-    //     var attr_id = e.target.dataset.id;
-    //     var attr_group_list = self.data.attr_group_list;
-
-    //     for (var i in attr_group_list) {
-    //         if (attr_group_list[i].attr_group_id != attr_group_id)
-    //             continue;
-    //         for (var j in attr_group_list[i].attr_list) {
-    //             attr_group_list[i].attr_list[j].checked = attr_group_list[i].attr_list[j].attr_id == attr_id;
-    //         }
-    //     }
-
-    //     self.setData({
-    //         attr_group_list: attr_group_list,
-    //     });
-
-    //     let ids = [];
-    //     let sentinel = 0;
-    //     for (var i = 0; i < attr_group_list.length; i++) {
-    //         let attr_list = attr_group_list[i]['attr_list'];
-    //         sentinel = 0;
-
-    //         for (var j = 0; j < attr_list.length; j++) {
-    //             if (attr_list[j]['checked']) {
-    //                 sentinel = attr_list[j]['attr_id'];
-    //                 continue;
-    //             }
-    //         }
-    //         if (sentinel) {
-    //             ids.push(sentinel);
-    //         } else {
-    //             return;
-    //         }
-    //     }
-
-    //     var goods = self.data.goods;
-    //     goods.attr.forEach(function (item, index, array) {
-    //         var attr_list = [];
-    //         item['attr_list'].forEach(function (itema, indexa, arraya) {
-    //             attr_list.push(itema['attr_id']);
-    //         });
-
-    //         if (ids.sort().toString() == attr_list.sort().toString()) {
-    //             goods['attr_pic'] = item['pic'];
-    //             goods['stock'] = item['num'];
-    //             goods['price'] = item['price'];
-    //             self.setData({
-    //                 goods: goods
-    //             })
-    //         }
-    //     });
-    // },
+    
     /**
      * 门店列表
      */

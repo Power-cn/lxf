@@ -218,12 +218,12 @@ if (!$returnUrl) {
             <li class="tab_bar_item" id="tab1" onclick="myclick(1)" style="background-color: #eeeeee">
                 基础设置
             </li>
-<!--            <li class="tab_bar_item" id="tab2" onclick="myclick(2)">-->
-<!--                分销价设置-->
-<!--            </li>-->
-<!--            <li class="tab_bar_item" id="tab3" onclick="myclick(3)">-->
-<!--                会员价设置-->
-<!--            </li>-->
+            <!--            <li class="tab_bar_item" id="tab2" onclick="myclick(2)">-->
+            <!--                分销价设置-->
+            <!--            </li>-->
+            <!--            <li class="tab_bar_item" id="tab3" onclick="myclick(3)">-->
+            <!--                会员价设置-->
+            <!--            </li>-->
         </ul>
     </div>
 
@@ -269,7 +269,7 @@ if (!$returnUrl) {
                                     <div class="copy-error text-danger fs-sm" hidden></div>
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row" hidden>
                                 <div class="col-3 text-right">
                                     <label class=" col-form-label">京东一键采集</label>
                                 </div>
@@ -817,7 +817,7 @@ if (!$returnUrl) {
                                 </div>
                             </div>
 
-                            <div class="form-group row">
+                            <div class="form-group row" style="display: none;">
                                 <div class="col-3 text-right">
                                     <label class=" col-form-label">是否支持会员折扣</label>
                                 </div>
@@ -998,16 +998,16 @@ if (!$returnUrl) {
     };
     var map = new Map();
 
-//    var page = new Vue({
-//        el: "#page",
-//        data: {
-//            sub_cat_list: [],
-//            attr_group_list: JSON.parse('<?//=json_encode($goods->getAttrData(), JSON_UNESCAPED_UNICODE)?>//'),//可选规格数据
-//            checked_attr_list: JSON.parse('<?//=json_encode($goods->getCheckedAttrData(), JSON_UNESCAPED_UNICODE)?>//'),//已选规格数据
-//            select_i: '',
-//            use_attr: <?//= !empty($goods['use_attr']) ? $goods['use_attr'] : 0 ?>
-//        }
-//    });
+    //    var page = new Vue({
+    //        el: "#page",
+    //        data: {
+    //            sub_cat_list: [],
+    //            attr_group_list: JSON.parse('<?//=json_encode($goods->getAttrData(), JSON_UNESCAPED_UNICODE)?>//'),//可选规格数据
+    //            checked_attr_list: JSON.parse('<?//=json_encode($goods->getCheckedAttrData(), JSON_UNESCAPED_UNICODE)?>//'),//已选规格数据
+    //            select_i: '',
+    //            use_attr: <?//= !empty($goods['use_attr']) ? $goods['use_attr'] : 0 ?>
+    //        }
+    //    });
 
     var ue = UE.getEditor('editor', {
         serverUrl: "<?=$urlManager->createUrl(['upload/ue'])?>",
@@ -1383,11 +1383,10 @@ if (!$returnUrl) {
         var val = $($(this).parent().prev('input')).val();
         for (var i in page.checked_attr_list) {
             if (type == 0) {
-                page.checked_attr_list[i].num = val
+                val >= 0 ? page.checked_attr_list[i].num = parseInt(val) : page.checked_attr_list[i].num = 1;
             } else if (type == 1) {
-                page.checked_attr_list[i].price = val
-            }
-            else if (type == 2) {
+                val >= 0.01 ? page.checked_attr_list[i].price = val : page.checked_attr_list[i].price = 0.01;
+            } else if (type == 2) {
                 page.checked_attr_list[i].no = val
             }
         }

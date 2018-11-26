@@ -128,6 +128,12 @@ class ScratchForm extends ApiModel
                         ]
                     ];
                 }else{
+                    $list = ScratchLog::find()->where([
+                        'store_id' => $this->store_id,
+                        'status' => 0,
+                        'user_id' => $this->user_id
+                    ])->one();
+
                     if($list->delete()){
                         return $this->lottery($setting,$log);
                     }

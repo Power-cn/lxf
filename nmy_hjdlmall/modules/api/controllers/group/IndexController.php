@@ -89,7 +89,6 @@ class IndexController extends Controller
     }
 
     /**
-    /**
      * @return string
      * 搜索
      */
@@ -102,7 +101,8 @@ class IndexController extends Controller
         return new \app\hejiang\ApiResponse(0, 'success', $goods);
     }
 
-    /**     * @param int $gid
+    /**
+     * @param int $gid
      * @return mixed|string
      * 商品详情
      */

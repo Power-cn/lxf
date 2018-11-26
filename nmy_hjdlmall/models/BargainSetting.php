@@ -14,6 +14,7 @@ use Yii;
  * @property integer $is_sms
  * @property integer $is_mail
  * @property string $content
+ * @property string $share_title
  */
 class BargainSetting extends \yii\db\ActiveRecord
 {
@@ -32,6 +33,7 @@ class BargainSetting extends \yii\db\ActiveRecord
     {
         return [
             [['store_id', 'is_print', 'is_share', 'is_sms', 'is_mail'], 'integer'],
+            [['share_title'], 'string'],
             [['content'], 'string', 'max' => 255],
         ];
     }
@@ -49,6 +51,7 @@ class BargainSetting extends \yii\db\ActiveRecord
             'is_sms' => '是否发送短信 0--否 1--是',
             'is_mail' => '是否发送邮件 0--否 1--是',
             'content' => '活动规则',
+            'share_title' => 'Share Title',
         ];
     }
 }

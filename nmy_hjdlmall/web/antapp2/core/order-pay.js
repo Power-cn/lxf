@@ -7,14 +7,20 @@ function setOnShowScene(scene) {
 }
 
 var pay = {
-    init: function (page, _app) {
+    init: function(page, _app) {
         var _this = this;
         var api = getApp().api;
         _this.page = page;
         app = _app;
 
+        // 可能成为上级的用户ID
+        var parentUserId = getApp().core.getStorageSync(getApp().const.PARENT_ID);
+        if (!parentUserId) {
+            parentUserId = 0;
+        }
+
         //订单列表的订单支付
-        _this.page.orderPay = function (e) {
+        _this.page.orderPay = function(e) {
             var index = e.currentTarget.dataset.index;
             var order_list = _this.page.data.order_list;
             var order = order_list[index];
@@ -50,6 +56,8 @@ var pay = {
                 paramData.order_id = order.order_id
             }
 
+            paramData.parent_id = parentUserId; // TODO 从缓存中获取
+            paramData.condition =  2; //首次付款
 
             if (pay_type_list.length == 1) {
                 getApp().core.showLoading({
@@ -68,7 +76,7 @@ var pay = {
                     content: '选择支付方式',
                     cancelText: '余额支付',
                     confirmText: '线上支付',
-                    success: function (res) {
+                    success: function(res) {
                         if (res.confirm) {
                             getApp().core.showLoading({
                                 title: "正在提交",
@@ -87,10 +95,10 @@ var pay = {
                 app.request({
                     url: url,
                     data: paramData,
-                    complete: function () {
+                    complete: function() {
                         getApp().core.hideLoading();
                     },
-                    success: function (res) {
+                    success: function(res) {
                         if (res.code == 0) {
                             setOnShowScene('pay');
                             getApp().core.requestPayment({
@@ -100,9 +108,9 @@ var pay = {
                                 package: res.data.package,
                                 signType: res.data.signType,
                                 paySign: res.data.paySign,
-                                success: function (e) { },
-                                fail: function (e) { },
-                                complete: function (e) {
+                                success: function(e) {},
+                                fail: function(e) {},
+                                complete: function(e) {
 
                                     if (e.errMsg == "requestPayment:fail" || e.errMsg == "requestPayment:fail cancel") { //支付失败转到待支付订单列表
                                         getApp().core.showModal({
@@ -110,7 +118,7 @@ var pay = {
                                             content: "订单尚未支付",
                                             showCancel: false,
                                             confirmText: "确认",
-                                            success: function (res) {
+                                            success: function(res) {
                                                 if (res.confirm) {
                                                     getApp().core.redirectTo({
                                                         url: "/" + route + "?status=0",
@@ -120,12 +128,6 @@ var pay = {
                                         });
                                         return;
                                     }
-
-                                    getApp().page.bindParent({
-                                        parent_id: getApp().core.getStorageSync(getApp().const.PARENT_ID), // TODO 从缓存中获取
-                                        condition: 2,//首次付款
-                                    })
-
 
                                     getApp().core.redirectTo({
                                         url: "/" + route + "?status=1",
@@ -152,7 +154,7 @@ var pay = {
                 getApp().core.showModal({
                     title: '当前账户余额：' + user_info.money,
                     content: '是否使用余额',
-                    success: function (e) {
+                    success: function(e) {
                         if (e.confirm) {
                             getApp().core.showLoading({
                                 title: "正在提交",
@@ -161,16 +163,11 @@ var pay = {
                             app.request({
                                 url: url,
                                 data: paramData,
-                                complete: function () {
+                                complete: function() {
                                     getApp().core.hideLoading();
                                 },
-                                success: function (res) {
+                                success: function(res) {
                                     if (res.code == 0) {
-                                        getApp().page.bindParent({
-                                            parent_id: getApp().core.getStorageSync(getApp().const.PARENT_ID), // TODO 从缓存中获取
-                                            condition: 2,//首次付款
-                                        })
-
                                         getApp().core.redirectTo({
                                             url: "/" + route + "?status=1",
                                         });
@@ -192,7 +189,7 @@ var pay = {
 
 
         //订单支付
-        _this.page.order_submit = function (data, order_type) {
+        _this.page.order_submit = function(data, order_type) {
             var url_submit = api.order.submit;
             var url_pay_data = api.order.pay_data;
             var route = "/pages/order/order";
@@ -227,7 +224,7 @@ var pay = {
                 getApp().core.showModal({
                     title: '当前账户余额：' + user_info.money,
                     content: '是否确定使用余额支付',
-                    success: function (e) {
+                    success: function(e) {
                         if (e.confirm) {
                             submit_pay();
                         }
@@ -247,11 +244,11 @@ var pay = {
                     url: url_submit,
                     method: "post",
                     data: data,
-                    success: function (res) {
+                    success: function(res) {
                         if (res.code == 0) {
                             getApp().page.bindParent({
-                                parent_id: getApp().core.getStorageSync(getApp().const.PARENT_ID), // TODO 从缓存中获取
-                                condition: 1,//首次下单
+                                parent_id: parentUserId, // TODO 从缓存中获取
+                                condition: 1, //首次下单
                             })
 
                             if (res.data.p_price != undefined && res.data.p_price === 0) {
@@ -260,12 +257,17 @@ var pay = {
                                     title: "提交成功",
                                 });
 
-                                setTimeout(function () {
-                                    getApp().core.navigateBack();
+                                setTimeout(function() {
+                                    getApp().core.redirectTo({
+                                        url: "/pages/order/order?status=1",
+                                    });
                                 }, 2000);
+
+
+
                                 return;
                             }
-                            setTimeout(function () {
+                            setTimeout(function() {
                                 _this.page.setData({
                                     options: {},
                                 });
@@ -282,10 +284,12 @@ var pay = {
                                         order_id: order_id,
                                         order_id_list: order_id_list,
                                         pay_type: 'WECHAT_PAY',
+                                        parent_user_id: parentUserId, // TODO 从缓存中获取
+                                        condition: 2, //首次付款
                                     },
-                                    success: function (res) {
+                                    success: function(res) {
                                         if (res.code == 0) {
-                                            setTimeout(function () {
+                                            setTimeout(function() {
                                                 getApp().core.hideLoading();
                                             }, 1000);
                                             setOnShowScene('pay');
@@ -308,16 +312,16 @@ var pay = {
                                                     package: res.data.package,
                                                     signType: res.data.signType,
                                                     paySign: res.data.paySign,
-                                                    success: function (e) { },
-                                                    fail: function (e) { },
-                                                    complete: function (e) {
+                                                    success: function(e) {},
+                                                    fail: function(e) {},
+                                                    complete: function(e) {
                                                         if (e.errMsg == "requestPayment:fail" || e.errMsg == "requestPayment:fail cancel") { //支付失败转到待支付订单列表
                                                             getApp().core.showModal({
                                                                 title: "提示",
                                                                 content: "订单尚未支付",
                                                                 showCancel: false,
                                                                 confirmText: "确认",
-                                                                success: function (res) {
+                                                                success: function(res) {
                                                                     if (res.confirm) {
                                                                         getApp().core.redirectTo({
                                                                             url: route + "?status=0",
@@ -328,10 +332,6 @@ var pay = {
                                                             return;
                                                         }
                                                         if (e.errMsg == "requestPayment:ok") {
-                                                            getApp().page.bindParent({
-                                                                parent_id: getApp().core.getStorageSync(getApp().const.PARENT_ID), // TODO 从缓存中获取
-                                                                condition: 2,//首次付款
-                                                            });
                                                             if (typeof _this.page.data.goods_card_list !== 'undefined' && _this.page.data.goods_card_list.length > 0) {
                                                                 _this.page.setData({
                                                                     show_card: true
@@ -432,11 +432,13 @@ var pay = {
                                         order_id: order_id,
                                         order_id_list: order_id_list,
                                         pay_type: pay_type,
-                                        form_id: data.formId
+                                        form_id: data.formId,
+                                        parent_user_id: parentUserId, // TODO 从缓存中获取
+                                        condition: 2, //首次付款
                                     },
-                                    success: function (res) {
+                                    success: function(res) {
                                         if (res.code == 0) {
-                                            setTimeout(function () {
+                                            setTimeout(function() {
                                                 getApp().core.hideLoading();
                                             }, 1000);
                                             if (order_type == 'pt') {
@@ -467,7 +469,7 @@ var pay = {
                                                 content: res.msg,
                                                 showCancel: false,
                                                 confirmText: "确认",
-                                                success: function (res) {
+                                                success: function(res) {
                                                     if (res.confirm) {
                                                         getApp().core.redirectTo({
                                                             url: route + "?status=0",

@@ -277,7 +277,7 @@ $urlPlatform = Yii::$app->controller->route;
                                     </span>
                                     <div class="fs-sm">小计：
                                         <span
-                                                class="text-danger"><?= round(($order_item['total_price'] - $order_item['express_price']), 2) ?>
+                                                class="text-danger"><?= round(($order_item['pay_price'] - $order_item['express_price']), 2) ?>
                                             元</span></div>
                                 </div>
                             </div>

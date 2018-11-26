@@ -15,8 +15,8 @@ Page({
         getApp().request({
             url: getApp().api.lottery.detail,
             data: {
-                id: options.id ? options.id:0,
-                lottery_id:options.lottery_id ? options.lottery_id:0,
+                id: options.id ? options.id : 0,
+                lottery_id:options.lottery_id ? options.lottery_id : 0,
                 form_id:options.form_id,
                 page_num: 1,
             },
@@ -29,10 +29,23 @@ Page({
                 getApp().core.hideLoading();
             }
         });
-    },
+        getApp().request({ 
+            url: getApp().api.lottery.setting,
+            success: function (res) {
+                if(res.code==0){
+                    var title = res.data.title;
+                    if(title){
+                        getApp().core.setNavigationBarTitle({
+                            title:title,
+                        })
+                        self.setData({
+                            title:title
+                        })
+                    }
+                }
+            },
+        });
 
-    onShow(){
-        getApp().page.onShow(this);
     },
 
     submit: function(e) {
@@ -48,18 +61,17 @@ Page({
     },
 
     userload: function(){
-        var is_loading = this.data.is_loading;
+        var self = this;
+        var is_loading = self.data.is_loading;
         if (is_loading) {
             return;
         }
-        var lottery_id = this.data;
-        var self = this;
-        var page_num = this.data.page_num + 1;
+        var lottery_id = self.data;
+        var page_num = self.data.page_num + 1;
 
         getApp().core.showLoading({
             title: '加载中',
         });
-
         getApp().request({
             url: getApp().api.lottery.detail,
             data: {
@@ -90,11 +102,12 @@ Page({
      */
     onShareAppMessage: function () {
         getApp().page.onShareAppMessage(this);
+        getApp().core.hideLoading();
         let user_info = getApp().getUser();
         let lottery_id = this.data.list.lottery_id;
         var res = {
             path: "/lottery/goods/goods?user_id=" + user_info.id + "&id="+ lottery_id,
-            title: '抽奖',
+            title: this.data.title?this.data.title:'抽奖',
         };
         return res;
     }

@@ -3,7 +3,7 @@
     <include src="/components/header/header" />
     <view class="body after-navber">
     
-        <view class="bg"> 
+        <view class="bg" style="{{(_navbar && _navbar.navs && _navbar.navs.length>0)?'padding-bottom:115rpx':''}}"> 
             <view class="pond-head">
                 <image src="{{__wxapp_img.pond.pond.pond_head.url}}"/>
                 <navigator hover-class="navigator-hover" url="/pond/rule/rule" >

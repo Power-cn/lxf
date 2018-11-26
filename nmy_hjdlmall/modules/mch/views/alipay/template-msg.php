@@ -12,8 +12,18 @@
 defined('YII_ENV') or exit('Access Denied');
 $this->title = '模版消息';
 ?>
+
+<style>
+    .point {
+        color: red;
+    }
+    .form-group-label {
+        flex: 0 0 249px;
+    }
+</style>
+
 <div class="panel mb-3">
-    <div class="panel-header"><?= $this->title ?></div>
+    <div class="panel-header"><?= $this->title ?><span class="point">(可复制相应模板ID到支付宝小程序后台搜索)</span></div>
     <div class="panel-body">
         <form class="auto-form" method="post">
 
@@ -22,8 +32,8 @@ $this->title = '模版消息';
                     商城
                 </legend>
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">订单支付</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">订单支付(模板ID: AT0001 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="pay_tpl" placeholder="请输入模版 ID ..."
@@ -51,8 +61,8 @@ $this->title = '模版消息';
                 </div>
 
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">订单取消</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">订单取消(模板ID: AT0027 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="revoke_tpl" placeholder="请输入模版 ID ..."
@@ -81,8 +91,8 @@ $this->title = '模版消息';
                 </div>
 
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">订单发货</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">订单发货(模板ID: AT0011 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="send_tpl" placeholder="请输入模版 ID ..."
@@ -109,8 +119,8 @@ $this->title = '模版消息';
                 </div>
 
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">订单退款</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">订单退款(模板ID: AT0003 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="refund_tpl" placeholder="请输入模版 ID ..."
@@ -143,8 +153,8 @@ $this->title = '模版消息';
                     分销
                 </legend>
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">提现成功</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">提现成功(模板ID: AT0112 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="cash_success_tpl" placeholder="请输入模版 ID ..."
@@ -172,8 +182,8 @@ $this->title = '模版消息';
                 </div>
 
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">提现失败</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">提现失败(模板ID: AT0037 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="cash_fail_tpl" placeholder="请输入模版 ID ..."
@@ -201,8 +211,8 @@ $this->title = '模版消息';
                 </div>
 
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">分销审核</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">分销审核(模板ID: AT0044 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="apply_tpl" placeholder="请输入模版 ID ..."
@@ -234,8 +244,8 @@ $this->title = '模版消息';
                     拼团
                 </legend>
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">拼团成功</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">拼团成功(模板ID: AT0151 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="pt_success_notice" placeholder="请输入模版 ID ..."
@@ -262,8 +272,8 @@ $this->title = '模版消息';
                 </div>
 
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">拼团失败</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">拼团失败(模板ID: AT0150 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="pt_fail_notice" placeholder="请输入模版 ID ..."
@@ -295,8 +305,8 @@ $this->title = '模版消息';
                     预约
                 </legend>
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">预约成功</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">预约成功(模板ID: AT0001 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="yy_success_notice" placeholder="请输入模版 ID ..."
@@ -323,8 +333,8 @@ $this->title = '模版消息';
                 </div>
 
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">预约失败</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">预约失败(模板ID: AT0003 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="yy_refund_notice" placeholder="请输入模版 ID ..."
@@ -357,8 +367,8 @@ $this->title = '模版消息';
                     多商户
                 </legend>
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">多商户入驻审核</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">多商户入驻审核(模板ID: AT0044 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="mch_tpl_1" placeholder="请输入模版 ID ..."
@@ -385,8 +395,8 @@ $this->title = '模版消息';
                 </div>
 
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">多商户下单</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">多商户下单(模板ID: AT0008 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="mch_tpl_2" placeholder="请输入模版 ID ..."
@@ -414,17 +424,17 @@ $this->title = '模版消息';
             </fieldset>
 
             <fieldset
-                    style="margin: 8px; border: 1px solid silver; padding: 8px; border-radius: 4px;<?= $model['fxhb']['is_show'] ? '' : 'display: none' ?>">
+                    style="margin: 8px; border: 1px solid silver; padding: 8px; border-radius: 4px;<?= $model['fxhb']['is_show'] ? 'display: none' : 'display: none' ?>">
                 <legend style="color:#333333; font-size:0.8em; font-weight:bold;">
                     裂变拆红包
                 </legend>
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">拆红包成功消息</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">拆红包成功消息(模板ID:  )</label>
                     </div>
                     <div class="col-sm-6">
-                        <input class="form-control" name="tpl_msg_id" placeholder="请输入模版 ID ..."
-                               value="<?= isset($model['fxhb']['tpl_msg_id']) ? $model['fxhb']['tpl_msg_id'] : '' ?>">
+                        <input class="form-control" name="fxhb_msg_id" placeholder="请输入模版 ID ..."
+                               value="<?= isset($model['fxhb']['fxhb_msg_id']) ? $model['fxhb']['fxhb_msg_id'] : '' ?>">
                         <div class="text-muted fs-sm">拆红包成功消息，<a data-toggle="modal" data-target="#tpl_msg_id"
                                                                   href="javascript:">查看模板消息格式</a></div>
                     </div>
@@ -447,10 +457,105 @@ $this->title = '模版消息';
                 </div>
             </fieldset>
 
-            <div class="form-group row">
-                <div class="form-group-label col-sm-2 text-right">
+            <fieldset
+                    style="margin: 8px; border: 1px solid silver; padding: 8px; border-radius: 4px;<?= $model['lottery']['is_show'] ? 'display: none' : 'display: none' ?>">
+                <legend style="color:#333333; font-size:0.8em; font-weight:bold;">
+                    抽奖结果
+                </legend>
+                <div class="form-group row">
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">抽奖结果消息(模板ID:  )</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <input class="form-control" name="bargain_msg_id" placeholder="请输入模版 ID ..."
+                               value="<?= isset($model['lottery']['bargain_msg_id']) ? $model['lottery']['bargain_msg_id'] : '' ?>">
+                        <div class="text-muted fs-sm">抽奖结果消息，<a data-toggle="modal" data-target="#tpl_msg_id"
+                                                                 href="javascript:">查看模板消息格式</a></div>
+                    </div>
                 </div>
-                <div class="col-sm-6">
+                <div class="modal fade" id="tpl_msg_id">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">模板消息格式：</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img style="max-width: 100%"
+                                     src="<?=Yii::$app->request->baseUrl?>/statics/images/fxhb/tplmsg.png">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset
+                    style="margin: 8px; border: 1px solid silver; padding: 8px; border-radius: 4px;<?= $model['lottery']['is_show'] ? 'display: none' : 'display: none' ?>">
+                <legend style="color:#333333; font-size:0.8em; font-weight:bold;">
+                    参与活动(砍价)
+                </legend>
+                <div class="form-group row">
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">活动参与成功(模板ID:  )</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <input class="form-control" name="activity_success_msg_id" placeholder="请输入模版 ID ..."
+                               value="<?= isset($tplMsg['activity']['activity_success_msg_id']) ? $tplMsg['activity']['activity_success_msg_id'] : '' ?>">
+                        <div class="text-muted fs-sm">活动参与成功通知，<a data-toggle="modal" data-target="#tip_yy_success_notice"
+                                                                  href="javascript:">查看模板消息格式</a></div>
+                    </div>
+                </div>
+                <div class="modal fade" id="tip_yy_success_notice">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">模板消息格式：</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img style="max-width: 100%"
+                                     src="<?= Yii::$app->request->baseUrl ?>/statics/images/tplmsg/yy_success_notice.png">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">活动参与失败(模板ID:  )</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <input class="form-control" name="activity_refund_msg_id" placeholder="请输入模版 ID ..."
+                               value="<?= isset($tplMsg['activity']['activity_refund_msg_id']) ? $tplMsg['activity']['activity_refund_msg_id'] : '' ?>">
+                        <div class="text-muted fs-sm">活动参与失败通知，<a data-toggle="modal"
+                                                                  data-target="#tip_yy_refund_notice"
+                                                                  href="javascript:">查看模板消息格式</a></div>
+                    </div>
+                </div>
+                <div class="modal fade" id="tip_yy_refund_notice">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">模板消息格式：</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img style="max-width: 100%"
+                                     src="<?= Yii::$app->request->baseUrl ?>/statics/images/tplmsg/yy_refund_notice.png">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="form-group row">
+                <div style="margin-left: 7px;" class="col-sm-6">
                     <a class="btn btn-primary auto-form-btn" href="javascript:">保存</a>
                 </div>
             </div>

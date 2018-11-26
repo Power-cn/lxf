@@ -97,7 +97,5 @@ Page({
                 is_loading = false;
             }
         });
-
-
     },
 });

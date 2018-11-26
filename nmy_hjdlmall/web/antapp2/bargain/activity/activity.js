@@ -124,10 +124,12 @@ Page({
      * 用户点击右上角分享
      */
     onShareAppMessage: function() {
+        getApp().page.onShareAppMessage(this);
         var self = this;
         var res = {
             path: "/bargain/activity/activity?order_id=" + self.data.order_id + "&user_id=" + self.data.__user_info.id,
-            success: function(e) {},
+            success: function (e) { },
+            title: self.data.share_title || null,
         };
         return res;
     },

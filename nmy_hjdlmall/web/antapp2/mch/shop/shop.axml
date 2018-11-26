@@ -54,6 +54,12 @@
                     <view>新品上架</view>
                 </view>
             </navigator>
+            <navigator open-type="redirect" url="/mch/shop-summary/shop-summary?mch_id={{mch_id}}" class="tab-item flex-grow-1 flex-y-center flex-x-center {{tab==4?'active':''}}">
+                <view>
+                    <image src="/mch/images/icon-summary.png"></image>
+                    <view>店铺简介</view>
+                </view>
+            </navigator>
         </view>
 
         <block a:if="{{tab==1}}">

@@ -52,6 +52,8 @@ use Yii;
  * @property integer $is_member_price
  * @property integer $is_share_price
  * @property integer $buy_member
+ * @property integer $logo
+ * @property integer $is_official_account
  */
 class Store extends \yii\db\ActiveRecord
 {

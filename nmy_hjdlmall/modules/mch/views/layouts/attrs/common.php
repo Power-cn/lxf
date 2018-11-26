@@ -73,9 +73,10 @@
 
     if (pageType === 'STORE') {
         initData.sub_cat_list = [];
+        // TODO attr_group_count 这里只要定义为0就好
         initData.attr_group_count = JSON.parse('<?= isset($goods) ? json_encode($goods->getAttrData()) : [] ?>', true).length;
         initData.old_checked_attr_list = [];
-        initData.goods_card_list = [];
+        initData.goods_card_list = <?= isset($goods_card_list) ? $goods_card_list : []?>;
 //        initData.card_list = <?//= isset($goods_card_list) ? $goods_card_list : []?>//;
         initData.card_list = <?= isset($card_list) ? $card_list : [] ?>;
         initData.goods_cat_list = <?= isset($goods_cat_list) ? $goods_cat_list : [] ?>;
@@ -190,8 +191,8 @@
     })
 </script>
 
-<!--是否使用规格-->
 <script>
+    // 是否使用规格
     function checkUseAttr() {
         if ($('.use-attr').length == 0)
             return;
@@ -213,9 +214,27 @@
     });
 
     checkUseAttr();
+
 </script>
 
 <script>
+    // 是否开启会员折扣
+    $(document).on("change", "input[name='model[is_level]']", function () {
+        setMemberDiscount();
+    });
+
+    setMemberDiscount();
+
+    function setMemberDiscount() {
+
+        if ($("input[name='model[is_level]']:checked").val() == 1) {
+            $(".member_price_box").show();
+        } else {
+            $(".member_price_box").hide();
+        }
+    }
+
+
     // 批量设置 多规格会员价
     $(document).on('click', '.set-member-price', function () {
         var level = page.level_list;
@@ -224,9 +243,15 @@
             var className = 'member' + level[i]['level'];
             var value = $('.' + className).val()
 
-            if (value > 0) {
+            if (value >= 0.01) {
                 for (var j = 0; j < attr.length; j++) {
                     Vue.set(attr[j], className, (parseFloat(value)).toFixed(2))
+                }
+            }
+
+            if (value > 0 && value < 0.01) {
+                for (var j = 0; j < attr.length; j++) {
+                    Vue.set(attr[j], className, (parseFloat(0.01)).toFixed(2))
                 }
             }
 
@@ -254,9 +279,9 @@
         var attr = page.checked_attr_list;
 
         for (var i = 0; i < attr.length; i++) {
-            oneValue > 0 ? Vue.set(attr[i], 'share_commission_first', (parseFloat(oneValue)).toFixed(2)) : '';
-            twoValue > 0 ? Vue.set(attr[i], 'share_commission_second', (parseFloat(twoValue)).toFixed(2)) : '';
-            threeValue > 0 ? Vue.set(attr[i], 'share_commission_third', (parseFloat(threeValue)).toFixed(2)) : '';
+            oneValue >= 0.01 ? Vue.set(attr[i], 'share_commission_first', (parseFloat(oneValue)).toFixed(2)) : '';
+            twoValue >= 0.01 ? Vue.set(attr[i], 'share_commission_second', (parseFloat(twoValue)).toFixed(2)) : '';
+            threeValue >= 0.01 ? Vue.set(attr[i], 'share_commission_third', (parseFloat(threeValue)).toFixed(2)) : '';
         }
     })
 

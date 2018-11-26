@@ -35,6 +35,9 @@ class CouponShareSendForm extends ApiModel
                 if ($coupon['expire_type'] == 1) {
                     $coupon['desc'] = "本券有效期为发放后{$coupon['expire_day']}天内";
                 } else {
+                    if($coupon['end_time'] <= time()) {
+                        continue;
+                    }
                     $coupon['desc'] = "本券有效期" . date('Y-m-d H:i:s', $coupon['begin_time']) . "至" . date('Y-m-d H:i:s', $coupon['end_time']);
                 }
                 if (count($coupon['goods_id_list']) > 0 && $coupon['appoint_type'] == 2) {

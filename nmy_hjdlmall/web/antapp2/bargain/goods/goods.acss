@@ -1,4 +1,5 @@
 /* bargain/goods/goods.wxss */
+@import "../../wxParse/wxParse.acss";
 @import "/components/goods-header/goods-header.acss";
 @import "/components/save_qrcode/save_qrcode.acss";
 .banner {

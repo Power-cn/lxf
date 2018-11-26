@@ -205,7 +205,7 @@ Page({
                     self.shareSendCoupon(self);
             },
             title: self.data.goods.name,
-            imageUrl: self.data.goods.pic_list[0].pic_url,
+            imageUrl: self.data.goods.pic_list[0],
         };
         return res;
     },
@@ -311,21 +311,6 @@ Page({
                     });
                 }
             }
-        });
-    },
-
-    selectDefaultAttr: function() {
-        var self = this;
-        if (!self.data.goods || self.data.goods.use_attr !== 0)
-            return;
-        for (var i in self.data.attr_group_list) {
-            for (var j in self.data.attr_group_list[i].attr_list) {
-                if (i == 0 && j == 0)
-                    self.data.attr_group_list[i].attr_list[j]['checked'] = true;
-            }
-        }
-        self.setData({
-            attr_group_list: self.data.attr_group_list,
         });
     },
 

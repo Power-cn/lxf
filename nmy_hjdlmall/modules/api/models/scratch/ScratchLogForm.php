@@ -57,7 +57,7 @@ class ScratchLogForm extends ApiModel
                             $v['name'] = $v['coupon'] = $v['coupon']['name'];
                         break;
                         case 3:
-                            $v['name'] = $v['num']['name'].'积分';
+                            $v['name'] = $v['num'].'积分';
                         break;
                         case 4:
                             $v['name'] = $v['gift'] = $v['gift']['name'];
@@ -117,7 +117,7 @@ class ScratchLogForm extends ApiModel
                     $v['name'] = $v['coupon']['name'];
                 break;
                 case 3:
-                    $v['name'] = $v['num']['name'].'积分';
+                    $v['name'] = $v['num'].'积分';
                 break;
                 case 4:
                     $v['name'] = $v['gift']['name'];

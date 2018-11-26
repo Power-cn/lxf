@@ -180,6 +180,17 @@ class Menu
                                 'is_menu' => true,
                                 'route' => 'mch/wechat-platform/send-msg',
                             ],
+                            [
+                                'offline' => true,
+                                'name' => '小程序发布',
+                                'is_menu' => true,
+                                'route' => 'mch/store/wxapp',
+                            ],
+                            [
+                                'name' => '单商户小程序',
+                                'is_menu' => true,
+                                'route' => 'mch/store/wxapp-nomch',
+                            ],
                         ],
                     ],
                     [
@@ -962,6 +973,11 @@ class Menu
                                         'is_menu' => false,
                                         'route' => 'mch/miaosha/calendar',
                                     ],
+                                    [
+                                        'name' => '多规格详情',
+                                        'is_menu' => false,
+                                        'route' => 'mch/miaosha/goods-detail-edit',
+                                    ],
                                 ],
                             ],
                             [
@@ -1450,7 +1466,7 @@ class Menu
                         'route' => 'mch/scratch/scratch/index',
                         'children' => [
                             [
-                                'name' => '刮刮卡配置',
+                                'name' => '基础设置',
                                 'is_menu' => true,
                                 'route' => 'mch/scratch/scratch/setting',
                             ],
@@ -1548,19 +1564,30 @@ class Menu
                         'route' => '',
                         'children' => [
                             [
+                                'name' => '基础设置',
                                 'is_menu' => true,
-                                'name' => '奖品列表',
+                                'route' => "mch/lottery/default/setting",
+                            ],
+                            [
+                                'is_menu' => true,
+                                'name' => '抽奖列表',
                                 'route' => 'mch/lottery/default/goods',
                                 'sub' => [
                                     [
+                                'route' => 'mch/lottery/default/setting',
                                         'is_menu' => false,
-                                        'name' => '奖品编辑',
+                                        'name' => '抽奖编辑',
                                         'route' => 'mch/lottery/default/goods-edit'
                                     ],
                                     [
                                         'is_menu' => false,
                                         'name' => '抽奖详情',
                                         'route' => 'mch/lottery/default/detail'
+                                    ],
+                                    [
+                                        'is_menu' => false,
+                                        'name' => '参与详情',
+                                        'route' => 'mch/lottery/default/partake-list'
                                     ],
                                 ]
                             ],
@@ -1738,7 +1765,22 @@ class Menu
                         'is_menu' => true,
                         'route' => 'mch/cache/index',
                     ],
+                    [
+                        'is_ind' => true,
+                        'admin' => true,
+                        'offline' => true,
+                        'name' => '更新',
+                        'is_menu' => true,
+                        'route' => 'mch/update/index',
+                    ],
+
                 ],
+            ],
+            [
+                'name' => '数据统计',
+                'is_menu' => true,
+                'icon' => 'icon-tongji',
+                'route' => 'mch/statistic/index'
             ],
         ];
     }

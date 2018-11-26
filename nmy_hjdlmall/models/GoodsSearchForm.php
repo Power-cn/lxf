@@ -60,8 +60,9 @@ class GoodsSearchForm extends Model
             $newItem['attr_group_list'] = $item->getAttrData();
             $newItem['attr'] = CommonGoodsAttr::getCheckedAttr($item);
             $newItem['price'] = $item['original_price'];
+            $newItem['is_level'] = $item->is_discount;
+//            $newItem['attr']['sell_num'] = $item->getSalesVolume();
             $newList[] = $newItem;
-            $newItem['attr']['sell_num'] = $item->getSalesVolume();
         }
 
         return [

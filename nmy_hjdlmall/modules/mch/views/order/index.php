@@ -271,7 +271,7 @@ $urlPlatform = Yii::$app->requestedRoute;
                                 <div class="goods-info">
                                     <div class="goods-name"><?= $goods_item['name'] ?></div>
                                     <div class="mt-1">
-                                                <span class="fs-sm">
+                                        <span class="fs-sm">
                                             规格：
                                         <span class="text-danger">
                                             <?php $attr_list = json_decode($goods_item['attr']); ?>
@@ -282,22 +282,19 @@ $urlPlatform = Yii::$app->requestedRoute;
                                                 <?php endforeach;;
                                             endif; ?>
                                         </span>
-                                                </span>
+                                        </span>
                                         <span class="fs-sm">数量：
-                                            <span
-                                                    class="text-danger"><?= $goods_item['num'] . $goods_item['unit'] ?></span>
-                                                </span>
+                                            <span class="text-danger"><?= $goods_item['num'] . $goods_item['unit'] ?></span>
+                                        </span>
                                     </div>
                                     <div>
-                                                <span class="fs-sm">小计：
-                                                    <span class="text-danger mr-4"><?= $goods_item['total_price'] ?>
-                                                        元</span></span>
-                                        <?php if ($order_item['discount'] && $order_item['discount'] != 10 && $goods_item['is_level'] == 1) : ?>
+                                        <span class="fs-sm">小计：
+                                            <span class="text-danger mr-4"><?= $goods_item['total_price'] ?>元</span>
+                                        </span>
+                                        <?php if ($goods_item['is_level'] == 1 && $order_item['discount'] != '10') : ?>
                                             <span class="fs-sm">会员折扣：
-                                                        <span class="text-danger"><?= $order_item['discount'] ?>折</span></span>
-<!--                                        --><?php //else: ?>
-<!--                                            <span class="fs-sm">会员折扣：-->
-<!--                                                        <span class="text-danger">商品会员价:--><?//= $goods_item['member_price'] ?><!--</span></span>-->
+                                                <span class="text-danger"><?= $order_item['discount'] ?>折</span>
+                                            </span>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -335,11 +332,7 @@ $urlPlatform = Yii::$app->requestedRoute;
                                 </span>
                         <?php endif; ?>
                         <?php if ($order_item['discount'] && $order_item['discount'] != 10) : ?>
-                            <div class='titleColor'>会员折扣：<span style="color:red;"><?= $order_item['discount'] ?></span>折
-                            </div>
-<!--                        --><?php //else: ?>
-<!--                            <div class='titleColor'>会员折扣：<span style="color:red;">商品会员价</span>-->
-<!--                            </div>-->
+<!--                            <div class='titleColor'>会员折扣：<span style="color:red;">--><?//= $order_item['discount'] ?><!--</span>折</div>-->
                         <?php endif; ?>
                         <?php if ($order_item['is_pay'] == 0 && $order_item['is_cancel'] == 0 && $order_item['is_send'] == 0) : ?>
                             <div>

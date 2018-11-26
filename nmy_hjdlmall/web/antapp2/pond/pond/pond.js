@@ -296,12 +296,17 @@ Page({
     */
     onShareAppMessage: function () {
         getApp().page.onShareAppMessage(this);
+        this.setData({
+          share_modal_active: false
+        });
         var user_info = getApp().getUser();
         var res = {
             path: "/pond/pond/pond?user_id=" + user_info.id,
             title: this.data.title?this.data.title:'九宫格抽奖',
         };
-        return res;
+        setTimeout(function () {
+          return res;
+        }, 500);
     },
 
     showShareModal:function(){

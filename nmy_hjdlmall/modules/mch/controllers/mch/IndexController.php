@@ -269,4 +269,13 @@ class IndexController extends Controller
             'exportList' => \Yii::$app->serializer->encode($excelFields)
         ]);
     }
+
+    public function actionMchDel()
+    {
+        $form = new MchListForm();
+        $form->mch_id = \Yii::$app->request->get('id');
+        $res = $form->delete();
+
+        return $res;
+    }
 }

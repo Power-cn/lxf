@@ -41,6 +41,7 @@ use Yii;
  */
 class MsGoods extends \yii\db\ActiveRecord
 {
+    public $is_level;
     /**
      * @inheritdoc
      */
@@ -56,7 +57,7 @@ class MsGoods extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'original_price', 'detail', 'store_id', 'attr'], 'required'],
-            [['original_price', 'weight', 'share_commission_first', 'share_commission_second', 'share_commission_third', 'rebate'], 'number'],
+            [['original_price', 'weight', 'share_commission_first', 'share_commission_second', 'share_commission_third', 'rebate','is_level'], 'number'],
             [['detail', 'cover_pic', 'video_url', 'full_cut', 'integral', 'attr'], 'string'],
             [['status', 'sort', 'virtual_sales', 'addtime', 'is_delete', 'sales', 'store_id', 'freight', 'use_attr', 'is_discount', 'coupon', 'individual_share', 'share_type'], 'integer'],
             [['name', 'unit', 'payment'], 'string', 'max' => 255],
@@ -401,6 +402,11 @@ class MsGoods extends \yii\db\ActiveRecord
         }
         return $num;
     }
+
+    public function getIsLevel() {
+        return $this->is_level = $this->is_discount;
+    }
+
 
     public function afterSave($insert, $changedAttributes)
     {

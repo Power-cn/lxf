@@ -70,6 +70,7 @@ class PtGoodsForm extends MchModel
     public $single_share_commission_first;
     public $single_share_commission_second;
     public $single_share_commission_third;
+    public $is_level;
 
     /**
      * @inheritdoc
@@ -78,7 +79,7 @@ class PtGoodsForm extends MchModel
     {
         return [
             [['store_id', 'name', 'original_price', 'price', 'cover_pic', 'detail', 'group_num', 'grouptime', 'cat_id', 'one_buy_limit'], 'required'],
-            [['store_id', 'cat_id', 'freight', 'limit_time', 'is_only', 'is_more', 'type', 'use_attr', 'share_type', 'attr_setting_type'], 'integer'],
+            [['store_id', 'cat_id', 'freight', 'limit_time', 'is_only', 'is_more', 'type', 'use_attr', 'share_type', 'attr_setting_type', 'is_level'], 'integer'],
             [['original_price', 'price'], 'number', 'min' => 0.01, 'max' => 999999],
             [['detail', 'cover_pic', 'goods_no'], 'string'],
             [['attr', 'goods_pic_list', 'payment'], 'safe',],
@@ -139,6 +140,7 @@ class PtGoodsForm extends MchModel
             'single_share_commission_first' => '一级佣金',
             'single_share_commission_second' => '二级佣金',
             'single_share_commission_third' => '三级佣金',
+            'is_level' => '会员折扣'
         ];
     }
 
@@ -258,6 +260,7 @@ class PtGoodsForm extends MchModel
             $goods->detail = preg_replace('/\\\u[a-z0-9]{4}/', '', userTextEncode($_this_attributes['detail']));
 
             $goods->use_attr = $this->use_attr ? 1 : 0;
+            $goods->is_level = $this->is_level;
             if ($goods->save()) {
                 PtGoodsPic::updateAll(['is_delete' => 1], ['goods_id' => $goods->id]);
                 foreach ($this->goods_pic_list as $pic_url) {

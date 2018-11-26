@@ -14,6 +14,7 @@ use Yii;
  * @property string $group_num
  * @property integer $group_time
  * @property string $attr
+ * @property int $is_level
  */
 class PtGoodsDetail extends \yii\db\ActiveRecord
 {
@@ -51,6 +52,7 @@ class PtGoodsDetail extends \yii\db\ActiveRecord
             'group_num' => '商品成团数',
             'group_time' => '拼团时间/小时',
             'attr' => '规格的库存及价格',
+            'is_level' => '是否享受会员折扣 0-不享受 1--享受',
         ];
     }
 

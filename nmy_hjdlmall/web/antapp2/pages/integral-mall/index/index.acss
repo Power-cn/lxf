@@ -8,6 +8,7 @@ page {
     /* height:258rpx;  */
     position: relative;
     z-index: 10;
+    margin-bottom: 48rpx;
 }
 
 .head-img {

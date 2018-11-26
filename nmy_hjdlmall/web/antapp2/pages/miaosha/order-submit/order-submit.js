@@ -72,32 +72,30 @@ Page({
     },
     dingwei: function() {
         var self = this;
-        getApp().core.chooseLocation({
+        getApp().getauth({
+            content: "需要获取您的地理位置授权，请到小程序设置中打开授权",
+            author:'scope.userLocation',
             success: function(e) {
-                longitude = e.longitude;
-                latitude = e.latitude;
-                self.setData({
-                    location: e.address,
-                });
-            },
-            fail: function(res) {
-                getApp().getauth({
-                    content: "需要获取您的地理位置授权，请到小程序设置中打开授权",
-                    success: function(e) {
-                        if (e) {
-                            if (e.authSetting["scope.userLocation"]) {
-                                self.dingwei();
-                            } else {
-                                getApp().core.showToast({
-                                    title: '您取消了授权',
-                                    image: "/images/icon-warning.png",
-                                })
+                if (e) {
+                    if (e.authSetting["scope.userLocation"]) {
+                        getApp().core.chooseLocation({
+                            success: function(e) {
+                                longitude = e.longitude;
+                                latitude = e.latitude;
+                                self.setData({
+                                    location: e.address,
+                                });
                             }
-                        }
+                        })
+                    } else {
+                        getApp().core.showToast({
+                            title: '您取消了授权',
+                            image: "/images/icon-warning.png",
+                        })
                     }
-                });
+                }
             }
-        })
+        });
     },
 
     orderSubmit: function(e) {
@@ -250,6 +248,8 @@ Page({
                             }
                         }
                         input_data.total_price = res.data.total_price;
+                        input_data.level_price = res.data.level_price;
+                        input_data.is_level = res.data.is_level;
                         input_data.goods_list = res.data.list;
                         input_data.goods_info = res.data.goods_info;
                         input_data.express_price = parseFloat(res.data.express_price);
@@ -258,7 +258,7 @@ Page({
                         input_data.send_type = res.data.send_type;
                         input_data.level = res.data.level;
                         input_data.integral = res.data.integral;
-                        input_data.new_total_price = res.data.total_price;
+                        input_data.new_total_price = res.data.level_price;
                         input_data.is_payment = res.data.is_payment;
                         input_data.is_coupon = res.data.list[0].coupon;
                         input_data.is_discount = res.data.list[0].is_discount;
@@ -410,12 +410,14 @@ Page({
     getPrice: function() {
         var self = this;
         var total_price = self.data.total_price;
-        var new_total_price = total_price;
+        // var new_total_price = total_price;
+        var new_total_price = self.data.level_price;
         var express_price = self.data.express_price;
         var picker_coupon = self.data.picker_coupon;
         var integral = self.data.integral;
         var integral_radio = self.data.integral_radio;
         var level = self.data.level;
+        var is_level = self.data.is_level;
         var offline = self.data.offline;
 
         if (picker_coupon) {
@@ -426,10 +428,10 @@ Page({
             new_total_price = new_total_price - parseFloat(integral.forehead);
         }
 
-        if (level) {
-            new_total_price = new_total_price * level.discount / 10;
-        }
-
+        // if (level && is_level === true) {
+            // new_total_price = new_total_price * level.discount / 10;
+            // new_total_price = new_total_price
+        // }
         if (new_total_price <= 0.01) {
             new_total_price = 0.01;
         }
@@ -437,6 +439,7 @@ Page({
         if (offline == 0) {
             new_total_price = new_total_price + express_price;
         }
+        new_total_price = parseFloat(new_total_price)
         self.setData({
             new_total_price: new_total_price.toFixed(2)
         });

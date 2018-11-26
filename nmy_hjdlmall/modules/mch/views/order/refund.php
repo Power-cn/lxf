@@ -157,7 +157,7 @@ $urlHandle = $urlManager->createUrl(['mch/order/refund-handle']);
         <div class="panel-header"><?= $this->title ?></div>
         <div class="panel-body">
             <?= $this->render('/layouts/order-search/order-search', [
-                'url_' => $urlPlatform,
+                'urlPlatform' => $urlPlatform,
                 'recycle_is_show' => false
             ]) ?>
         </div>

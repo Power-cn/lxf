@@ -39,19 +39,18 @@ class LotteryBehavior extends BaseBehavior
      */
     private function checkPrizeTimeout($event)
     {
+        $cache_key = 'lottery_prize_timeout_checker';
+        if (\Yii::$app->cache->get($cache_key)) {
+            return true;
+        }
+        \Yii::$app->cache->set($cache_key, true, 30);
+
         /** @var Wechat $wechat */
         $wechat = isset($event->action->controller->wechat) ? $event->action->controller->wechat : null;
-        $cacheKey = 'lottery_prize_timeout_checker';
         if (!$wechat) {
             \Yii::$app->cache->set($cache_key, false);
             return true;
         }
-
-        if (\Yii::$app->cache->get($cacheKey)) {
-            return true;
-        }
-
-        \Yii::$app->cache->set($cacheKey, true, 30);
 
         $lottery = LotteryGoods::find()->where([
             'store_id' => $this->store->id,
@@ -71,6 +70,7 @@ class LotteryBehavior extends BaseBehavior
                             'store_id' => $this->store->id,
                             'lottery_id' => $lottery->id,
                             'status' => 0,
+                            'child_id' => 0,
                         ]);
                 $count = $query->count();//参与人数
 
@@ -86,15 +86,21 @@ class LotteryBehavior extends BaseBehavior
                     $ids_a = array_keys($same);
 
                     //$num = $lottery->stock-count($same); //剩余数量
+                    //lucky_code
+                    $lucky_logs = LotteryLog::find()->select('id,user_id,child_id')->where([ 
+                                'store_id' => $this->store->id,
+                                'lottery_id' => $lottery->id,
+                                'status' => 0,
+                            ])->andWhere(['not', ['in','child_id',$same]])->asArray()->all();
+                    $lucky_log = array_column($lucky_logs,'user_id', 'id');
 
-                    if(count($same) >= $stock){
-                        $num = count($same) - $stock;
-
-                        $new_ids = array_splice($ids_a,0,$num);
+                    if(count($same) > $stock){
+                        $new_ids = array_splice($ids_a,0,$stock);
+                    } else if( count($same) == $stock){
+                        $new_ids = $ids_a;
                     } else if( count($same)+1 == $stock){
                         //随机值
-                        $new_logs = array_diff($logs,$same);
-
+                        $new_logs = array_diff($lucky_log,$same);
                         $ids_b = array_rand($new_logs,1);
                         array_push($ids_a,$ids_b);
 
@@ -102,8 +108,22 @@ class LotteryBehavior extends BaseBehavior
                     } else {
                         $num = $stock-count($same); 
                         //随机值
-                        $new_logs = array_diff($logs,$same);
-                        $ids_b = array_rand($new_logs,$num); 
+                        $new_logs = array_diff($lucky_log,$same);
+
+                        //$ids_b = array_rand($new_logs,$num); 
+                        $ids_b = [];$array = [];
+                        while($num>count($ids_b)) {
+                            $ids = array_rand($new_logs,1);
+                            $user_id = $new_logs[$ids];
+
+                            if(in_array($user_id,$array)){
+                                continue;
+                            } else {
+                               $array[] = $user_id;
+                               $ids_b[] = $ids;
+                            }
+
+                        }
                         $new_ids = array_merge($ids_a,$ids_b);
 
                     }
@@ -134,7 +154,7 @@ class LotteryBehavior extends BaseBehavior
                     ]);
 
                     //无获奖
-                    $idList = LotteryLog::find()->select('id')
+                    $idList_err = LotteryLog::find()->select('id')
                             ->where([
                                 'AND',
                                 ['store_id' => $this->store->id],
@@ -142,10 +162,10 @@ class LotteryBehavior extends BaseBehavior
                                 ['status' => 0],
                             ])->asArray()->all();
 
-                    $idList = array_column($idList,'id');
+                    $idList_err = array_column($idList_err,'id');
 
                     LotteryLog::updateAll(['status' => 1,'obtain_time' => time(), ], [
-                        'id' => $idList,
+                        'id' => $idList_err,
                     ]);
                     $lottery->type = 1;
                     if($lottery->save()){
@@ -172,6 +192,7 @@ class LotteryBehavior extends BaseBehavior
                         ['store_id' => $this->store->id],
                         ['lottery_id' => $lottery->id],
                         ['status' => 0],
+                        ['child_id' => 0],
                     ])->asArray()->all();
 
                     $idList = array_column($idList,'id');

@@ -49,16 +49,20 @@
             <block a:for="{{banner_list}}" a:key="{{item.id}}">
                 <swiper-item>
                     <block a:if='{{item.open_type == "wxapp"}}'>
-                        <navigator url="{{item.page_url}}" app-id="{{item.appId}}" path="{{item.path}}" target="miniProgram">
+                        <navigator app-id="{{item.appId}}" path="{{item.path}}" target="miniProgram">
                             <view class="slide-title">{{item.title}}</view>
                             <image src="{{item.pic_url}}" class="slide-image" mode="aspectFill" />
                         </navigator>
                     </block>
                     <block a:else>
-                        <navigator onTap="navigatorClick" data-url="{{item.page_url}}" data-open_type="{{item.open_type}}" url="{{item.page_url}}" open-type="{{item.open_type ? item.open_type : 'navigator'}}">
-                            <view class="slide-title">{{item.title}}</view>
-                            <image src="{{item.pic_url}}" class="slide-image" mode="aspectFill" />
-                        </navigator>
+                        <form report-submit="true" onSubmit="_formIdSubmit" data-type="navigate" data-url="{{item.page_url}}">
+                            <button formType="submit" id="_formIdSubmit">
+                                <navigator onTap="navigatorClick" data-url="{{item.page_url}}" data-open_type="{{item.open_type}}" open-type="{{item.open_type ? item.open_type : 'navigator'}}">
+                                    <view class="slide-title">{{item.title}}</view>
+                                    <image src="{{item.pic_url}}" class="slide-image" mode="aspectFill" />
+                                </navigator>
+                            </button>
+                        </form>
                     </block>
                 </swiper-item>
             </block>
@@ -69,12 +73,16 @@
 
 <template name="search">
     <!-- 搜索栏 开始 -->
-    <view class="search-block">
-        <navigator url="/pages/search/search">
-            <image src="{{__wxapp_img.search.search.url}}" />
-            <text>搜索</text>
-        </navigator>
-    </view>
+    <form report-submit="true" onSubmit="_formIdSubmit" data-type="navigate" data-url="/pages/search/search">
+        <button formType="submit" id="_formIdSubmit">
+            <view class="search-block">
+                <navigator>
+                    <image src="{{__wxapp_img.search.search.url}}" />
+                    <text>搜索</text>
+                </navigator>
+            </view>
+        </button>
+    </form>
     <!-- 搜索栏 结束 -->
 </template>
 
@@ -82,16 +90,20 @@
     <!-- 导航图标 开始 -->
     <view class="nav-icon-list flex-row" a:if="{{nav_icon_list&&nav_icon_list.length>0}}">
         <view class="flex-grow-0 nav-icon{{nav_count==1?'-1':''}}" a:for="{{nav_icon_list}}" a:key="{{item.id}}">
-            <block a:if='{{item.open_type == "wxapp"}}'>
-                <navigator data-url="{{item.url}}" data-open_type="{{item.open_type}}" url="{{item.url}}" open-type="navigate" target="miniProgram" path="{{item.path}}" app-id="{{item.appId}}">
-                    <image src="{{item.pic_url}}"></image>
-                    <view>{{item.name}}</view>
-                </navigator>
-            </block>
-            <navigator onTap="navigatorClick" data-url="{{item.url}}" data-open_type="{{item.open_type}}" url="{{item.url}}" open-type="{{item.open_type}}" a:else>
-                <image src="{{item.pic_url}}"></image>
-                <view>{{item.name}}</view>
-            </navigator>
+            <form report-submit="true" onSubmit="_formIdSubmit" data-bind="myBtnClick" data-type="navigate" data-url="{{item.url}}">
+                <button formType="submit" id="_formIdSubmit">
+                    <block a:if='{{item.open_type == "wxapp"}}'>
+                        <navigator data-url="{{item.url}}" data-open_type="{{item.open_type}}" target="miniProgram" path="{{item.path}}" app-id="{{item.appId}}" style='z-index:9;position:relative'>
+                            <image src="{{item.pic_url}}"></image>
+                            <view>{{item.name}}</view>
+                        </navigator>
+                    </block>
+                    <navigator a:else onTap="navigatorClick" data-url="{{item.url}}" data-open_type="{{item.open_type}}" open-type="{{item.open_type}}">
+                        <image src="{{item.pic_url}}"></image>
+                        <view>{{item.name}}</view>
+                    </navigator>
+                </button>
+            </form>
         </view>
     </view>
     <!-- 导航图标 结束 -->
@@ -99,30 +111,34 @@
 
 <template name="topic">
     <!-- 专题 开始 -->
-    <navigator class="topic-bar" url="/pages/topic-list/topic-list">
-        <view class="flex-row">
-            <view style='height:68rpx' class="flex-grow-0 flex-y-center" a:if='{{update_list.topic.count == 2}}'>
-                <image class="bar-icon" src="{{update_list.topic.logo_2}}"></image>
-            </view>
-            <view class="flex-grow-0 flex-y-center" a:if='{{update_list.topic.count == 1}}'>
-                <image class="bar-icon-1" src="{{update_list.topic.logo_1}}"></image>
-            </view>
-            <view class="flex-grow-1">
-                <swiper style="height:100%;line-height:32rpx" vertical="true" display-multiple-items="1" autoplay="true" interval="4000" duration="500" circular="false">
-                    <swiper-item a:for="{{topic_list}}" a:key="{{item.id}}">
-                        <block a:for="{{item}}" a:for-index="i" a:for-item="v" a:key="{{v.id}}">
-                            <view class='flex-row'>
-                                <view class="flex-grow-0 flex-y-center">
-                                    <image src='{{update_list.topic.heated}}' style='width:54rpx;height:28rpx;margin-right:10rpx;'></image>
-                                </view>
-                                <view class="flex-grow-1 topic-title fs-sm}">{{v.title}}</view>
-                            </view>
-                        </block>
-                    </swiper-item>
-                </swiper>
-            </view>
-        </view>
-    </navigator>
+    <form report-submit="true" onSubmit="_formIdSubmit" data-bind="myBtnClick" data-type="navigate" data-url="/pages/topic-list/topic-list">
+        <button formType="submit" id="_formIdSubmit">
+            <navigator class="topic-bar" url="/pages/topic-list/topic-list">
+                <view class="flex-row">
+                    <view style='height:68rpx' class="flex-grow-0 flex-y-center" a:if='{{update_list.topic.count == 2}}'>
+                        <image class="bar-icon" src="{{update_list.topic.logo_2}}"></image>
+                    </view>
+                    <view class="flex-grow-0 flex-y-center" a:if='{{update_list.topic.count == 1}}'>
+                        <image class="bar-icon-1" src="{{update_list.topic.logo_1}}"></image>
+                    </view>
+                    <view class="flex-grow-1">
+                        <swiper style="height:100%;line-height:32rpx" vertical="true" display-multiple-items="1" autoplay="true" interval="4000" duration="500" circular="false">
+                            <swiper-item a:for="{{topic_list}}" a:key="{{item.id}}">
+                                <block a:for="{{item}}" a:for-index="i" a:for-item="v" a:key="{{v.id}}">
+                                    <view class='flex-row'>
+                                        <view class="flex-grow-0 flex-y-center">
+                                            <image src='{{update_list.topic.heated}}' style='width:54rpx;height:28rpx;margin-right:10rpx;'></image>
+                                        </view>
+                                        <view class="flex-grow-1 topic-title fs-sm}">{{v.title}}</view>
+                                    </view>
+                                </block>
+                            </swiper-item>
+                        </swiper>
+                    </view>
+                </view>
+            </navigator>
+        </button>
+    </form>
     <!-- 专题 结束 -->
 </template>
 
@@ -135,8 +151,12 @@
                 <text>专享优惠券</text>
             </view>
             <navigator class="flex-y-center" url="/pages/coupon-list/coupon-list">
-                <text>更多</text>
-                <image src="{{__wxapp_img.store.jiantou_r.url}}" />
+                <form report-submit="true" onSubmit="_formIdSubmit">
+                    <button formType="submit" id="_formIdSubmit">
+                        <text>更多</text>
+                        <image src="{{__wxapp_img.store.jiantou_r.url}}" />
+                    </button>
+                </form>
             </navigator>
         </view>
         <scroll-view scroll-x="true" style="height: 162rpx">
@@ -192,6 +212,8 @@
                     </navigator>
                 </view>
                 <view class="goods-list flex-row goods-list-cols-{{cat_goods_cols}}" a:if="{{cat_goods_cols == 1}}">
+                    <!-- <form report-submit="true" onSubmit="_formIdSubmit" data-bind="myBtnClick" data-type="navigate" data-url="/pages/topic-list/topic-list">
+                        <button formType="submit" id="_formIdSubmit"> -->
                     <view class="products_container" a:for="{{cat.goods_list}}" a:for-index="goods_index" a:for-item="goods" a:key="{{goods.id}}">
                         <navigator class="products_item flex-row" url="/pages/goods/goods?id={{goods.id}}">
                             <view class='flex-grow-0 product_logo'>
@@ -210,21 +232,27 @@
                             <image catchTap="showshop" src="{{__wxapp_img.store.home_gwc.url}}" class="toCart" data-id="{{goods.id}}" />
                         </view>
                     </view>
+                    <!-- </button>
+                    </form> -->
                 </view>
                 <block a:else>
                     <view class="goods-list flex-row goods-list-cols-{{cat_goods_cols}}">
                         <view class="flex-grow-0" a:for="{{cat.goods_list}}" a:for-index="goods_index" a:for-item="goods" a:key="{{goods.id}}">
-                            <navigator class="goods-item" url="/pages/goods/goods?id={{goods.id}}">
-                                <image src="{{goods.pic_url}}" mode="aspectFill" />
-                                <text class="text-more-2 {{cat_goods_cols == 3?'fs-sm':''}}" style='color:#353535;margin-top:15rpx;padding:0 20rpx;'>{{goods.name}}
+                            <form report-submit="true" onSubmit="_formIdSubmit" data-bind="myBtnClick" data-type="navigate" data-url="/pages/goods/goods?id={{goods.id}}">
+                                <button formType="submit" id="_formIdSubmit">
+                                    <navigator class="goods-item" url="">
+                                        <image src="{{goods.pic_url}}" mode="aspectFill" />
+                                        <text class="text-more-2 {{cat_goods_cols == 3?'fs-sm':''}}" style='color:#353535;margin-top:15rpx;padding:0 20rpx;'>{{goods.name}}
                                     </text>
-                                <text class="goods-price" a:if='{{cat_goods_cols == 3}}'><block a:if="{{goods.is_negotiable!=1}}">￥</block>{{goods.price}}</text>
-                                <view class='flex-row' style='padding:10rpx 20rpx' a:else>
-                                    <view class='flex-grow-1' style='color:#ff4544'>
-                                        <block a:if="{{goods.is_negotiable!=1}}">￥</block>{{goods.price}}</view>
-                                    <view class='fs-sm flex-y-center' style='color:#999999;'>已售{{goods.sales}}</view>
-                                </view>
-                            </navigator>
+                                        <text class="goods-price" a:if='{{cat_goods_cols == 3}}'><block a:if="{{goods.is_negotiable!=1}}">￥</block>{{goods.price}}</text>
+                                        <view class='flex-row' style='padding:10rpx 20rpx' a:else>
+                                            <view class='flex-grow-1' style='color:#ff4544'>
+                                                <block a:if="{{goods.is_negotiable!=1}}">￥</block>{{goods.price}}</view>
+                                            <view a:if='{{__is_sales}}' class='fs-sm flex-y-center' style='color:#999999;'>已售{{goods.sales}}</view>
+                                        </view>
+                                    </navigator>
+                                </button>
+                            </form>
                         </view>
                     </view>
                 </block>
@@ -277,16 +305,20 @@
         <scroll-view scroll-x="true" style="background: #fff;padding: 16rpx 8rpx">
             <view class="flex-row miaosha-goods-list">
                 <navigator class="flex-grow-0 miaosha-goods" style="background: #fff;" a:for="{{miaosha.goods_list}}" a:key="{{item.id}}" url="/pages/miaosha/details/details?id={{item.id}}">
-                    <image src="{{item.pic}}"></image>
-                    <view class='text-more-2'>{{item.name}}</view>
-                    <view style="color: #ff4544;" class="flex-row flex-y-center flex-x-center text-more">
-                        <view>￥</view>
-                        <view style='font-size:13pt'>{{item.miaosha_price}}</view>
-                    </view>
-                    <view style="color: #aaa;" class="flex-y-center flex-x-center text-more fs-sm">
-                        <view>￥</view>
-                        <view>{{item.price}}</view>
-                    </view>
+                    <form report-submit="true" onSubmit="_formIdSubmit">
+                        <button formType="submit" id="_formIdSubmit">
+                            <image mode="aspectFill" src="{{item.pic}}"></image>
+                            <view class='text-more-2'>{{item.name}}</view>
+                            <view style="color: #ff4544;" class="flex-row flex-y-center flex-x-center text-more">
+                                <view>￥</view>
+                                <view style='font-size:13pt'>{{item.miaosha_price}}</view>
+                            </view>
+                            <view style="color: #aaa;" class="flex-y-center flex-x-center text-more fs-sm">
+                                <view>￥</view>
+                                <view>{{item.price}}</view>
+                            </view>
+                        </button>
+                    </form>
                 </navigator>
             </view>
         </scroll-view>
@@ -312,19 +344,23 @@
         <scroll-view scroll-x="true">
             <view class="flex-row pintuan-goods-list" style="padding: 0 20rpx 20rpx">
                 <navigator a:for="{{pintuan.goods_list}}" a:key="{{item.id}}" url="/pages/pt/details/details?gid={{item.id}}" class="flex-grow-0" style="background: #fff;width: 260rpx;">
-                    <view style="padding:24rpx 20rpx;">
-                        <image src="{{item.pic}}" style="width: 220rpx;height: 220rpx;margin-bottom: 12rpx;"></image>
-                        <view style="display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 2;overflow: hidden;font-size: 9pt;margin-bottom: 16rpx;">
-                            {{item.name}}
-                        </view>
-                        <view style="color:#ff4544;line-height: 1">
-                            <text style="font-size: 9pt">￥</text>
-                            <text style="font-weight: bold">{{item.price}}</text>
-                        </view>
-                    </view>
-                    <view style="font-size: 9pt;color: #aaa;padding:10rpx 20rpx;border-top: 1rpx solid #eee">
-                        已拼{{item.sale_num}}
-                    </view>
+                    <form report-submit="true" onSubmit="_formIdSubmit">
+                        <button formType="submit" id="_formIdSubmit">
+                            <view style="padding:24rpx 20rpx;">
+                                <image mode="aspectFill" src="{{item.pic}}" style="width: 220rpx;height: 220rpx;margin-bottom: 12rpx;"></image>
+                                <view style="display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 2;overflow: hidden;font-size: 9pt;margin-bottom: 16rpx;">
+                                    {{item.name}}
+                                </view>
+                                <view style="color:#ff4544;line-height: 1">
+                                    <text style="font-size: 9pt">￥</text>
+                                    <text style="font-weight: bold">{{item.price}}</text>
+                                </view>
+                            </view>
+                            <view style="font-size: 9pt;color: #aaa;padding:10rpx 20rpx;border-top: 1rpx solid #eee">
+                                已拼{{item.sale_num}}
+                            </view>
+                        </button>
+                    </form>
                 </navigator>
             </view>
         </scroll-view>
@@ -349,17 +385,21 @@
             <view class="flex-row miaosha-goods-list">
                 <block a:for="{{yuyue}}" a:key="{{item.id}}">
                     <navigator class="flex-grow-0 miaosha-goods" url="/pages/book/details/details?id={{item.id}}" style='width:352rpx'>
-                        <image src="{{item.cover_pic}}" style="width:325rpx;height:325rpx;" mode="aspectFill"></image>
-                        <view class='text-more-2'>{{item.name}}</view>
-                        <view style="color: #ff4544;line-height: 1;text-overflow: ellipsis;overflow: hidden;white-space: nowrap" class="flex-row flex-y-center">
-                            <block a:if='{{item.price > 0}}'>
-                                <view>￥</view>
-                                <view style='font-size:13pt'>{{item.price}}</view>
-                            </block>
-                            <block a:else>
-                                <view>免费</view>
-                            </block>
-                        </view>
+                        <form report-submit="true" onSubmit="_formIdSubmit">
+                            <button formType="submit" id="_formIdSubmit">
+                                <image src="{{item.cover_pic}}" style="width:325rpx;height:325rpx;" mode="aspectFill"></image>
+                                <view class='text-more-2'>{{item.name}}</view>
+                                <view style="color: #ff4544;line-height: 1;text-overflow: ellipsis;overflow: hidden;white-space: nowrap" class="flex-row flex-y-center">
+                                    <block a:if='{{item.price > 0}}'>
+                                        <view>￥</view>
+                                        <view style='font-size:13pt'>{{item.price}}</view>
+                                    </block>
+                                    <block a:else>
+                                        <view>免费</view>
+                                    </block>
+                                </view>
+                            </button>
+                        </form>
                     </navigator>
                 </block>
             </view>
@@ -406,10 +446,14 @@
         </view>
         <scroll-view scroll-x="true" style="padding: 10rpx 19rpx;white-space: nowrap;">
             <navigator a:for="{{mch_list}}" a:key="{{item.id}}" url="/mch/shop/shop?mch_id={{item.id}}" style="margin: 0 5rpx;display: inline-block;width: 224rpx">
-                <image src="{{item.logo}}" style="width: 224rpx;height: 224rpx;background-color: #fff"></image>
-                <view style="text-align:center; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;font-size: 9pt;">
-                    {{item.name}}
-                </view>
+                <form report-submit="true" onSubmit="_formIdSubmit">
+                    <button formType="submit" id="_formIdSubmit">
+                        <image src="{{item.logo}}" style="width: 224rpx;height: 224rpx;background-color: #fff"></image>
+                        <view style="text-align:center; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;font-size: 9pt;">
+                            {{item.name}}
+                        </view>
+                    </button>
+                </form>
             </navigator>
         </scroll-view>
     </view>

@@ -9,6 +9,7 @@
 namespace app\modules\api\models;
 
 use Alipay\AlipayRequestFactory;
+use app\models\OrderUnion;
 use app\utils\Refund;
 use app\utils\SendMail;
 use app\utils\Sms;
@@ -134,7 +135,7 @@ class OrderRevokeForm extends ApiModel
         //已付款就退款
         if ($order->is_pay == 1 && $order->pay_type == 1) {
             if ($order->pay_price > 0) {
-                $refund_res = Refund::refund($order,$order->order_no,$order->pay_price);
+                $refund_res = Refund::refund($order, $order->order_no, $order->pay_price);
                 if ($refund_res !== true) {
                     $t->rollBack();
                     return $refund_res;
@@ -170,7 +171,12 @@ class OrderRevokeForm extends ApiModel
         }
     }
 
-    //微信支付退款
+    /**
+     * 微信支付退款
+     * @param $order
+     * @param null $refund_account
+     * @return array|bool
+     */
     private function wxRefund($order, $refund_account = null)
     {
         $wechat = $this->getWechat();
@@ -180,6 +186,20 @@ class OrderRevokeForm extends ApiModel
             'total_fee' => $order->pay_price * 100,
             'refund_fee' => $order->pay_price * 100,
         ];
+
+        if (isset($order->order_union_id) && $order->order_union_id != 0) {
+            // 多商户合并订单退款
+            $orderUnion = OrderUnion::findOne($order->order_union_id);
+            if (!$orderUnion) {
+                return [
+                    'code' => 1,
+                    'msg' => '订单取消失败，合并支付订单不存在。',
+                ];
+            }
+            $data['out_trade_no'] = $orderUnion->order_no;
+            $data['total_fee'] = $orderUnion->price * 100;
+        }
+
         if ($refund_account) {
             $data['refund_account'] = $refund_account;
         }

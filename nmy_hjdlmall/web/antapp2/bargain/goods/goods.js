@@ -322,10 +322,13 @@ Page({
      * 用户点击右上角分享
      */
     onShareAppMessage: function () {
+        getApp().page.onShareAppMessage(this);
         var self = this;
         var res = {
             path: "/bargain/list/list?goods_id=" + self.data.goods.id + "&user_id=" + self.data.__user_info.id,
             success: function (e) { },
+            title: self.data.goods.name,
+            imageUrl: self.data.goods.pic_list[0].pic_url,
         };
         return res;
     },

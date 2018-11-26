@@ -44,6 +44,8 @@ class MiaoshaGoodsEditForm extends MchModel
     public $single_share_commission_third;
     public $miaosha_price;
     public $miaosha_num;
+    public $miaosha_pic;
+    public $is_level;
 
     public function rules()
     {
@@ -53,7 +55,7 @@ class MiaoshaGoodsEditForm extends MchModel
             [['buy_max', 'buy_limit'],'integer', 'min' => 0],
 
             [['store_id', 'buy_limit', 'stock'], 'required'],
-            [['store_id','share_type', 'use_attr', 'attr_setting_type'], 'integer'],
+            [['store_id','share_type', 'use_attr', 'attr_setting_type', 'is_level'], 'integer'],
             [['attr', 'goods_pic_list','form_list',], 'safe',],
             [['share_commission_first', 'share_commission_second', 'share_commission_third','individual_share','rebate','buy_limit','stock'], 'default', 'value' => 0],
             [['price','share_commission_first', 'share_commission_second', 'share_commission_third','rebate',], 'number', 'min' => 0,'max'=>999999],
@@ -61,7 +63,7 @@ class MiaoshaGoodsEditForm extends MchModel
             [['attr', 'attr_member_price_List'], 'app\models\common\admin\validator\AttrValidator'],
             [['single_share_commission_first', 'single_share_commission_second', 'single_share_commission_third'], 'default', 'value' => 0],
             [['single_share_commission_first', 'single_share_commission_second', 'single_share_commission_third'], 'number', 'min' => 0, 'max' => 999999],
-            [['miaosha_price', 'miaosha_num'], 'safe']
+            [['miaosha_price', 'miaosha_num', 'miaosha_pic'], 'safe']
         ];
     }
 
@@ -110,12 +112,17 @@ class MiaoshaGoodsEditForm extends MchModel
                     $miaoshaGoods->is_delete = 0;
                 }
                 $miaoshaGoods->buy_max = $this->buy_max;
+                $miaoshaGoods->is_level = $this->is_level;
                 $miaoshaGoods->buy_limit = $this->buy_limit;
                 $miaoshaGoods->save();
 
                 $this->setAttr($msGoods, $miaoshaGoods);
                 //单商品分销设置
-                $goodsShare = new GoodsShare();
+                $goodsShare = GoodsShare::find()->where(['relation_id' => $miaoshaGoods->id])->one();
+                if (!$goodsShare) {
+                    $goodsShare = new GoodsShare();
+                }
+
                 $goodsShare->store_id = $this->store_id;
                 $goodsShare->type = GoodsShare::SHARE_GOODS_TYPE_MS;
                 $goodsShare->goods_id = $msGoods->id;
@@ -188,11 +195,12 @@ class MiaoshaGoodsEditForm extends MchModel
 
         $new_attr = [];
         foreach ($this->attr as $i => $item) {
+
             $new_attr_item = [
                 'attr_list' => [],
                 'num' => intval($item['num']),
                 'price' => doubleval($item['price']),
-                'pic' => $item['pic'] ? $item['pic'] : '',
+                'pic' => $this->miaosha_pic[$i] ? $this->miaosha_pic[$i] : '',
                 'miaosha_price' => $this->miaosha_price[$i] ? $this->miaosha_price[$i] : 0,
                 'miaosha_num' => $this->miaosha_num[$i] ? $this->miaosha_num[$i] : 0,
                 'sell_num' => $item['sell_num'] ? $item['sell_num'] : 0,

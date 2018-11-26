@@ -344,13 +344,18 @@ Page({
     */
     onShareAppMessage: function () {
         getApp().page.onShareAppMessage(this);
+        this.setData({
+          share_modal_active: false
+        });
 
         var user_info = getApp().getUser();
         var res = {
             path: "/scratch/index/index?user_id=" + user_info.id,
             title: this.data.title?this.data.title:'刮刮卡',
         };
-        return res;
+        setTimeout(function () {
+          return res;
+        }, 500);
     },
 
     onHide: function () {

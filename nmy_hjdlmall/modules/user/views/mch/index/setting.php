@@ -41,6 +41,14 @@ $urlManager = Yii::$app->urlManager;
                 </div>
             </div>
             <div class="form-group row">
+                <div class="form-group-label col-sm-2 text-right">
+                    <label class="col-form-label">微信号</label>
+                </div>
+                <div class="col-sm-6">
+                    <input class="form-control" name="model[wechat_name]" value="<?= $model->wechat_name ?>">
+                </div>
+            </div>
+            <div class="form-group row">
                 <div class="col-sm-2 form-group-label text-right">
                     <label class="col-form-label">店铺信息</label>
                 </div>
@@ -76,6 +84,22 @@ $urlManager = Yii::$app->urlManager;
                 </div>
                 <div class="col-sm-6">
                     <input class="form-control" name="model[address]" value="<?= $model->address ?>">
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="form-group-label col-sm-2 text-right">
+                    <label class="col-form-label required">主营内容</label>
+                </div>
+                <div class="col-sm-6">
+                    <input class="form-control" name="model[main_content]" value="<?= $model->main_content ?>">
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="form-group-label col-sm-2 text-right">
+                    <label class="col-form-label">店铺简介</label>
+                </div>
+                <div class="col-sm-6">
+                    <textarea class="form-control" name="model[summary]"><?= $model->summary ?></textarea>
                 </div>
             </div>
             <div class="form-group row">

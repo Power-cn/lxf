@@ -36,6 +36,8 @@ use Yii;
  * @property integer $wechat_name
  * @property string $longitude
  * @property string $latitude
+ * @property string $main_content
+ * @property string $summary
  */
 class Mch extends \yii\db\ActiveRecord
 {
@@ -77,7 +79,7 @@ class Mch extends \yii\db\ActiveRecord
             [['store_id', 'user_id', 'addtime', 'is_delete', 'is_open', 'is_lock', 'is_recommend', 'review_status', 'review_time', 'province_id', 'city_id', 'district_id', 'mch_common_cat_id', 'transfer_rate', 'sort'], 'integer'],
             [['review_result', 'logo', 'header_bg'], 'string'],
             [['account_money'], 'number'],
-            [['realname', 'tel', 'name', 'wechat_name', 'longitude', 'latitude'], 'string', 'max' => 255],
+            [['realname', 'tel', 'name', 'wechat_name', 'longitude', 'latitude', 'main_content', 'summary'], 'string', 'max' => 255],
             [['address', 'service_tel'], 'string', 'max' => 1000],
         ];
     }
@@ -116,6 +118,8 @@ class Mch extends \yii\db\ActiveRecord
             'wechat_name' => '微信号',
             'longitude' => '经度',
             'latitude' => '纬度',
+            'main_content' => '主营内容',
+            'summary' => '简介',
         ];
     }
 

@@ -2,7 +2,11 @@ if (typeof wx === 'undefined') var wx = getApp().core;
 var utils = getApp().helper;
 var videoContext = '';
 var WxParse = require('../../wxParse/wxParse.js');
+var quickNavigation = require('../../components/quick-navigation/quick-navigation.js');
 var lotteryInter;
+var options_id;
+var timer;
+var luckyTimer;
 Page({
 
     /**
@@ -19,8 +23,8 @@ Page({
         p: 1,
         user_index: 0,
         show_animate: true,
-        animationTranspond:{},
-        award_bg:false
+        animationTranslottery:{},
+        award_bg:false,
     },
 
     /**
@@ -28,7 +32,10 @@ Page({
      */
     onLoad: function(options) {
         getApp().page.onLoad(this, options);
-        
+        if(options.user_id){
+            this.buyZero();           
+        }
+        quickNavigation.init(this);
         if (typeof my === 'undefined') {
             var scene = decodeURIComponent(options.scene);
             if (typeof scene !== 'undefined') {
@@ -44,7 +51,14 @@ Page({
                 options.id = query.gid;
             }
         }
-        this.getGoods(options);
+        options_id = options.id;
+    },
+    /**
+     * 生命周期函数--监听页面显示
+     */
+    onShow: function() {
+        getApp().page.onShow(this);
+        this.getGoods({id:options_id});
     },
 
     getGoods: function(options) {
@@ -59,10 +73,14 @@ Page({
             url: getApp().api.lottery.goods,
             data: {
                 id: id,
+                user_id:options.user_id,
+                page: 1,
             },
             success: function(res) {
                 if (res.code == 0) {
                     var detail = res.data.goods.detail;
+                    var time = res.data.lottery_info.end_time;
+                    self.setTimeStart(time);
                     WxParse.wxParse("detail", "html", detail, self);
                     self.setData(res.data);
                 } else {
@@ -72,9 +90,12 @@ Page({
                         showCancel: false,
                         success: function(e) {
                             if (e.confirm) {
-                                getApp().core.navigateBack({
-                                    delta: -1
-                                })
+                                // getApp().core.navigateBack({
+                                //     delta: -1
+                                // })
+                                getApp().core.redirectTo({
+                                    url: "/lottery/index/index",
+                                });
                             }
                         }
                     })
@@ -85,7 +106,52 @@ Page({
             }
         });
     },
+    catchTouchMove:function(res){
+        return false
+    },
+    onHide: function () {
+        getApp().page.onHide(this);
+        clearInterval(timer);
+    },
+    onUnload: function () {
+        getApp().page.onUnload(this);
+        clearInterval(timer);
+    },
 
+    setTimeStart: function (e) {
+        var self  =this;
+        var nowTime = new Date();
+        var times = parseInt((e - nowTime.getTime() / 1000));
+        clearInterval(timer);
+        timer = setInterval(function(){
+            var day=0,
+                hour=0,
+                minute=0,
+                second=0;//时间默认值
+
+            if(times > 0){
+              day = Math.floor(times / (60 * 60 * 24));
+              hour = Math.floor(times / (60 * 60)) - (day * 24);
+              minute = Math.floor(times / 60) - (day * 24 * 60) - (hour * 60);
+              second = Math.floor(times) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+            }
+            var time_list = {
+                'day': day,
+                'hour':hour,
+                'minute':minute,
+                'second':second,
+            };
+            self.setData({
+                time_list:time_list
+            })
+            times--;
+        },1000);
+
+        if(times<=0){
+            clearInterval(timer);
+        }
+
+    },
 
     buyZero: function() {
         var self = this;
@@ -107,7 +173,7 @@ Page({
         }
 
         self.setData({
-            animationTranspond: animation.export()
+            animationTranslottery: animation.export()
         });
 
         var circleCount = 0;
@@ -119,7 +185,7 @@ Page({
             }
 
             self.setData({
-                animationTranspond: animation.export()
+                animationTranslottery: animation.export()
             });
 
             circleCount++;
@@ -146,7 +212,7 @@ Page({
             }
 
             self.setData({
-                animationTranspond: animation.export()
+                animationTranslottery: animation.export()
             });
 
             circleCount++;
@@ -170,12 +236,6 @@ Page({
             award_bg:false,
         }) 
 
-    },
-    /**
-     * 生命周期函数--监听页面显示
-     */
-    onShow: function() {
-       
     },
 
     play: function(e) {
@@ -254,6 +314,7 @@ Page({
         let user_info = getApp().getUser();
         let id = this.data.lottery_info.id;
         var res = {
+            imageUrl:this.data.goods.pic_list[0].pic_url,
             path: "/lottery/goods/goods?id=" + id + "&user_id=" + user_info.id,
         };
         return res;

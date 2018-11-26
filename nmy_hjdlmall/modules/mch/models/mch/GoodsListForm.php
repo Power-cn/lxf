@@ -87,6 +87,9 @@ class GoodsListForm extends MchModel
         $cats = Cat::find()->where(['store_id' => $this->store_id, 'is_delete' => 0])->all();
         $cats = $this->simplifyData($cats);
 
+        if(!$cats) {
+            $cats = [];
+        }
         foreach($list as &$v){
             $goodsCat = GoodsCat::findOne([
                 'store_id' => $this->store_id,

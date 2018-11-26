@@ -92,7 +92,7 @@ class GoodsForm extends ApiModel
         if ($goods->is_negotiable) {
             $min_price = Goods::GOODS_NEGOTIABLE;
         } else {
-            $min_price = min($price);
+            $min_price = sprintf('%.2f', min($price));
         }
 
         $res = CommonGoods::getMMPrice([
@@ -102,34 +102,51 @@ class GoodsForm extends ApiModel
             'share_commission_first' => $goods['share_commission_first'],
             'price' => $goods['price'],
             'individual_share' => $goods['individual_share'],
-            'mch_id' => $goods['mch_id']
+            'mch_id' => $goods['mch_id'],
+            'is_level' => $goods['is_level'],
         ]);
+
+        $attr = json_decode($goods->attr, true);
+        $goodsPrice = $goods->price;
+        $isMemberPrice = false;
+        if ($res['user_is_member'] === true && count($attr) === 1 && $attr[0]['attr_list'][0]['attr_name'] == '默认') {
+            $goodsPrice = $res['min_member_price'] ? $res['min_member_price'] : $goods->price;
+            $isMemberPrice = true;
+        }
+
+        // 多商户商品无会员价
+        if ($res['is_mch_goods'] === true) {
+            $isMemberPrice = false;
+        }
 
         $data = [
             'id' => $goods->id,
             'pic_list' => $pic_list,
             'attr' => $goods->attr,
             'is_negotiable' => $goods->is_negotiable,
-            'max_price' => number_format(max($price), 2, '.', ''),
-            'min_price' => number_format($min_price, 2, '.', ''),
+            'max_price' => sprintf('%.2f', max($price)),
+            'min_price' => $min_price,
             'name' => $goods->name,
             'cat_id' => $goods->cat_id,
-            'price' => number_format($goods->price, 2, '.', ''),
+            'price' => sprintf('%.2f', $goodsPrice),
             'detail' => $goods->detail,
             'sales_volume' => $goods->getSalesVolume() + $goods->virtual_sales,
             'attr_group_list' => $goods->getAttrGroupList(),
             'num' => $goods->getNum(),
             'is_favorite' => $is_favorite,
             'service_list' => $new_service_list,
-            'original_price' => number_format($goods->original_price, 2, '.', ''),
+            'original_price' => sprintf('%.2f', $goods->original_price),
             'video_url' => $goods->video_url,
             'unit' => $goods->unit,
             'use_attr' => intval($goods->use_attr),
             'mch' => $mch,
-            'max_share_price' => number_format($res['max_share_price'], 2, '.', ''),
-            'min_member_price' => number_format($res['min_member_price'], 2, '.', ''),
+            'max_share_price' => sprintf('%.2f', $res['max_share_price']),
+            'min_member_price' => sprintf('%.2f', $res['min_member_price']),
             'is_share' => $res['is_share'],
+            'is_level' => $res['is_level'],
+            'is_member_price' => $isMemberPrice,
         ];
+
         return new ApiResponse(0, 'success', $data);
     }
 

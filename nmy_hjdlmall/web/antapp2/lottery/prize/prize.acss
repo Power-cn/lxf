@@ -33,16 +33,13 @@
 }
 
 
-.user_coupon_font{
-    color: #666666;
-    /* margin-top:10rpx; */}
-.user_coupon{
-    color: #666666;
+.flow image {
+    width: 20rpx;
+    height: 30rpx;
+    margin-left: 16rpx;
 }
-.xia{
-    position: absolute; 
-    width:28rpx;
-    height:28rpx; 
-    right:15px;
-    bottom:9px;
+.no-content {
+    padding-top: 200rpx;
+    color: #888;
+    text-align: center;
 }

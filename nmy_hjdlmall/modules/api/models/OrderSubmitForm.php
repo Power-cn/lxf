@@ -197,7 +197,6 @@ class OrderSubmitForm extends OrderData
             $gift = LotteryLog::find()
                 ->where([
                     'store_id' => $this->store_id,
-                    'status' => 2,
                     'id' => $this->lottery_id,
                     'user_id' => $this->user_id
                 ])->with(['gift' => function ($query) {
@@ -207,6 +206,28 @@ class OrderSubmitForm extends OrderData
                     ]);
                 }])
                 ->one();
+
+
+            if (empty($gift)) {
+                return [
+                    'code' => 1,
+                    'msg' => '已兑换或不存在',
+                ];
+            }
+
+            if($gift['status']!=2){
+                $gift = LotteryLog::find()->where([
+                            'store_id' => $this->store_id,
+                            'lottery_id' => $gift->lottery_id,
+                            'user_id' => $this->user_id,
+                            'status' => 2
+                        ])->with(['gift' => function ($query) {
+                            $query->where([
+                                'store_id' => $this->store_id,
+                                'is_delete' => 0
+                            ]);
+                        }])->one();
+            }
         } else {
             return;
         }

@@ -172,7 +172,7 @@ class OrderSubmitPreviewForm extends ApiModel
             if ($item['begin_time'] > (strtotime(date('Y-M-d')) + 86400) || $item['end_time'] < time()) {
                 continue;
             }
-            if ($item['cat_id_list'] || $item['goods_id_list']) {
+            if (($item['cat_id_list'] && $item['cat_id_list'] != 'null') || ($item['goods_id_list'] && $item['goods_id_list'] != 'null')) {
                 continue;
             }
             $list[$i]['status'] = 0;
@@ -253,10 +253,21 @@ class OrderSubmitPreviewForm extends ApiModel
         }
         $total_price = 0;
 //        $goods_attr_info = $goods->getAttrInfo($attr_id_list);
-        $goods_attr_info = CommonGoods::currentGoodsAttr($miaosha_goods, $attr_id_list, [
+
+        $goodsData = [
+            'attr' => $miaosha_goods['attr'],
+            'price' => $goods->original_price,
+            // 'is_level' => $goods->is_discount,
+             'is_level' => $miaosha_goods['is_level'],
+        ];
+
+        $otherData = [
             'type' => 'MIAOSHA',
-            'original_price' => $goods->original_price
-        ]);
+            'original_price' => $goods->original_price,
+            'id' => $miaosha_goods->id,
+        ];
+
+        $goods_attr_info = CommonGoods::currentGoodsAttr($goodsData, $attr_id_list, $otherData);
 
         $attr_list = Attr::find()->alias('a')
             ->select('ag.attr_group_name,a.attr_name')
@@ -270,8 +281,9 @@ class OrderSubmitPreviewForm extends ApiModel
             'goods_pic' => $goods_pic,
 //            'goods_pic' => $goods->getGoodsPic(0)->pic_url,
             'num' => $goods_info->num,
-            'price' => doubleval(empty($goods_attr_info['price']) ? $goods->original_price : $goods_attr_info['price']) * $goods_info->num,
-            'single_price' => doubleval(empty($goods_attr_info['price']) ? $goods->original_price : $goods_attr_info['price']),
+//            'price' => doubleval(empty($goods_attr_info['price']) ? $goods->original_price : $goods_attr_info['price']) * $goods_info->num,
+            'price' => sprintf('%.2f', ($goods_attr_info['goods_price'] * $goods_info->num)),
+            'single_price' => doubleval(empty($goods_attr_info['goods_price']) ? $goods->original_price : $goods_attr_info['goods_price']),
             'attr_list' => $attr_list,
             'give' => 0,
             'coupon' => $goods->coupon,
@@ -293,10 +305,11 @@ class OrderSubmitPreviewForm extends ApiModel
                     'msg' => '该轮秒杀商品已售罄',
                 ];
 
-            $goods_item->single_price = $temp_price;
-            $goods_item->price = $temp_price * $goods_item->num;
+//            $goods_item->single_price = $temp_price;
+//            $goods_item->price = $temp_price * $goods_item->num;
 
         }
+
         $buy_limit = MsOrder::find()
             ->andWhere(['user_id' => $this->user_id, 'is_cancel' => 0, 'goods_id' => $goods->id, 'is_delete' => 0])
             ->andWhere([
@@ -313,7 +326,6 @@ class OrderSubmitPreviewForm extends ApiModel
                 'msg' => '当前活动限购' . $miaosha_data['buy_limit'] . '单',
             ];
         }
-
 
         $total_price += $goods_item->price;
 
@@ -405,15 +417,18 @@ class OrderSubmitPreviewForm extends ApiModel
         //商品支付方式
         $is_payment = json_decode($goods_item->payment, true);
         $pay_type_list = OrderData::getPayType($this->store_id, $is_payment);
+
         return [
             'code' => 0,
             'msg' => 'success',
             'data' => [
-                'total_price' => number_format(floatval($total_price), 2),
+                'total_price' => sprintf('%.2f', $total_price),
                 'goods_info' => $goods_info,
                 'list' => [
                     $goods_item
                 ],
+                'level_price' => sprintf('%.2f', ($goods_attr_info['level_price'] * $goods_info->num)),
+                'is_level' => $goods_attr_info['is_level'],
                 'address' => $address,
                 'express_price' => $express_price,
                 'integral' => $resIntegral,
@@ -510,9 +525,17 @@ class OrderSubmitPreviewForm extends ApiModel
                 break;
             }
         }
-        $res = CommonGoods::currentGoodsAttr($miaosha_goods, $attr_id_list, [
+
+        $goodsData = [
+            'attr' => $miaosha_goods['attr'],
+            'price' => $goods->original_price,
+            'is_level' => $miaosha_goods['is_level'],
+        ];
+
+        $res = CommonGoods::currentGoodsAttr($goodsData, $attr_id_list, [
             'type' => 'MIAOSHA',
-            'original_price' => $goods->original_price
+            'original_price' => $goods->original_price,
+            'id' => $miaosha_goods['id'],
         ]);
 //        $goods_price = $goost_attr_data['price'];
         $goods_price = $res['price'];

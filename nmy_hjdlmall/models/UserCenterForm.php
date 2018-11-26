@@ -349,6 +349,7 @@ class UserCenterForm extends Model
                 'is_phone' => 0,
                 'phone' => ''
             ],
+            'is_menu' => 1,
             'menu_style' => 0,
             'top_style' => 0,
             'is_wallet' => 1,

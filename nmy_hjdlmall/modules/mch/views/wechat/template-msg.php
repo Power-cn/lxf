@@ -12,19 +12,30 @@
 defined('YII_ENV') or exit('Access Denied');
 $this->title = '模版消息';
 ?>
+
+
+<style>
+    .form-group-label {
+        flex: 0 0 249px;
+    }
+    .point {
+        color: red;
+    }
+</style>
+
 <div class="panel mb-3" id="app">
-    <div class="panel-header"><?= $this->title ?></div>
+    <div class="panel-header"><?= $this->title ?><span class="point">(可复制相应模板编号到微信小程序后台搜索)</span></div>
     <div class="panel-body">
         <form class="auto-form" method="post">
 
             <fieldset
                     style="margin: 8px; border: 1px solid silver; padding: 8px; border-radius: 4px; <?= $tplMsg['store']['is_show'] ? '' : 'display: none' ?>">
                 <legend style="color:#333333; font-size:0.8em; font-weight:bold;">
-                    商城
+                    关联模块：<span style="color: red;">商城</span>
                 </legend>
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">订单支付</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">订单支付(模板编号: AT0009 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="pay_tpl" placeholder="请输入模版 ID ..."
@@ -52,8 +63,8 @@ $this->title = '模版消息';
                 </div>
 
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">订单取消</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">订单取消(模板编号: AT0024 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="revoke_tpl" placeholder="请输入模版 ID ..."
@@ -82,8 +93,8 @@ $this->title = '模版消息';
                 </div>
 
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">订单发货</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">订单发货(模板编号: AT0007 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="send_tpl" placeholder="请输入模版 ID ..."
@@ -110,8 +121,8 @@ $this->title = '模版消息';
                 </div>
 
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">订单退款</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">订单退款(模板编号: AT0036 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="refund_tpl" placeholder="请输入模版 ID ..."
@@ -137,16 +148,129 @@ $this->title = '模版消息';
                         </div>
                     </div>
                 </div>
+
+                <div class="form-group row">
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">活动参与成功(模板编号: AT1348 )</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <input class="form-control" name="activity_success_tpl" placeholder="请输入模版 ID ..."
+                               value="<?= isset($tplMsg['store']['activity_success_tpl']) ? $tplMsg['store']['activity_success_tpl'] : '' ?>">
+                        <div class="text-muted fs-sm">活动参与成功通知，<a data-toggle="modal" data-target="#tip_activity_success_notice"
+                                                                  href="javascript:">查看模板消息格式</a></div>
+                    </div>
+                </div>
+                <div class="modal fade" id="tip_activity_success_notice">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">模板消息格式：</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img style="max-width: 100%"
+                                     src="<?= Yii::$app->request->baseUrl ?>/statics/images/tplmsg/activity_success_tpl.png">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">活动参与失败(模板编号: AT1863 )</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <input class="form-control" name="activity_refund_tpl" placeholder="请输入模版 ID ..."
+                               value="<?= isset($tplMsg['store']['activity_refund_tpl']) ? $tplMsg['store']['activity_refund_tpl'] : '' ?>">
+                        <div class="text-muted fs-sm">活动参与失败通知，<a data-toggle="modal"
+                                                                  data-target="#tip_activity_refund_notice"
+                                                                  href="javascript:">查看模板消息格式</a></div>
+                    </div>
+                </div>
+                <div class="modal fade" id="tip_activity_refund_notice">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">模板消息格式：</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img style="max-width: 100%"
+                                     src="<?= Yii::$app->request->baseUrl ?>/statics/images/tplmsg/activity_refund_tpl.png">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">账户变动通知(模板编号: AT0677 )</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <input class="form-control" name="tpl_msg_id" placeholder="请输入模版 ID ..."
+                               value="<?= isset($tplMsg['store']['account_change_tpl']) ? $tplMsg['store']['account_change_tpl'] : '' ?>">
+                        <div class="text-muted fs-sm">账户变动通知，<a data-toggle="modal" data-target="#tip_fxhb_tpl_1"
+                                                                href="javascript:">查看模板消息格式</a></div>
+                    </div>
+                </div>
+                <div class="modal fade" id="tip_fxhb_tpl_1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">模板消息格式：</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img style="max-width: 100%"
+                                     src="<?=Yii::$app->request->baseUrl?>/statics/images/tplmsg/fxhb.png">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">审核结果通知(模板编号: AT0146 )</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <input class="form-control" name="mch_tpl_1" placeholder="请输入模版 ID ..."
+                               value="<?= isset($tplMsg['store']['apply']) ? $tplMsg['store']['apply'] : '' ?>">
+                        <div class="text-muted fs-sm">审核结果通知，<a data-toggle="modal" data-target="#tip_mch_tpl_1"
+                                                                href="javascript:">查看模板消息格式</a></div>
+                    </div>
+                </div>
+                <div class="modal fade" id="tip_mch_tpl_1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">模板消息格式：</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img style="max-width: 100%"
+                                     src="<?= Yii::$app->request->baseUrl ?>/statics/images/tplmsg/mch-tpl-1.png">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </fieldset>
 
-            <fieldset
-                    style="margin: 8px; border: 1px solid silver; padding: 8px; border-radius: 4px;<?= $tplMsg['share']['is_show'] ? '' : 'display: none' ?>">
+            <fieldset style="margin: 8px; border: 1px solid silver; padding: 8px; border-radius: 4px;<?= $tplMsg['share']['is_show'] ? '' : 'display: none' ?>">
                 <legend style="color:#333333; font-size:0.8em; font-weight:bold;">
-                    分销
+                    关联模块：<span style="color: red;">分销</span>
                 </legend>
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">提现成功</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">提现成功(模板编号: AT0830 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="cash_success_tpl" placeholder="请输入模版 ID ..."
@@ -174,8 +298,8 @@ $this->title = '模版消息';
                 </div>
 
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">提现失败</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">提现失败(模板编号: AT1242 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="cash_fail_tpl" placeholder="请输入模版 ID ..."
@@ -203,8 +327,8 @@ $this->title = '模版消息';
                 </div>
 
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">分销审核</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">分销审核(模板编号: AT0674 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="apply_tpl" placeholder="请输入模版 ID ..."
@@ -234,11 +358,11 @@ $this->title = '模版消息';
             <fieldset
                     style="margin: 8px; border: 1px solid silver; padding: 8px; border-radius: 4px; <?= $tplMsg['pintuan']['is_show'] ? '' : 'display: none' ?>">
                 <legend style="color:#333333; font-size:0.8em; font-weight:bold;">
-                    拼团
+                    关联模块：<span style="color: red;">拼团</span>
                 </legend>
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">拼团成功</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">拼团成功通知(模板编号: AT0051 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="pintuan_success_notice" placeholder="请输入模版 ID ..."
@@ -265,8 +389,8 @@ $this->title = '模版消息';
                 </div>
 
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">拼团失败</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">拼团失败通知(模板编号: AT0310 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="pintuan_fail_notice" placeholder="请输入模版 ID ..."
@@ -296,11 +420,11 @@ $this->title = '模版消息';
             <fieldset
                     style="margin: 8px; border: 1px solid silver; padding: 8px; border-radius: 4px;<?= $tplMsg['book']['is_show'] ? '' : 'display: none' ?>">
                 <legend style="color:#333333; font-size:0.8em; font-weight:bold;">
-                    预约
+                    关联模块：<span style="color: red;">预约</span>
                 </legend>
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">预约成功</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">预约成功(模板编号: AT0009 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="yy_success_notice" placeholder="请输入模版 ID ..."
@@ -327,8 +451,8 @@ $this->title = '模版消息';
                 </div>
 
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">预约失败</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">预约失败(模板编号: AT0036 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="yy_refund_notice" placeholder="请输入模版 ID ..."
@@ -359,44 +483,17 @@ $this->title = '模版消息';
             <fieldset
                     style="margin: 8px; border: 1px solid silver; padding: 8px; border-radius: 4px;<?= $tplMsg['mch']['is_show'] ? '' : 'display: none' ?>">
                 <legend style="color:#333333; font-size:0.8em; font-weight:bold;">
-                    多商户
+                    关联模块：<span style="color: red;">多商户</span>
                 </legend>
-                <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">多商户入驻审核</label>
-                    </div>
-                    <div class="col-sm-6">
-                        <input class="form-control" name="mch_tpl_1" placeholder="请输入模版 ID ..."
-                               value="<?= isset($tplMsg['mch']['apply']) ? $tplMsg['mch']['apply'] : '' ?>">
-                        <div class="text-muted fs-sm">入驻审核模板消息，<a data-toggle="modal" data-target="#tip_mch_tpl_1"
-                                                                  href="javascript:">查看模板消息格式</a></div>
-                    </div>
-                </div>
-                <div class="modal fade" id="tip_mch_tpl_1">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">模板消息格式：</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body text-center">
-                                <img style="max-width: 100%"
-                                     src="<?= Yii::$app->request->baseUrl ?>/statics/images/tplmsg/mch-tpl-1.png">
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">多商户下单</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">新订单通知(模板编号: AT0079 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="mch_tpl_2" placeholder="请输入模版 ID ..."
                                value="<?= isset($tplMsg['mch']['order']) ? $tplMsg['mch']['order'] : '' ?>">
-                        <div class="text-muted fs-sm">下单模板消息，<a data-toggle="modal" data-target="#tip_mch_tpl_2"
+                        <div class="text-muted fs-sm">新订单通知，<a data-toggle="modal" data-target="#tip_mch_tpl_2"
                                                                 href="javascript:">查看模板消息格式</a></div>
                     </div>
                 </div>
@@ -419,52 +516,18 @@ $this->title = '模版消息';
             </fieldset>
 
             <fieldset
-                    style="margin: 8px; border: 1px solid silver; padding: 8px; border-radius: 4px;<?= $tplMsg['fxhb']['is_show'] ? '' : 'display: none' ?>">
-                <legend style="color:#333333; font-size:0.8em; font-weight:bold;">
-                    裂变拆红包
-                </legend>
-                <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">拆红包成功消息</label>
-                    </div>
-                    <div class="col-sm-6">
-                        <input class="form-control" name="tpl_msg_id" placeholder="请输入模版 ID ..."
-                               value="<?= isset($tplMsg['fxhb']['tpl_msg_id']) ? $tplMsg['fxhb']['tpl_msg_id'] : '' ?>">
-                        <div class="text-muted fs-sm">拆红包成功消息，<a data-toggle="modal" data-target="#tip_fxhb_tpl_1"
-                                                                  href="javascript:">查看模板消息格式</a></div>
-                    </div>
-                </div>
-                <div class="modal fade" id="tip_fxhb_tpl_1">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">模板消息格式：</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body text-center">
-                                <img style="max-width: 100%"
-                                     src="<?=Yii::$app->request->baseUrl?>/statics/images/tplmsg/fxhb.png">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </fieldset>
-
-            <fieldset
                     style="margin: 8px; border: 1px solid silver; padding: 8px; border-radius: 4px;<?= $tplMsg['lottery']['is_show'] ? '' : 'display: none' ?>">
                 <legend style="color:#333333; font-size:0.8em; font-weight:bold;">
-                    抽奖
+                    关联模块：<span style="color: red;">抽奖</span>
                 </legend>
                 <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">抽中奖品消息</label>
+                    <div class="form-group-label col-sm-3 text-right">
+                        <label class="col-form-label">中奖结果通知(模板编号: AT1186 )</label>
                     </div>
                     <div class="col-sm-6">
                         <input class="form-control" name="lottery_success_notice" placeholder="请输入模版 ID ..."
                                value="<?= isset($tplMsg['lottery']['lottery_success_notice']) ? $tplMsg['lottery']['lottery_success_notice'] : '' ?>">
-                        <div class="text-muted fs-sm">抽中奖品消息，<a data-toggle="modal" data-target="#tip_lot_tpl_1"
+                        <div class="text-muted fs-sm">中奖结果通知，<a data-toggle="modal" data-target="#tip_lot_tpl_1"
                                                                   href="javascript:">查看模板消息格式</a></div>
                     </div>
                 </div>
@@ -480,7 +543,7 @@ $this->title = '模版消息';
                             </div>
                             <div class="modal-body text-center">
                                 <img style="max-width: 100%"
-                                     src="<?= Yii::$app->request->baseUrl ?>/statics/images/tplmsg/lottery-success-notice.png">
+                                     src="<?= Yii::$app->request->baseUrl ?>/statics/images/tplmsg/lottery_success_tpl.png">
                             </div>
                         </div>
                     </div>
@@ -489,9 +552,7 @@ $this->title = '模版消息';
             </fieldset>
 
             <div class="form-group row">
-                <div class="form-group-label col-sm-2 text-right">
-                </div>
-                <div class="col-sm-6">
+                <div style="margin-left: 7px;" class="col-sm-6">
                     <a class="btn btn-primary auto-form-btn" href="javascript:">保存</a>
                 </div>
             </div>

@@ -2,26 +2,7 @@
 <view class="page">
     <include src="/components/common/common" />
     <include src="/components/header/header" />
-    <view class="body after-navber">
-        <block a:if="{{is_area == 1}}">
-            <view class="bottom-bar flex-row">
-                <view class="is_area">所选地区自营商品暂时无货</view>
-            </view>
-        </block>
-        <block a:else>
-            <form report-submit='true' onSubmit='orderSubmit'>
-                <view class="bottom-bar flex-row">
-                    <view class="flex-y-center flex-grow-1" style="padding: 0 24rpx">
-                        <view class="flex-grow-1" style="color:#ff4544 ">
-                            总计：￥{{new_total_price}}
-                        </view>
-
-                    </view>
-                    <view class="flex-y-center flex-grow-0 flex-x-center submit-btn" style='background-color:#ccc;' a:if="{{offer_rule && offer_rule.is_allowed == 1}}">{{offer_rule.msg}}</view>
-                    <button class="flex-y-center flex-grow-0 flex-x-center submit-btn" form-type='submit' a:else>提交</button>
-                </view>
-            </form>
-        </block>
+    <view class="body after-navber" a:if="{{mch_list}}">
         <view style="padding-bottom: 129rpx;" class="{{show_card?'no-scroll':''}} {{(show_shop || show_coupon_picker || show_card) ?'hidden':''}}">
             <!--选择收货地址-->
             <view class='block' a:if="{{mch_offline}}">
@@ -106,7 +87,8 @@
                             <block a:else>
                                 <view class='flex-row flex-y-center'>
                                     <view class='flex-grow-0'>展开另外
-                                        <text style="color:#ff4544;">{{item.show_length}}</text></view>
+                                        <text style="color:#ff4544;">{{item.show_length}}</text>
+                                    </view>
                                     <image class='show-more-img flex-grow-0' src='{{__wxapp_img.shop.down.url}}'></image>
                                 </view>
                             </block>
@@ -323,6 +305,29 @@
                 </view>
             </view>
         </view>
+        <block a:if="{{is_area == 1}}">
+            <view class="bottom-bar flex-row">
+                <view class="is_area">
+                    <view>所选地区自营商品暂时无货</view>
+                </view>
+            </view>
+        </block>
+        <block a:else>
+            <view class="bottom-bar flex-row">
+                <view class="flex-y-center flex-grow-1" style="padding: 0 24rpx">
+                    <view class="flex-grow-1" style="color:#ff4544 ">
+                        总计：￥{{new_total_price}}
+                    </view>
+
+                </view>
+                <view class="flex-y-center flex-grow-0 flex-x-center submit-btn" style='background-color:#ccc;' a:if="{{offer_rule && offer_rule.is_allowed == 1}}">
+                    <view style="white-space:normal;">{{offer_rule.msg}}</view>
+                </view>
+                <view onTap='orderSubmit' class='flex-x-center flex-y-center flex-row submit-btn' a:else>
+                    <view>提交</view>
+                </view>
+            </view>
+        </block>
         <include src="/components/get-card/get-card.axml" />
     </view>
     <include src="/components/footer/footer" />

@@ -24,12 +24,13 @@ class SettingForm extends MchModel
     public $is_mail;
     public $is_print;
     public $content;
+    public $share_title;
 
     public function rules()
     {
         return [
             [['is_share', 'is_sms', 'is_mail', 'is_print'], 'integer'],
-            [['content'], 'trim'],
+            [['content', 'share_title'], 'trim'],
             [['content'], 'string'],
         ];
     }

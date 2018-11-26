@@ -61,6 +61,7 @@ class YyGoodsForm extends MchModel
     public $single_share_commission_first;
     public $single_share_commission_second;
     public $single_share_commission_third;
+    public $is_level;
 
     /**
      * @inheritdoc
@@ -68,7 +69,7 @@ class YyGoodsForm extends MchModel
     public function rules()
     {
         return [
-            [['name', 'price', 'original_price', 'detail', 'service', 'store_id', 'buy_limit', 'stock'], 'required'],
+            [['name', 'price', 'original_price', 'detail', 'service', 'store_id', 'buy_limit', 'stock', 'is_level'], 'required'],
             [['detail', 'cover_pic'], 'string'],
             [['cat_id', 'store_id','share_type', 'use_attr', 'attr_setting_type'], 'integer'],
             [['name','shop_id'], 'string', 'max' => 255],
@@ -117,6 +118,7 @@ class YyGoodsForm extends MchModel
             'single_share_commission_first' => '一级佣金',
             'single_share_commission_second' => '二级佣金',
             'single_share_commission_third' => '三级佣金',
+            'is_level' => '会员折扣'
         ];
     }
 
@@ -212,7 +214,8 @@ class YyGoodsForm extends MchModel
             };
             $goods->detail = preg_replace('/\\\u[a-z0-9]{4}/', '', userTextEncode($_this_attributes['detail']));
 
-            $goods->use_attr = $this->use_attr ? 1 : 0; 
+            $goods->use_attr = $this->use_attr ? 1 : 0;
+            $goods->is_level = $this->is_level;
             if ($goods->save()) {
                 YyGoodsPic::updateAll(['is_delete' => 1], ['goods_id' => $goods->id]);
                 foreach ($this->goods_pic_list as $pic_url) {

@@ -7,6 +7,7 @@
             <div class="col-sm-6">
                 <div class="upload-group">
                     <div class="input-group">
+
                         <input class="form-control file-input" name="image_url" v-model="form[tabIndex].image_url" value="123">
                         <span class="input-group-btn">
                             <a class="btn btn-secondary pond-select-file" href="javascript:" data-toggle="tooltip"
@@ -28,6 +29,7 @@
                         </span>
                     </div>
                     <div class="upload-preview text-center upload-preview">
+                        <span class="upload-preview-tip">150&times;80</span>
                         <img class="upload-preview-img" :src="form[tabIndex].image_url">
                     </div>
                 </div>
@@ -69,16 +71,22 @@
             </div>
             <div class="col-sm-6">
                 <select class="form-control parent" v-model="form[tabIndex].attr">
-              
                     <option v-for="(item,index) in attrs[tabIndex]" :value="item['attr_list']">
-                
                         <template v-for="items in item['attr_list']" >
                             {{items['attr_group_name']}}:{{items['attr_name']}}  
                         </template>
                     </option>
-
-
                 </select>
+            </div>
+        </div>
+
+        <div class="form-group row num" v-if="form[tabIndex].type==1 || form[tabIndex].type==3">
+            <div class="form-group-label col-sm-2 text-right">
+                <label class="col-form-label">名称</label>
+            </div>
+            <div class="col-sm-6">
+                <input class="form-control" v-model="form[tabIndex].name" value="">
+                   <div class="fs-sm text-muted">不填 则表示默认</div>
             </div>
         </div>
 

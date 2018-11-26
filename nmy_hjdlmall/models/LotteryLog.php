@@ -19,6 +19,8 @@ use Yii;
  * @property integer $order_id
  * @property integer $obtain_time
  * @property string $form_id
+ * @property integer $child_id
+ * @property integer $lucky_code
  */
 class LotteryLog extends \yii\db\ActiveRecord
 {
@@ -36,10 +38,10 @@ class LotteryLog extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['store_id', 'user_id', 'lottery_id', 'addtime', 'status', 'goods_id', 'raffle_time', 'order_id', 'obtain_time'], 'integer'],
+            [['store_id', 'user_id', 'lottery_id', 'addtime', 'status', 'goods_id', 'raffle_time', 'order_id', 'obtain_time', 'child_id'], 'integer'],
             [['attr'], 'required'],
             [['attr'], 'string'],
-            [['form_id'], 'string', 'max' => 255],
+            [['form_id', 'lucky_code'], 'string', 'max' => 255],
         ];
     }
 
@@ -61,6 +63,8 @@ class LotteryLog extends \yii\db\ActiveRecord
             'order_id' => '订单ID',
             'obtain_time' => '获取时间',
             'form_id' => 'Form ID',
+            'child_id' => '下级ID',
+            'lucky_code' => '幸运码',
         ];
     }
 
@@ -74,9 +78,17 @@ class LotteryLog extends \yii\db\ActiveRecord
         return $this->hasOne(LotteryGoods::className(), ['id' => 'lottery_id']);
     }
 
-
     public function getGift()
     {
         return $this->hasOne(Goods::className(), ['id' => 'goods_id']); 
+    }
+    public function getChildId()
+    {
+        return $this->hasOne(User::className(), ['id' => 'child_id']);
+    }
+
+    public function getChildSelf()
+    {
+        return $this->hasOne(LotteryLog::className(), ['child_id' => 'user_id']);
     }
 }

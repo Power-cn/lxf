@@ -472,7 +472,8 @@ Page({
                     goods.attr_pic = res.data.pic;
                     // goods.original_price = res.data.single;
                     goods.single_price = res.data.single_price ? res.data.single_price : 0;
-                    goods.group_price = res.data.price
+                    goods.group_price = res.data.price;
+                    goods.is_member_price = res.data.is_member_price;
 
                     self.setData({
                         goods: goods,
@@ -544,6 +545,7 @@ Page({
                     // goods.original_price = res.data.single;
                     goods.single_price = res.data.single_price ? res.data.single_price : 0;
                     goods.group_price = res.data.price
+                    goods.is_member_price = res.data.is_member_price;
                     self.setData({
                         goods: goods,
                     });

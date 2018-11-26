@@ -9,6 +9,7 @@
 namespace app\modules\mch\models;
 
 use app\models\Goods;
+use app\models\MsGoods;
 use app\models\MsOrder;
 use app\models\Order;
 use app\models\OrderDetail;
@@ -278,7 +279,7 @@ class ShareOrderForm extends MchModel
             if ($item['order_type'] == 'ms') {
                 $list_ms = $this->getMsOrderGoodsList($item['id']);
                 $list[$i]['goods_list'] = $list_ms;
-                $order = $list_ms[0];
+                $order = MsOrder::find()->where(['id' => $item['id']])->asArray()->one();
             }
             if ($item['order_type'] == 'pt') {
                 $list_pt = $this->getPtOrderGoodsList($item['id']);
@@ -341,7 +342,10 @@ class ShareOrderForm extends MchModel
 
     public function getMsOrderGoodsList($order_id)
     {
-        $list = MsOrder::find()->where(['id' => $order_id])->asArray()->one();
+        $list = MsOrder::find()->alias('o')->where(['o.id' => $order_id])
+        ->leftJoin(['g' => MsGoods::tableName()],'g.id = o.goods_id')
+            ->select(['o.attr', 'g.name', 'o.total_price', 'o.num','g.cover_pic pic'])
+            ->asArray()->one();
         $list['attr_list'] = json_decode($list['attr']);
         return [$list];
     }

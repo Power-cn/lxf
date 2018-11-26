@@ -80,22 +80,7 @@ Page({
   onPullDownRefresh: function (options) { getApp().page.onPullDownRefresh(this);
   
   },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function (options) {
-      var self = this;
-      var index = options.target.dataset.index;
-      var path = '/pages/pt/group/details?oid=' + options.target.dataset.id
-      return {
-          title: self.data.order_list[index].goods_list[0].goods_name,
-          path: path,
-          imageUrl: self.data.order_list[index].goods_list[0].goods_pic,
-          success: function (res) {
-          }
-      }
-  },
+  
   /**
    * 初次加载数据
    */

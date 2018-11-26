@@ -319,7 +319,7 @@ if ($_GET['goods_id']) {
                                                     </td>
                                                 <?php endforeach; ?>
                                                 <td>
-                                                    <input name="attr[<?= $k ?>][num]" readonly
+                                                    <input name="attr[<?= $k ?>][num]" class="form-control" readonly
                                                            value="<?= $vv['num'] ?>">
                                                 </td>
                                                 <td>
@@ -330,11 +330,11 @@ if ($_GET['goods_id']) {
                                                            style="width: 100px">
                                                 </td>
                                                 <td>
-                                                    <input name="attr[<?= $k ?>][single]" readonly
+                                                    <input name="attr[<?= $k ?>][single]" class="form-control" readonly
                                                            value="<?= $vv['single'] ?>">
                                                 </td>
                                                 <td>
-                                                    <input name="attr[<?= $k ?>][no]" readonly value="<?= $vv['no'] ?>">
+                                                    <input name="attr[<?= $k ?>][no]" class="form-control" readonly value="<?= $vv['no'] ?>">
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>

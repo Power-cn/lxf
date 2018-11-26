@@ -443,7 +443,7 @@ Page({
                     getApp().shareSendCoupon(self);
             },
             title: self.data.goods.name,
-            imageUrl: self.data.goods.pic_list[0].pic_url,
+            imageUrl: self.data.goods.pic_list[0],
         };
         return res;
     },

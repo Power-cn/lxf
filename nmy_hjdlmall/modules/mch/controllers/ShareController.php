@@ -529,7 +529,10 @@ class ShareController extends Controller
         }
         $t = \Yii::$app->db->beginTransaction();
         $count1 = Share::updateAll(['is_delete' => 1], 'id=:id', [':id' => $id]);
-        $count2 = User::updateAll(['is_distributor' => 0, 'parent_id' => 0, 'time' => 0], 'id=:id', [':id' => $share->user_id]);
+        $user = User::findOne($share->user_id);
+        $user->is_distributor = 0;
+        $user->time = time();
+        $user->save();
         $count3 = User::updateAll(['parent_id' => 0], 'parent_id=:parent_id', [':parent_id' => $share->user_id]);
         if ($count1 != 0) {
             $t->commit();

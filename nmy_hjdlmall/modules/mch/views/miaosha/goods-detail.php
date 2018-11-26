@@ -41,8 +41,12 @@ $this->params['active_nav_group'] = 10;
                             :59</span>
                         <span class="mr-3">限购数量：<?= $item['buy_max'] == 0 ? '不限购' : ($item['buy_max'] . '件') ?></span>
                         <span class="mr-3">限购单数：<?= $item['buy_limit'] == 0 ? '不限单' : ($item['buy_limit'] . '单') ?></span>
-                        <a class="btn btn-sm btn-danger delete-btn float-right"
-                           href="<?= $urlManager->createUrl(['mch/miaosha/miaosha-delete', 'id' => $item['id']]) ?>">删除</a>
+                        <div class="float-right">
+                            <a class="btn btn-sm btn-primary"
+                               href="<?= $urlManager->createUrl(['mch/miaosha/goods-detail-edit', 'id' => $item['id']]) ?>">编辑</a>
+                            <a class="btn btn-sm btn-danger delete-btn"
+                               href="<?= $urlManager->createUrl(['mch/miaosha/miaosha-delete', 'id' => $item['id']]) ?>">删除</a>
+                        </div>
                     </td>
                 </tr>
                 <tr>

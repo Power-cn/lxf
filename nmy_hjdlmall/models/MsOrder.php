@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "{{%ms_order}}".
@@ -183,6 +184,11 @@ class MsOrder extends \yii\db\ActiveRecord
             ->leftJoin(['g'=>MsGoods::tableName()], 'g.id=goods_id')->select(['od.*','g.name','g.attr goods_attr']);
     }
 
+
+    /**
+     * @inheritdoc
+     * @return ActiveQuery the newly created [[ActiveQuery]] instance.
+     */
     public static function find()
     {
         return Yii::createObject(MyActiveQuery::className(), [

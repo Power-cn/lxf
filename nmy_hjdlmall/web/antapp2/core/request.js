@@ -14,17 +14,37 @@ module.exports = function(object) {
     }
     let core = this.core;
     let access_token = this.core.getStorageSync(this.const.ACCESS_TOKEN);
+    let formIdList = this.core.getStorageSync(this.const.FORM_ID_LIST);
     if (access_token) {
         object.data.access_token = access_token;
     }
     object.data._version = this._version;
-    object.data._platform = this.platform
+    object.data._platform = this.platform;
 
-    if (!this.is_login && this.page.currentPage){
+    if (!this.is_login && this.page.currentPage) {
         this.is_login = true;
         this.login({});
     }
     var app = this;
+
+    // 保存form_id
+    if (formIdList && formIdList.length >= 1 && app.is_form_id_request) {
+        app.is_form_id_request = false;
+        app.request({
+            url: app.api.default.form_id,
+            method: 'POST',
+            data: {
+                formIdList: JSON.stringify(formIdList)
+            },
+            success: function(res) {
+                app.core.removeStorageSync(app.const.FORM_ID_LIST)
+            },
+            complete: function() {
+                app.is_form_id_request = true;
+            }
+        })
+    }
+
     core.request({
         url: object.url,
         header: object.header || {
@@ -33,7 +53,7 @@ module.exports = function(object) {
         data: object.data || {},
         method: object.method || "GET",
         dataType: object.dataType || "json",
-        success: function (res) {
+        success: function(res) {
             if (res.data.code == -1) {
                 app.core.hideLoading();
                 app.page.setUserInfoShow();

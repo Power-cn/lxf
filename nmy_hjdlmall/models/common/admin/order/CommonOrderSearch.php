@@ -40,11 +40,12 @@ class CommonOrderSearch
         if (isset($page->parent_id) && $page->parent_id) {
             $query->andWhere(['o.parent_id' => $page->parent_id]);
         }
+
         if (isset($page->date_start) && $page->date_start) {
             $query->andWhere(['>=', 'o.addtime', strtotime($page->date_start)]);
         }
         if (isset($page->date_end) && $page->date_end) {
-            $query->andWhere(['<=', 'o.addtime', strtotime($page->date_end) + 86400]);
+            $query->andWhere(['<=', 'o.addtime', strtotime($page->date_end)]);
         }
 
         if (isset($page->platform) && $page->platform) {

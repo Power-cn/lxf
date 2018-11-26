@@ -20,6 +20,7 @@ class PondForm extends MchModel
     public $coupon_id;
     public $gift_id;
     public $attr;
+    public $name;
 
     public function rules()
     {
@@ -29,7 +30,7 @@ class PondForm extends MchModel
             [['price'], 'number'],
             [['attr'], 'string'],
             [['num', 'stock', 'orderby'], 'integer','max'=>99999999],
-            [['image_url'], 'string', 'max' => 255],
+            [['image_url', 'name'], 'string', 'max' => 255],
         ];
     }
 
@@ -49,6 +50,7 @@ class PondForm extends MchModel
             'create_time' => 'Create Time',
             'update_time' => 'Update Time',
             'attr' => '规格',
+            'name' => '别名'
         ];
     }
     public function save()
@@ -71,6 +73,7 @@ class PondForm extends MchModel
             case 1:
                 $this->model->price = $this->price;
                 $this->model->stock = $this->stock;
+                $this->model->name = $this->name;
                 break;
             case 2:
                 $this->model->coupon_id = $this->coupon_id;
@@ -79,6 +82,7 @@ class PondForm extends MchModel
             case 3:
                 $this->model->num = $this->num;
                 $this->model->stock = $this->stock;
+                $this->model->name = $this->name;
                 break;
             case 4:
                 $this->model->gift_id = $this->gift_id;

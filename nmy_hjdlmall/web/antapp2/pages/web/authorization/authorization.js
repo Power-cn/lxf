@@ -140,11 +140,4 @@ Page({
     onReachBottom: function (options) { getApp().page.onReachBottom(this);
 
     },
-
-    /**
-     * 用户点击右上角分享
-     */
-    onShareAppMessage: function (options) { getApp().page.onShareAppMessage(this);
-
-    }
 })

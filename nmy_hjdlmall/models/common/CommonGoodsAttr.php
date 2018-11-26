@@ -34,7 +34,7 @@ class CommonGoodsAttr
 
         foreach ($newAttr as $k => $item) {
             foreach ($item['attr_list'] as $k2 => $item2) {
-                $attr = Attr::find()->where(['attr_name' => $item2['attr_name'], 'is_delete' => Model::IS_DELETE_FALSE])->asArray()->one();
+                $attr = Attr::find()->where(['id' => $item2['attr_id'], 'is_delete' => Model::IS_DELETE_FALSE])->asArray()->one();
                 $cache_key = 'attr_group_by_attr_' . $attr['attr_group_id'];
                 $attrGroup = \Yii::$app->cache->get($cache_key);
 

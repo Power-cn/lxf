@@ -11,33 +11,24 @@ namespace app\modules\api\models\miaosha;
 use app\models\Address;
 use app\models\Attr;
 use app\models\AttrGroup;
-use app\models\Cart;
 use app\models\common\api\CommonOrder;
 use app\models\common\CommonGoods;
 use app\models\Coupon;
 use app\models\FormId;
 use app\models\FreeDeliveryRules;
 use app\models\Goods;
-use app\models\Level;
 use app\models\MiaoshaGoods;
 use app\models\Model;
 use app\models\MsGoods;
 use app\models\MsOrder;
 use app\models\MsSetting;
-use app\models\Option;
-use app\models\Order;
-use app\models\OrderDetail;
-use app\models\OrderForm;
 use app\models\PostageRules;
-use app\models\PrinterSetting;
 use app\models\Store;
 use app\models\User;
 use app\models\UserCoupon;
-use app\modules\api\controllers\OrderController;
 use app\utils\PinterOrder;
 use app\modules\api\models\ApiModel;
 use app\modules\api\models\OrderData;
-use yii\helpers\VarDumper;
 use app\models\TerritorialLimitation;
 use app\models\Register;
 
@@ -77,9 +68,9 @@ class OrderSubmitForm extends ApiModel
             [['user_coupon_id', 'offline', 'shop_id', 'use_integral'], 'integer'],
             [['offline'], 'default', 'value' => 0],
             [['payment'], 'default', 'value' => 0],
-            [['form','formId'], 'safe'],
-            [['payment'],'integer','message'=>'请选择支付方式'],
-            [['address_mobile'],'match','pattern' =>Model::MOBILE_PATTERN , 'message'=>'手机号错误']
+            [['form', 'formId'], 'safe'],
+            [['payment'], 'integer', 'message' => '请选择支付方式'],
+            [['address_mobile'], 'match', 'pattern' => Model::MOBILE_PATTERN, 'message' => '手机号错误']
         ];
     }
 
@@ -199,7 +190,8 @@ class OrderSubmitForm extends ApiModel
         $order->order_no = $this->getOrderNo();
 
         //此处计算所有的优惠措施
-        $total_price_2 = $total_price; //实际支付金额
+//        $total_price_2 = $total_price; //实际支付金额
+        $total_price_2 = $data['miaosha_data']['level_price']; //实际支付金额
         //减去 优惠券（不含运费）
         $goods = $goods_list[0];
         if ($this->user_coupon_id && $goods->coupon == 1) {
@@ -227,13 +219,14 @@ class OrderSubmitForm extends ApiModel
 
         //减去折扣（不含运费）
         $discount = 10;
-        if ($goods->is_discount == 1) {
-            $level = Level::find()->where(['store_id' => $this->store_id, 'level' => \Yii::$app->user->identity->level])->asArray()->one();
-            if ($level) {
-                $discount = $level['discount'];
-            }
-            $total_price_2 = max(0.01, round($total_price_2 * $discount / 10, 2));
-        }
+//        if ($goods->is_discount == 1) {
+//            $level = Level::find()->where(['store_id' => $this->store_id, 'level' => \Yii::$app->user->identity->level])->asArray()->one();
+//            if ($level) {
+//                $discount = $level['discount'];
+//            }
+//
+//            $total_price_2 = max(0.01, round($total_price_2 * $discount / 10, 2));
+//        }
 
         //包邮规则
         if ($express_price != 0) {
@@ -311,7 +304,7 @@ class OrderSubmitForm extends ApiModel
                 $register->addtime = time();
                 $register->continuation = 0;
                 $register->type = 5;
-                $register->integral = '-'.$resIntegral['forehead_integral'];
+                $register->integral = '-' . $resIntegral['forehead_integral'];
                 $register->order_id = $order->id;
                 $register->save();
                 $user->save();
@@ -479,18 +472,31 @@ class OrderSubmitForm extends ApiModel
 //        $miaosha_data = $this->getMiaoshaData($goods, $attr_id_list);
         $miaosha_goods = MiaoshaGoods::findOne([
             'goods_id' => $goods->id,
+            'store_id' => $this->getCurrentStoreId(),
             'is_delete' => 0,
             'open_date' => date('Y-m-d'),
             'start_time' => intval(date('H')),
         ]);
 
-        $miaosha_data = CommonGoods::currentGoodsAttr($miaosha_goods, $attr_id_list, [
+        $goodsData = [
+            'attr' => $miaosha_goods['attr'],
+            'price' => $goods->original_price,
+            // 'is_level' => $goods->is_discount,
+             'is_level' => $miaosha_goods['is_level'],
+        ];
+
+        $miaosha_data = CommonGoods::currentGoodsAttr($goodsData, $attr_id_list, [
             'type' => 'MIAOSHA',
-            'original_price' => $goods->original_price
+            'original_price' => $goods->original_price,
+            'id' => $miaosha_goods['id'],
         ]);
+        $miaosha_data['level_price'] = $miaosha_data['level_price'] * $goods_info->num;
+        //下单判断是后端要用到完整的秒杀库存
+        $miaosha_data['miaosha_num'] = $miaosha_data['miaosha_num_count'];
 
         if ($miaosha_data) {
             $res = $this->getMiaoshaPrice($miaosha_data, $goods, $attr_id_list, $goods_info->num);
+
             if ($res !== false) {
                 if ($res['miaosha_price_num'] <= 0) {
                     return [
@@ -498,7 +504,8 @@ class OrderSubmitForm extends ApiModel
                         'msg' => '订单提交失败，商品“' . $goods->name . '”库存不足',
                     ];
                 }
-                $goods_item->price = $res['single_price'] * $res['miaosha_price_num'];
+
+                $goods_item->price = $miaosha_data['goods_price'] * $res['miaosha_price_num'];
                 $goods_item->single_price = $res['single_price'];
                 $this->setMiaoshaSellNum($miaosha_data['id'], $attr_id_list, $res['miaosha_price_num']);
             }
@@ -527,7 +534,9 @@ class OrderSubmitForm extends ApiModel
         }
 
         $total_price += $goods_item->price;
+
         return [
+            'miaosha_data' => $miaosha_data,
             'total_price' => $total_price,
             'list' => [$goods_item],
             'resIntegral' => $resIntegral,
@@ -637,7 +646,7 @@ class OrderSubmitForm extends ApiModel
                 'original_price_num' => 0,
                 'single_price' => $miaosha_price
             ];
-        }else{
+        } else {
             return [
                 'res' => '库存不足',
                 'miaosha_price_num' => 0,
@@ -687,10 +696,11 @@ class OrderSubmitForm extends ApiModel
         return $res;
     }
 
-    function array_to_object($arr) {
+    function array_to_object($arr)
+    {
         if (gettype($arr) != 'array') {
             return;
-}
+        }
         foreach ($arr as $k => $v) {
             if (gettype($v) == 'array' || getType($v) == 'object') {
                 $arr[$k] = (object)array_to_object($v);

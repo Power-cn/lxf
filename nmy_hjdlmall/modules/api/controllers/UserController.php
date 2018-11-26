@@ -106,6 +106,7 @@ class UserController extends Controller
         $user_center_data = $user_center_form->getData();
         $user_center_data = $user_center_data['data'];
         $wallet['is_wallet'] = $user_center_data['is_wallet'];
+        $wallet['is_menu'] = $user_center_data['is_menu'];
         if($user_center_data['copyright']['open_type'] == 'wxapp'){
             $url = $user_center_data['copyright']['url'];
             preg_match('/^[^\?+]\?([\w|\W]+)=([\w|\W]*?)&([\w|\W]+)=([\w|\W]*?)$/', $url, $res);
@@ -385,7 +386,7 @@ class UserController extends Controller
         $money = \Yii::$app->user->identity->money;
 
 
-        $list = Level::find()->select(['id', 'image', 'level', 'name', 'price', 'buy_prompt', 'detail'])->where(['store_id' => $this->store->id, 'is_delete' => 0])->andWhere(['<>', 'price', '0'])->andWhere(['>', 'level', $level])->orderBy('level asc')->asArray()->all();
+        $list = Level::find()->select(['id', 'image', 'level', 'name', 'price', 'buy_prompt', 'detail'])->where(['store_id' => $this->store->id, 'is_delete' => 0, 'status' => 1])->andWhere(['<>', 'price', '0'])->andWhere(['>', 'level', $level])->orderBy('level asc')->asArray()->all();
 
         $now_level = Level::find()->where(['store_id' => $this->store->id, 'level' => $level, 'is_delete' => 0])->asArray()->one();
         if($now_level && $now_level['synopsis']) {

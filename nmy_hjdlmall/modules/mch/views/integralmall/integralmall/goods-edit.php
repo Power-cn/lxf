@@ -279,7 +279,7 @@ $staticBaseUrl = Yii::$app->request->baseUrl . '/statics';
                                     <div class="copy-error text-danger fs-sm" hidden></div>
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row"hidden>
                                 <div class="col-3 text-right">
                                     <label class=" col-form-label">京东一键采集</label>
                                 </div>

@@ -23,6 +23,7 @@ use app\models\PtOrder;
 use app\models\PtOrderRefund;
 use app\models\YyOrder;
 use app\modules\api\models\ApiModel;
+use yii\helpers\VarDumper;
 
 class Refund
 {
@@ -48,7 +49,14 @@ class Refund
         }
     }
 
-    //微信支付退款
+    /**
+     * 微信支付退款
+     * @param $order
+     * @param $refundFee
+     * @param $orderRefundNo
+     * @param null $refund_account
+     * @return array|bool
+     */
     private function wxRefund($order, $refundFee, $orderRefundNo, $refund_account = null)
     {
         if (isset($order->pay_price)) {
@@ -64,6 +72,20 @@ class Refund
             'total_fee' => $payPrice * 100,
             'refund_fee' => $refundFee * 100,
         ];
+
+        if (isset($order->order_union_id) && $order->order_union_id != 0) {
+            // 多商户合并订单退款
+            $orderUnion = OrderUnion::findOne($order->order_union_id);
+            if (!$orderUnion) {
+                return [
+                    'code' => 1,
+                    'msg' => '订单取消失败，合并支付订单不存在。',
+                ];
+            }
+            $data['out_trade_no'] = $orderUnion->order_no;
+            $data['total_fee'] = $orderUnion->price * 100;
+        }
+
         if ($refund_account) {
             $data['refund_account'] = $refund_account;
         }
@@ -94,7 +116,7 @@ class Refund
                     'res' => $refundQuery,
                 ];
             }
-            if($refundQuery['result_code'] == 'FAIL'){
+            if ($refundQuery['result_code'] == 'FAIL') {
                 return [
                     'code' => 1,
                     'msg' => '订单取消失败，退款失败，' . $res['err_code_des'],
@@ -108,7 +130,7 @@ class Refund
                     'res' => $refundQuery,
                 ];
             }
-            if($refundQuery['refund_status_0'] != 'SUCCESS'){
+            if ($refundQuery['refund_status_0'] != 'SUCCESS') {
                 return [
                     'code' => 1,
                     'msg' => '订单取消失败，退款失败，' . $refundQuery['err_code_des'],

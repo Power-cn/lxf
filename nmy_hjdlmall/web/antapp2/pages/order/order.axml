@@ -99,10 +99,9 @@
                             </block>
                         </block>
                         <block a:else>
-                            <view class="flex-grow-1" a:if="{{order.is_send==0 && status!=1}}">
+                            <view class="flex-grow-1" a:if="{{order.is_send==0}}">
                                 <text a:if="{{order.apply_delete==1}}">取消申请中</text>
-                                <button a:else class="order-option-btn" onTap="orderRevoke" data-id="{{order.order_id}}">取消
-                                </button>
+                                <button a:else class="order-option-btn" onTap="orderRevoke" data-id="{{order.order_id}}">取消</button>
                             </view>
                             <view class="flex-grow-1" a:if="{{order.is_pay==0 && order.pay_type != 2}}">
                                 <button class="order-option-btn" onTap="orderPay" data-id="{{order.order_id}}" data-index='{{index}}'>付款</button>

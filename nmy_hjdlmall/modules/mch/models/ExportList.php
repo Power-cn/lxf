@@ -13,6 +13,7 @@ use app\models\IntegralGoods;
 use app\models\IntegralOrderDetail;
 use app\models\MsGoods;
 use app\models\MsOrder;
+use app\models\MsOrderRefund;
 use app\models\OrderDetail;
 use app\models\OrderRefund;
 use app\models\PtGoods;
@@ -690,27 +691,28 @@ class ExportList
      */
     public function UserExportData($list)
     {
+        $handle = fopen('php://temp', 'rwb');
         $newFields = $this->dataFields();
+        $newFields['platform'] = '所属平台';
+        $fieldVals = implode(',', array_values($newFields)) . "\n";
+        $EXCEL_OUT = mb_convert_encoding($fieldVals, 'GBK', 'UTF-8');
 
-        $newList = [];
+        fwrite($handle, $EXCEL_OUT);
+
         foreach ($list as $item) {
             $arr = [];
             $arr['id'] = $item['id'];
             $arr['nickname'] = $item['nickname'];
-            $arr['addtime'] = date('Y-m-d H:i:s', $item['addtime']);
-            $arr['integral'] = $item['integral'];
-            $arr['money'] = $item['money'];
+            $arr['binding'] = $item['binding'];
             $arr['contact_way'] = $item['contact_way'];
             $arr['comments'] = $item['comments'];
-            $arr['binding'] = $item['binding'];
-            $arr['platform'] = $item['platform'] ? '支付宝' : '微信';
-            $arr['card_count'] = $item['card_count'] ? $item['card_count'] : 0;
-            $arr['order_count'] = $item['order_count'] ? $item['order_count'] : 0;
-            $arr['coupon_count'] = $item['coupon_count'] ? $item['coupon_count'] : 0;
+            $arr['addtime'] = date('Y-m-d H:i:s', $item['addtime']);
 
             $clerk = $item['is_clerk'] ? '核销员|' : '';
             $level = isset($item['l_name']) ? $item['l_name'] : '普通会员';
             $arr['identity'] = $clerk . $level;
+
+            $arr['order_count'] = $item['order_count'] ? $item['order_count'] : 0;
 
             $order = empty($item['orderConsume']) ? 0 : floatval($item['orderConsume']);
             $pt = empty($item['ptOrderConsume']) ? 0 : floatval($item['ptOrderConsume']);
@@ -718,10 +720,22 @@ class ExportList
             $ms = empty($item['msOrderConsume']) ? 0 : floatval($item['msOrderConsume']);
             $integral = empty($item['integralOrderConsume']) ? 0 : floatval($item['integralOrderConsume']);
             $arr['consume_count'] = $order + $pt + $yy + $ms + $integral;
-            $newList[] = $arr;
+            $arr['coupon_count'] = $item['coupon_count'] ? $item['coupon_count'] : 0;
+            $arr['card_count'] = $item['card_count'] ? $item['card_count'] : 0;
+            $arr['integral'] = $item['integral'];
+            $arr['money'] = $item['money'];
+            $arr['platform'] = $item['platform'] ? '支付宝' : '微信';
+
+            $fieldVals = implode(',', array_values($arr)) . "\n";
+            $EXCEL_OUT = mb_convert_encoding($fieldVals, 'GBK', 'UTF-8');
+
+            fwrite($handle, $EXCEL_OUT);
         }
 
-        Export::order_3($newList, $newFields);
+        $name = date('YmdHis', time()) . rand(1000, 9999); //导出文件名称
+        \Yii::$app->response->sendStreamAsFile($handle, $name . '.csv');
+
+//        Export::order_3($newList, $newFields);
     }
 
     /**
@@ -976,8 +990,13 @@ class ExportList
                 $newItem['order_status'] = '订单已取消';
             } else {
                 // TODO 如果卡顿，需去除循环查询
-                $orderRefund = OrderRefund::find()->where(['order_id' => $datum->id])
-                    ->select('status')->one();
+                if ($this->order_type) {
+                    $orderRefund = MsOrderRefund::find()->where(['order_id' => $datum->id])->select('status')->one();
+                } else {
+                    $orderRefund = OrderRefund::find()->where(['order_id' => $datum->id])
+                        ->select('status')->one();
+                }
+
                 if ($orderRefund) {
                     switch ($orderRefund->status) {
                         case 0:
@@ -998,7 +1017,8 @@ class ExportList
 
                     }
                 } else {
-                    $newItem['order_status'] = '订单已完成';
+//                    $newItem['order_status'] = '订单已完成';
+                    $newItem['order_status'] = $datum['is_confirm'] == 1 ? '已完成' : '进行中';
                 }
             }
 

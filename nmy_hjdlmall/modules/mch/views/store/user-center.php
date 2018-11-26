@@ -378,6 +378,29 @@ $this->params['active_nav_group'] = 1;
                             </label>
                         </div>
                     </div>
+                    
+                    <div class="form-group row">
+                        <div class="form-group-label col-sm-2 text-right">
+                            <label class="col-form-label">菜单栏</label>
+                        </div>
+                        <div class="col-sm-6" style="max-width: 360px">
+                            <label class="radio-label">
+                                <input id="radio1" :checked="is_menu==0?'checked':''"
+                                       value="0"
+                                       name="is_menu" type="radio" class="custom-control-input" v-model="is_menu">
+                                <span class="label-icon"></span>
+                                <span class="label-text">隐藏</span>
+                            </label>
+                            <label class="radio-label">
+                                <input id="radio1"  :checked="is_menu==1?'checked':''"
+                                       value="1"
+                                       name="is_menu" type="radio" class="custom-control-input" v-model="is_menu">
+                                <span class="label-icon"></span>
+                                <span class="label-text">开启</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="form-group row">
                         <div class="form-group-label col-sm-2 text-right">
                             <label class="col-form-label">菜单栏样式</label>
@@ -784,6 +807,7 @@ $this->params['active_nav_group'] = 1;
             edit_menu: null,
             menu_list: null,
             copyright: null,
+            is_menu: null,
             menu_style: null,
             top_style: null,
             is_wallet: null,
@@ -810,6 +834,7 @@ $this->params['active_nav_group'] = 1;
             app.menus = res.data.menus;
             app.copyright = res.data.copyright;
             app.menu_list = res.menu_list;
+            app.is_menu = res.data.is_menu;
             app.menu_style = res.data.menu_style;
             app.top_style = res.data.top_style;
             app.is_wallet = res.data.is_wallet;
@@ -906,6 +931,7 @@ $this->params['active_nav_group'] = 1;
                     wallets: app.wallets,
                     menus: app.menus,
                     copyright: app.copyright,
+                    is_menu: app.is_menu,
                     menu_style:app.menu_style,
                     top_style:app.top_style,
                     is_wallet:app.is_wallet,

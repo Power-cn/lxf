@@ -27,14 +27,22 @@
                     </view>
                 </block>
                 <block a:else>
-                    <view style="color:#ff4544;margin-bottom: 12rpx;font-weight: bold">￥{{goods.price}} 
-                    <text a:if="{{goods.is_member_price}}" class='is_member_price'>会员价</text></view>
+                    <block a:if="{{pageType === 'PINTUAN'}}">
+                        <view style="color:#ff4544;margin-bottom: 12rpx;font-weight: bold">
+                            ￥{{groupNum ? goods.group_price : goods.single_price}}
+                            <text a:if="{{goods.is_member_price === true && groupNum === true}}" class='is_member_price'>会员价</text>
+                        </view>
+                    </block>
+                    <block a:else>
+                        <view style="color:#ff4544;margin-bottom: 12rpx;font-weight: bold">￥{{goods.price}}
+                            <text a:if="{{goods.is_member_price === true}}" class='is_member_price'>会员价</text>
+                        </view>
+                    </block>
+
+                    <view style="font-size:9pt">
+                        库存{{goods.num}}
+                    </view>
                 </block>
-
-                <view style="font-size:9pt">
-                    库存{{goods.num}}
-                </view>
-
             </view>
             <view class="flex-grow-0">
                 <view onTap="hideAttrPicker" class="flex-x-center flex-y-center" style="width: 100rpx;height: 100rpx">

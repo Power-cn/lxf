@@ -75,6 +75,7 @@ class StoreSettingForm extends MchModel
     public $buy_member;
     public $logo;
     public $quick_map;
+    public $is_official_account;
 
     public function rules()
     {
@@ -84,7 +85,7 @@ class StoreSettingForm extends MchModel
             [['order_send_tpl', 'contact_tel', 'kdniao_mch_id', 'kdniao_api_key', 'address', 'service', 'integration', 'notice', 'web_service', 'web_service_url', 'logo'], 'string'],
             [['show_customer_service', 'cat_style', 'cut_thread', 'purchase_frame', 'is_recommend', 'cat_goods_cols', 'is_offline', 'is_coupon', 'cat_goods_count', 'send_type', 'nav_count', 'dial', 'is_comment', 'is_sales', 'phone_auth', 'buy_member'], 'integer', 'max'=>99999999],
             ['cat_goods_count', 'default', 'value' => 6],
-            [['cat_goods_count', 'recommend_count', 'is_share_price', 'is_member_price'], 'integer', 'min' => 0, 'max' => 100],
+            [['cat_goods_count', 'recommend_count', 'is_share_price', 'is_member_price', 'is_official_account'], 'integer', 'min' => 0, 'max' => 100],
             [['cert_pem', 'key_pem'], 'default', 'value' => '0'],
             [['postage'], 'number', 'min' => -1],
             [['over_day'], 'number', 'min' => 0],
@@ -141,7 +142,8 @@ class StoreSettingForm extends MchModel
             'quick_navigation' => '首页快捷导航',
             'good_negotiable' => '商品面议方式',
             'buy_member' => '是否购买会员',
-            'logo'  => '商城logo'
+            'logo'  => '商城logo',
+            'is_official_account' => '关联公众号组件'
         ];
     }
 
@@ -185,6 +187,7 @@ class StoreSettingForm extends MchModel
         $store->is_share_price = $this->is_share_price;
         $store->buy_member = $this->buy_member;
         $store->logo = $this->logo;
+        $store->is_official_account = $this->is_official_account;
         $store->save();
 
 //        Option::set('service', $this->service, $this->store_id, 'admin');

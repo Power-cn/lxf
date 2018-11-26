@@ -81,7 +81,7 @@ class MiaoshaListForm extends ApiModel
             'g.status' => 1,
         ])->andWhere(['>','open_date',$this->date])
             ->leftJoin(['g' => MsGoods::tableName()], 'mg.goods_id=g.id')
-            ->orderBy('start_time asc')
+            ->orderBy('open_date asc,start_time asc')
             ->select('mg.start_time,mg.open_date')->one();
             
         $under = [];

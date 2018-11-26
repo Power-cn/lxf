@@ -69,6 +69,7 @@ Page({
      * 用户点击右上角分享
      */
     onShareAppMessage: function (options) {
+        getApp().page.onShareAppMessage(this);
         return {
             path: 'pages/web/web?url=' + encodeURIComponent(options.webViewUrl)
         };

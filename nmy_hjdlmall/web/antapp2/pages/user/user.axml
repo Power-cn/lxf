@@ -177,7 +177,7 @@
                     </view>
                 </view>
 
-                <view class="option-list" a:if="{{style.menu == 0}}">
+                <view class="option-list" a:if="{{style.menu == 0 && wallet.is_menu == 1}}">
                     <block a:for="{{menus}}" a:key="{{item.id}}">
                         <block a:if="{{item.open_type=='navigator'}}">
 
@@ -221,19 +221,24 @@
                                 </block>
                             </block>
                             <block a:else>
-                                <navigator class="option-item" url="{{item.url}}">
-                                    <view class="flex-row option-content">
-                                        <view class="flex-grow-1 flex-row">
-                                            <view class="flex-grow-0 flex-y-center">
-                                                <image class="option-icon" src="{{item.icon}}" />
+                                <!-- 列表模式  单纯跳转页面的菜单 -->
+                                <form report-submit="true" onSubmit="_formIdSubmit" data-bind="myBtnClick" data-type="navigate" data-url="{{item.url}}">
+                                    <button formType="submit" id="_formIdSubmit">
+                                        <view class="option-item">
+                                            <view class="flex-row option-content">
+                                                <view class="flex-grow-1 flex-row">
+                                                    <view class="flex-grow-0 flex-y-center">
+                                                        <image class="option-icon" src="{{item.icon}}" />
+                                                    </view>
+                                                    <view class="flex-grow-1 flex-y-center">{{item.name}}</view>
+                                                </view>
+                                                <view class="flex-grow-0 flex-y-center">
+                                                    <image class="option-jisntou" src="{{__wxapp_img.store.jiantou_r.url}}" />
+                                                </view>
                                             </view>
-                                            <view class="flex-grow-1 flex-y-center">{{item.name}}</view>
                                         </view>
-                                        <view class="flex-grow-0 flex-y-center">
-                                            <image class="option-jisntou" src="{{__wxapp_img.store.jiantou_r.url}}" />
-                                        </view>
-                                    </view>
-                                </navigator>
+                                    </button>
+                                </form>
                             </block>
                         </block>
 
@@ -270,6 +275,7 @@
                             </button>
                         </block>
 
+                        <!-- 列表样式 不需要跳转页面的菜单 例如：清除缓存 -->
                         <block a:elif="{{item.open_type=='no_navigator'}}">
                             <button a:if="{{__platform == 'wx'}}" class="option-item" onTap='clearCache' plain="true" session-from="{{__user_info.nickname}}|">
                                 <view class="flex-row option-content">
@@ -288,7 +294,7 @@
                     </block>
                 </view>
 
-                <view class="options-list" a:if="{{style.menu == 1}}" style="background-color: #fff;">
+                <view class="options-list" a:if="{{style.menu == 1 && wallet.is_menu == 1}}" style="background-color: #fff;">
                     <view class="flex-row" style="flex-wrap: wrap">
                         <block a:for="{{menus}}" a:key="{{item.id}}">
                             <block a:if="{{item.open_type=='navigator'}}">
@@ -323,14 +329,19 @@
                                     </block>
                                 </block>
                                 <block a:else>
-                                    <navigator class="option-item flex-grow-0 style" url="{{item.url}}">
-                                        <view>
-                                            <view class="flex-x-center">
-                                                <image class="option-icon" src="{{item.icon}}" />
+                                    <!-- 九宫格模式  单纯跳转页面的菜单 -->
+                                    <form style='width:25%;' report-submit="true" onSubmit="_formIdSubmit" data-bind="myBtnClick" data-type="navigate" data-url="{{item.url}}">
+                                        <button style='width:100%;' formType="submit" id="_formIdSubmit">
+                                            <view class="option-item flex-grow-0 style" style='width:100%;'>
+                                                <view>
+                                                    <view class="flex-x-center">
+                                                        <image class="option-icon" src="{{item.icon}}" />
+                                                    </view>
+                                                    <view class="text-more-2" style="text-align: center">{{item.name}}</view>
+                                                </view>
                                             </view>
-                                            <view class="text-more-2" style="text-align: center">{{item.name}}</view>
-                                        </view>
-                                    </navigator>
+                                        </button>
+                                    </form>
                                 </block>
                             </block>
 
@@ -357,6 +368,7 @@
                                 </button>
                             </block>
 
+                            <!-- 九宫格样式 不需要跳转页面的菜单 例如：清除缓存 -->
                             <block a:elif="{{item.open_type=='no_navigator'}}">
                                 <view class="option-item flex-grow-0 style" onTap="clearCache">
                                     <view>

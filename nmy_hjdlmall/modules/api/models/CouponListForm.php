@@ -44,7 +44,7 @@ class CouponListForm extends ApiModel
             $coupon_list[$index]['begintime'] = date('Y.m.d', $value['begin_time']);
             $coupon_list[$index]['endtime'] = date('Y.m.d', $value['end_time']);
             $coupon_list[$index]['content'] = "适用范围：全场通用";
-            if ($value['appoint_type'] == 1) {
+            if ($value['appoint_type'] == 1 && $value['cat_id_list'] !== 'null') {
                 $coupon_list[$index]['cat'] = Cat::find()->select('id,name')->where(['store_id'=>$this->store_id,'is_delete'=>0,'id'=>json_decode($value['cat_id_list'])])->asArray()->all();
                 $cat_list = [];
                 foreach ($coupon_list[$index]['cat'] as $item) {
@@ -52,7 +52,7 @@ class CouponListForm extends ApiModel
                 }
                 $coupon_list[$index]['content'] = "适用范围：仅限分类：".implode('、', $cat_list)."使用";
                 $coupon_list[$index]['goods'] = [];
-            } elseif ($value['appoint_type'] == 2) {
+            } elseif ($value['appoint_type'] == 2 && $value['goods_id_list'] !== 'null') {
                 $coupon_list[$index]['goods'] = Goods::find()->select('id')->where(['store_id'=>$this->store_id,'is_delete'=>0,'id'=>json_decode($value['goods_id_list'])])->asArray()->all();
                 $coupon_list[$index]['cat'] = [];
                 $coupon_list[$index]['content'] = "指定商品使用 点击查看指定商品";

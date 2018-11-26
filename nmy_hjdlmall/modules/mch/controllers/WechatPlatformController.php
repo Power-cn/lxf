@@ -10,6 +10,7 @@
 
 namespace app\modules\mch\controllers;
 
+use app\models\FormId;
 use app\models\tplmsg\BindWechatPlatform;
 use app\models\User;
 use app\modules\mch\models\wechatplatform\AddTplForm;
@@ -82,27 +83,41 @@ class WechatPlatformController extends Controller
         $keyword = trim($keyword);
         $query = User::find()->where([
             'AND',
-            ['IS NOT', 'wechat_platform_open_id', null],
-            ['!=', 'wechat_platform_open_id', ''],
+//            ['IS NOT', 'wechat_platform_open_id', null],
+//            ['!=', 'wechat_platform_open_id', ''],
             ['is_delete' => 0,],
             ['store_id' => $this->store->id,],
         ]);
+
         if ($keyword) {
             $query->andWhere([
                 'OR',
-                ['LIKE', 'id', $keyword,],
+                ['id' => $keyword,],
                 ['LIKE', 'nickname', $keyword,],
                 ['LIKE', 'wechat_platform_open_id', $keyword,],
             ]);
         }
-        $query->select('id,wechat_platform_open_id,nickname,avatar_url');
+        $query->select('id,nickname,avatar_url,wechat_open_id');
         $count = $query->count('1');
-        $pagination = new Pagination(['totalCount' => $count, 'page' => $page - 1]);
-        $query->limit($pagination->limit)->offset($pagination->offset);
+        $pagination = new Pagination(['totalCount' => $count, 'pageSize' => 10, 'page' => $page - 1]);
+        $list = $query->limit($pagination->limit)->offset($pagination->offset)->asArray()->all();
+
+        foreach ($list as &$item) {
+            $formId = FormId::find()->where([
+                'wechat_open_id' => $item['wechat_open_id'],
+                'send_count' => 0,
+                'store_id' => $this->store->id,
+                'type' => 'form_id'
+            ])
+                ->andWhere(['>', 'addtime', time() - (7 * 24 * 60 * 60)])
+                ->select('form_id')->one();
+            $item['form_id'] = $formId->form_id;
+        }
+
         return [
             'code' => 0,
             'data' => [
-                'list' => $query->asArray()->all(),
+                'list' => $list,
             ],
         ];
     }

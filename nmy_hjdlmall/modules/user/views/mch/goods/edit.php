@@ -275,7 +275,7 @@ if (!$returnUrl) {
                 </div>
             </div>
 
-            <div class="step-block" flex="dir:left box:first" v-if="cat_list">
+            <div class="step-block" flex="dir:left box:first" v-if="cat_list" hidden>
                 <div>
                     <span>一键导入</span>
                 </div>
@@ -852,6 +852,8 @@ if (!$returnUrl) {
             attr_row_list: [],
             model: null,
             setting: null,
+            attr_group_count: 0,
+            old_checked_attr_list: [],
         },
         computed: {
             attr_error: function () {
@@ -892,7 +894,7 @@ if (!$returnUrl) {
                 });
                 setTimeout(function () {
                     if (res.data.model.detail)
-                        ue.setContent(res.data.model.detail);
+                        ue.setContent(res.data.model.detail + "");
                 }, 300);
             } else {
                 $.alert({
@@ -1025,8 +1027,42 @@ if (!$returnUrl) {
             attr_name: attr_name,
             attr_group_name: app.attr_group_list[group_index].attr_group_name,
         });
+
+        // 如果是单规格的，添加新规格时不清空原先的数据
+        app.old_checked_attr_list = app.attr_row_list;
+        app.attr_group_count = app.attr_group_list.length;
+        var attrList = attrGroupGenerate(app.attr_group_list);
+        if (app.attr_group_list.length === 1) {
+            for (var i in attrList) {
+                if (i > app.old_checked_attr_list.length - 1) {
+                    app.old_checked_attr_list.push(attrList[i])
+                }
+            }
+            var newCheckedAttrList = app.old_checked_attr_list;
+        } else if (app.attr_group_list.length === app.attr_group_count) {
+            for (var pi in attrList) {
+                var pAttrName = '';
+                for (var pj in attrList[pi].attr_list) {
+                    pAttrName += attrList[pi].attr_list[pj].attr_name
+                }
+                for (var ci in app.old_checked_attr_list) {
+                    var cAttrName = '';
+                    for (var cj in app.old_checked_attr_list[ci].attr_list) {
+                        cAttrName += app.old_checked_attr_list[ci].attr_list[cj].attr_name;
+                    }
+                    if (pAttrName === cAttrName) {
+                        attrList[pi] = app.old_checked_attr_list[ci];
+                    }
+                }
+            }
+            var newCheckedAttrList = attrList;
+        } else {
+            var newCheckedAttrList = attrList;
+        }
+
         $('.add-attr-input').val('');
-        app.attr_row_list = attrGroupGenerate(app.attr_group_list);
+//        app.attr_row_list = attrGroupGenerate(newCheckedAttrList);
+        app.attr_row_list = newCheckedAttrList;
     });
 
     //删除规格组
@@ -1041,7 +1077,47 @@ if (!$returnUrl) {
         var group_index = $(this).attr('data-group-index');
         var attr_index = $(this).attr('data-attr-index');
         app.attr_group_list[group_index].attr_list.splice(attr_index, 1);
-        app.attr_row_list = attrGroupGenerate(app.attr_group_list);
+
+
+        // 如果是单规格的，添加新规格时不清空原先的数据
+        app.old_checked_attr_list = app.attr_row_list;
+        app.attr_group_count = app.attr_group_list.length;
+        var attrList = attrGroupGenerate(app.attr_group_list);
+        if (app.attr_group_list.length === 1) {
+            var newCheckedAttrList = [];
+            for (var i in app.attr_group_list[0].attr_list) {
+                var attrName = app.attr_group_list[0].attr_list[i].attr_name;
+                for (j in app.old_checked_attr_list) {
+                    var oldAttrName = app.old_checked_attr_list[j].attr_list[0].attr_name;
+                    if (attrName === oldAttrName) {
+                        newCheckedAttrList.push(app.old_checked_attr_list[j]);
+                        break;
+                    }
+                }
+            }
+        } else if (app.attr_group_list.length === app.attr_group_count) {
+            for (var pi in attrList) {
+                var pAttrName = '';
+                for (var pj in attrList[pi].attr_list) {
+                    pAttrName += attrList[pi].attr_list[pj].attr_name
+                }
+                for (var ci in app.old_checked_attr_list) {
+                    var cAttrName = '';
+                    for (var cj in app.old_checked_attr_list[ci].attr_list) {
+                        cAttrName += app.old_checked_attr_list[ci].attr_list[cj].attr_name;
+                    }
+                    if (pAttrName === cAttrName) {
+                        attrList[pi] = app.old_checked_attr_list[ci];
+                    }
+                }
+            }
+            var newCheckedAttrList = attrList;
+        } else {
+            var newCheckedAttrList = attrList;
+        }
+
+//        app.attr_row_list = attrGroupGenerate(app.attr_group_list);
+        app.attr_row_list = newCheckedAttrList;
     });
 
     //规格价格修改

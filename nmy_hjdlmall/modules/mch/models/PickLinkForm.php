@@ -701,6 +701,11 @@ class PickLinkForm
                 'params' => []
             ],
             [
+                'name' => "九宫格抽奖",
+                'url' => "/pond/pond/pond",
+                'params' => []
+            ],
+            [
                 'sign' => 'scratch',
                 'name' => "刮刮卡",
                 'url' => "/scratch/index/index",

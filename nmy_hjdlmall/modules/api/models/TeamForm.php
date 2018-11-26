@@ -335,17 +335,17 @@ class TeamForm extends ApiModel
             ];
         }
         $first = User::find()->select(['id'])
-            ->where(['store_id' => $this->store_id, 'parent_id' => $this->user_id, 'is_delete' => 0])->column();
+            ->where(['store_id' => $this->store_id, 'parent_id' => $this->user_id, 'is_delete' => 0, 'type' => 1])->column();
         $count = count($first);
         $team['f_c'] = $first;
         if ($share_setting->level >= 2) {
             $second = User::find()->select(['id'])
-                ->where(['store_id' => $this->store_id, 'parent_id' => $first, 'is_delete' => 0])->column();
+                ->where(['store_id' => $this->store_id, 'parent_id' => $first, 'is_delete' => 0, 'type' => 1])->column();
             $count += count($second);
             $team['s_c'] = $second;
             if ($share_setting->level >= 3) {
                 $third = User::find()->select(['id'])
-                    ->where(['store_id' => $this->store_id, 'parent_id' => $second, 'is_delete' => 0])->column();
+                    ->where(['store_id' => $this->store_id, 'parent_id' => $second, 'is_delete' => 0, 'type' => 1])->column();
                 $count += count($third);
                 $team['t_c'] = $third;
             }

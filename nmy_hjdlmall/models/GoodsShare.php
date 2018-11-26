@@ -18,9 +18,11 @@ use Yii;
  * @property integer $share_type
  * @property string $rebate
  * @property string $attr_setting_type
+ * @property integer relation_id
  */
 class GoodsShare extends \yii\db\ActiveRecord
 {
+    public $is_level;
     /**
      * 分销商品类型：拼团
      */
@@ -56,7 +58,7 @@ class GoodsShare extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['store_id', 'type', 'goods_id', 'individual_share', 'share_type'], 'integer'],
+            [['store_id', 'type', 'goods_id', 'individual_share', 'share_type', 'relation_id'], 'integer'],
             [['share_commission_first', 'share_commission_second', 'share_commission_third', 'rebate', 'attr_setting_type'], 'number'],
         ];
     }
@@ -77,6 +79,7 @@ class GoodsShare extends \yii\db\ActiveRecord
             'share_commission_third' => '三级分销佣金比例',
             'share_type' => '佣金配比 0--百分比 1--固定金额',
             'rebate' => '自购返利',
+            'relation_id' => '判断秒杀活动ID',
         ];
     }
 }

@@ -11,7 +11,7 @@ $this->title = '编辑门店';
 $this->params['active_nav_group'] = 1;
 ?>
 
-<script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77"></script>
+<script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77"></script>
 <div class="panel mb-3">
     <div class="panel-header"><?= $this->title ?></div>
     <div class="panel-body">

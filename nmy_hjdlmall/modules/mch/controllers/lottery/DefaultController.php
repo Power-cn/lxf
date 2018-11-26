@@ -6,24 +6,118 @@ use app\models\Banner;
 use app\modules\mch\models\BannerForm;
 use app\modules\mch\models\lottery\LotteryGoodsForm;
 use app\modules\mch\models\lottery\LotteryReserveForm;
+use app\modules\mch\models\lottery\LotterySettingForm;
+use app\models\LotteryLog;
+use app\models\LotteryReserve;
+use app\models\LotterySetting;
 use app\models\LotteryGoods;
+use app\models\User;
 use app\models\Goods;
 use app\models\AttrGroup;
 use app\models\Attr;
-use app\models\LotteryLog;
 use yii\data\Pagination;
-use app\models\LotteryReserve;
-use app\models\User;
+
 class DefaultController extends Controller
 {
+    //基础配置
+    public function actionSetting(){
+        $model = LotterySetting::findOne([
+            'store_id' => $this->store->id, 
+        ]);
+        if(!$model) {
+            $model = new LotterySetting();
+        }
+        if(\Yii::$app->request->isPost){
+            $form = new LotterySettingForm();
+            $form->attributes = \Yii::$app->request->post();
+            $form->model = $model;
+            $form->store_id = $this->store->id;
+            return $form->save();
+        }
+
+        return $this->render('setting', [
+            'setting' => $model,
+        ]);
+    } 
 
     //奖品列表
     public function actionGoods()
     {
-        $form = new LotteryGoodsForm();
+        $form = new LotteryGoodsForm(); 
         $form->store_id = $this->store->id;
         $list = $form->search();
         return $this->render('goods',$list);
+    }
+ 
+    //中奖名单
+    public function actionPartakeList($id) {
+        $query = LotteryLog::find()->select('count(user_id) as lucky_num,user_id,child_id,status,lucky_code,addtime,lottery_id,id')->with(['user'=>function ($query) {
+            $query->select('nickname,id,avatar_url,platform')->where([
+                'is_delete' => 0, 
+                'store_id' => $this->store->id,
+            ]);
+        }])->with(['childSelf'=>function ($query) use ($id) {
+                $query->select('child_id,user_id,lottery_id')->where(['lottery_id' => $id])->with(['user'=>function ($query) {
+                    $query->select('nickname,id,avatar_url,platform,binding')->where([
+                        'is_delete' => 0,
+                        'store_id' => $this->store->id,
+                    ]);
+                }]);
+            }])->where(['store_id' => $this->store->id,'lottery_id' => $id])
+                ->andWhere(['not', ['status' => -1]])
+                ->orderBy('status desc,addtime desc')->groupBy('user_id')
+                ->having(['child_id' => 0]);
+
+        $count = $query->count();
+        $pagination = new Pagination(['totalCount' => $count]);
+        $list = $query->limit($pagination->limit)->offset($pagination->offset)->asArray()->all();
+
+        foreach($list as &$item){
+            $item['is_award'] = $item['status'];
+            if($item['is_award']==1){
+                $status = LotteryLog::find()->where([
+                        'AND',
+                        ['store_id' => $this->store->id],
+                        ['user_id' => $item['user_id']],
+                        ['lottery_id' => $item['lottery_id']],
+                        ['in','status',[2,3]]
+                    ])->one();
+                if($status){
+                    $item['is_award'] = $status['status'];
+                }
+            }
+            $item['addtime'] = date('Y-m-d H:i:s',$item['addtime']);
+        };
+        unset($item);
+
+        return $this->render('partake-list', [
+            'list' => $list,
+            'pagination' => $pagination,
+        ]);
+    }
+
+    public function actionPartakeDetail($lottery_id,$user_id) {
+        $list = LotteryLog::find()->select('lottery_id,child_id,status,lucky_code,addtime')->where([
+                    'AND',
+                    ['store_id' => $this->store->id],
+                    ['user_id' => $user_id],
+                    ['lottery_id' => $lottery_id],
+                    ['not', ['child_id' => 0]],
+                    ['not', ['status' => -1]]
+                ])->with(['childId'=>function ($query) {
+                    $query->select('nickname,addtime,id,avatar_url')->where([
+                        'store_id' => $this->store->id,
+                    ]);
+                }])->asArray()->all();
+
+        $list = array_map(function($item) {
+            $item['childId']['addtime'] = date('Y-m-d H:i:s', $item['addtime']);
+            return $item;
+        }, $list);
+        return [
+            'code' => 0,
+            'list' => $list,
+        ];
     }
 
     //删除
@@ -53,11 +147,14 @@ class DefaultController extends Controller
             'id' => $post['id'] 
         ]);
         if(!empty($form)){
-            if($post['stock']!==null){
+            if($post['stock']!=''){
                $form->stock = $post['stock']; 
             }
-            if($post['status']!==null){
+            if($post['status']!=''){
                 $form->status = $post['status']; 
+            }
+            if($post['sort']!=''){
+                $form->sort = $post['sort'];
             }
             $form->update_time = time();
             if($form->save()){
@@ -72,7 +169,7 @@ class DefaultController extends Controller
   
      }
 
-    //
+    //预中奖
     public function actionDetail($id = null){
         $goods_list = LotteryGoods::find()
             ->where([
@@ -105,6 +202,7 @@ class DefaultController extends Controller
             $num = LotteryLog::find()->where([
                     'store_id' => $this->store->id,
                     'lottery_id' => $id,
+                    'child_id' => 0,
                 ])->count();
         return $this->render('detail', [
             'goods_list' => $goods_list,
@@ -123,7 +221,7 @@ class DefaultController extends Controller
                 'is_delete' => 0,
             ]);
         if (!$data) {
-            \Yii::$app->response->redirect(\Yii::$app->request->referrer)->send(); //
+            \Yii::$app->response->redirect(\Yii::$app->request->referrer)->send();
             return;
         };
 
@@ -189,6 +287,7 @@ class DefaultController extends Controller
     }
 
 
+
     //查找用户
     public function actionSearchUser()
     {
@@ -202,6 +301,7 @@ class DefaultController extends Controller
             ['u.store_id' => $this->store->id, 'u.type' => 1],
             ['l.store_id' => $this->store->id],
             ['l.lottery_id' => $lottery_id],
+            ['l.child_id' => 0],
             ])->leftJoin(['u' => User::tableName()], 'l.user_id=u.id');
 
         $list = $query->limit(30)->asArray()->all();
@@ -217,9 +317,7 @@ class DefaultController extends Controller
     ////规格查询
     public function actionAttr($id)
     {
-
         $goods = Goods::findOne(['id' => $id, 'store_id' => $this->store->id, 'mch_id' => 0]);
-
         if (!$goods->attr) {
             return [];
         }
@@ -249,6 +347,7 @@ class DefaultController extends Controller
             ]
          ];
     }
+
     private function getAttrGroupByAttId($att_id)
     {
         $cache_key = 'get_attr_group_by_attr_id_' . $att_id;
@@ -265,8 +364,6 @@ class DefaultController extends Controller
         \Yii::$app->cache->set($cache_key, $attr_group, 10);
         return $attr_group;
     }
-
-
 
     // 幻灯片列表
     public function actionSlide()

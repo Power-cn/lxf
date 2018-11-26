@@ -53,13 +53,13 @@ class PondForm extends ApiModel
             switch($v['type'])
             {
                 case 1:
-                $v['name'] = $v['price']+'元红包';
+                $v['name'] = $v['name'] ? $v['name'] : $v['price'].'元红包';
                 break;
                 case 2:
                 $v['name'] = $v['coupon']['name'];
                 break;
                 case 3:
-                $v['name'] = $v['num']+'积分';
+                $v['name'] = $v['name'] ? $v['name'] : $v['num'].'积分';
                 if(!$v['image_url']){
                     $v['image_url'] = '/pond/images/pond-jf.png';
                 }

@@ -286,7 +286,7 @@ $urlPlatform = Yii::$app->controller->route;
                     <?php endif; ?>
                 </td>
                 <td class="order-tab-5">
-                    <?php if (($order_item['is_pay'] == 1 || $order_item['pay_type'] == 2) && $order_item['is_use'] != 1 && $order_item['is_refund'] == 0) : ?>
+                    <?php if (($order_item['is_pay'] == 1 || $order_item['pay_type'] == 2) && $order_item['is_use'] != 1 && ($order_item['is_refund'] == 0 || $order_item['is_refund'] == 2)) : ?>
                         <div class="mb-2">
                             <a class="btn btn-sm btn-primary clerk-btn" href="javascript:"
                                data-order-id="<?= $order_item['id'] ?>">核销</a>

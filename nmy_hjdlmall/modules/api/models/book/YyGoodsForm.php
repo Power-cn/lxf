@@ -9,6 +9,8 @@
 namespace app\modules\api\models\book;
 
 use app\models\Article;
+use app\models\Attr;
+use app\models\AttrGroup;
 use app\models\common\CommonGoods;
 use app\models\GoodsShare;
 use app\models\Order;
@@ -93,6 +95,8 @@ class YyGoodsForm extends ApiModel
             ->andWhere(['goods_id' => $this->gid, 'is_delete' => 0])
             ->column();
 
+        $info['attr'] = $info['attr'] ? $info['attr'] : '[{}]';
+
         $info['attr'] = json_decode($info['attr'], true);
         $info['service'] = explode(',', $info['service']);
         $attr_group_list = $goods->getAttrGroupList();
@@ -115,36 +119,56 @@ class YyGoodsForm extends ApiModel
                 ->all();
             $info['shopListNum'] = count($shopList);
         }
+        $defaultAttr = Attr::find()->where(['is_default' => 1])->one();
+        $defaultAttr = '[{"attr_list":[{"attr_id":' . $defaultAttr->id . ',"attr_name":"' . $defaultAttr->attr_name . '"}],"num":' . $goods['stock'] . ',"price":' . $goods['price'] . ',"pic":""}]';
+        $goods['attr'] = $goods['attr'] ? $goods['attr'] : $defaultAttr;
+        // 获取最高分销价 、最低会员价、当前会员价
+        $goodsShare = GoodsShare::find()->where(['type' => GoodsShare::SHARE_GOODS_TYPE_YY, 'goods_id' => $goods->id])->one();
+        $res = CommonGoods::getMMPrice([
+            'attr' => $goods['attr'],
+            'attr_setting_type' => $goodsShare['attr_setting_type'],
+            'share_type' => $goodsShare['share_type'],
+            'share_commission_first' => $goodsShare['share_commission_first'],
+            'price' => $goods['price'],
+            'individual_share' => $goodsShare['individual_share'],
+            'is_level' => $goods['is_level'],
+        ], ['type' => 'BOOK']);
 
-        if($info['use_attr']){
+
+        $info['max_share_price'] = sprintf('%.2f', $res['max_share_price']);
+        $info['min_member_price'] = sprintf('%.2f', $res['min_member_price']);
+        $info['is_share'] = $res['is_share'];
+        $info['is_level'] = $res['is_level'];
+
+        if ($info['use_attr']) {
             $num = 0;
             $price = [];
-            foreach($info['attr'] as $v){
+            foreach ($info['attr'] as $v) {
                 $num += $v['num'];
-                if($v['price'] > 0){
+                if ($v['price'] > 0) {
                     $price[] = $v['price'];
-                }else{
+                } else {
                     $price[] = $info['price'];
                 }
             }
 
-            // 获取最高分销价 、最低会员价、当前会员价
-            $goodsShare = GoodsShare::find()->where(['type' => GoodsShare::SHARE_GOODS_TYPE_YY, 'goods_id' => $goods->id])->one();
-            $res = CommonGoods::getMMPrice([
-                'attr' => $goods['attr'],
-                'attr_setting_type' => $goodsShare['attr_setting_type'],
-                'share_type' => $goodsShare['share_type'],
-                'share_commission_first' => $goodsShare['share_commission_first'],
-                'price' => $goods['price'],
-                'individual_share' => $goodsShare['individual_share'],
-            ]);
 
-            $info['price'] = number_format(min($price), 2, '.', '');
+            $info['price'] = min($price);
             $info['stock'] = $num;
-            $info['max_share_price'] = number_format($res['max_share_price'], 2, '.', '');
-            $info['min_member_price'] = number_format($res['min_member_price'], 2, '.', '');
-            $info['is_share'] = $res['is_share'];
         }
+
+        $attr = \Yii::$app->serializer->decode($goods['attr']);
+        $goodsPrice = $info['price'];
+        // 默认规格价格显示
+        $isMemberPrice = false;
+        if ($res['user_is_member'] === true && count($attr) === 1 && $attr[0]['attr_list'][0]['attr_name'] == '默认') {
+            $goodsPrice = $res['min_member_price'] ? $res['min_member_price'] : $info['price'];
+            $isMemberPrice = true;
+        }
+
+        $info['is_member_price'] = $isMemberPrice;
+        $info['price'] = sprintf('%.2f', $goodsPrice);
+
         return [
             'code' => 0,
             'msg' => 'success',

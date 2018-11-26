@@ -271,6 +271,11 @@ $list = [
         'route' => '/bargain/list/list',
         'params' => [],
     ],
+    [
+        'name' => '抽奖',
+        'route' => '/lottery/index/index',
+        'params' => [],
+    ],
 ];
 ?>
 <style>

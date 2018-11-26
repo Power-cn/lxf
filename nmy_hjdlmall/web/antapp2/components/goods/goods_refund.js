@@ -140,6 +140,34 @@ module.exports = {
         var type = e.currentTarget.dataset.type;
         var form_id = e.detail.formId;
 
+        var pic_url_list = [];
+        var pic_complete_count = 0;
+        var pageType = self.data.pageType;
+        var httpUrl = getApp().api.order.refund;
+        var navigateToUrl = '';
+        var orderType = '';
+
+        if (pageType === 'STORE') {
+            navigateToUrl = '/pages/order/order?status=4';
+            orderType = 'STORE';
+
+        } else if (pageType === 'PINTUAN') {
+            navigateToUrl = '/pages/pt/order/order?status=4';
+            orderType = 'PINTUAN';
+
+        } else if (pageType === 'MIAOSHA') {
+            navigateToUrl = '/pages/miaosha/order/order?status=4';
+            orderType = 'MIAOSHA';
+
+        } else {
+            getApp().core.showModal({
+                title: '提示',
+                content: 'pageType变量未定义或变量值不是预期的',
+            });
+            return;
+
+        }
+
         /*--退货退款开始--*/
         if (type == 1) {//退货退款
             var desc = self.data.refund_data_1.desc || "";
@@ -149,34 +177,6 @@ module.exports = {
                     image: "/images/icon-warning.png",
                 });
                 return;
-            }
-
-            var pic_url_list = [];
-            var pic_complete_count = 0;
-            var pageType = self.data.pageType;
-            var httpUrl = getApp().api.order.refund;
-            var navigateToUrl = '';
-            var orderType = '';
-
-            if (pageType === 'STORE') {
-                navigateToUrl = '/pages/order/order?status=4';
-                orderType = 'STORE';
-
-            } else if (pageType === 'PINTUAN') {
-                navigateToUrl = '/pages/pt/order/order?status=4';
-                orderType = 'PINTUAN';
-
-            } else if (pageType === 'MIAOSHA') {
-                navigateToUrl = '/pages/miaosha/order/order?status=4';
-                orderType = 'MIAOSHA';
-
-            } else {
-                getApp().core.showModal({
-                    title: '提示',
-                    content: 'pageType变量未定义或变量值不是预期的',
-                });
-                return;
-
             }
 
             //如果有图片先上传图片
@@ -265,6 +265,7 @@ module.exports = {
         }
         /*--退货退款结束--*/
 
+
         /*--换货开始--*/
         if (type == 2) {//换货
             var desc = self.data.refund_data_2.desc || "";
@@ -317,6 +318,7 @@ module.exports = {
                     title: "正在提交",
                     mask: true,
                 });
+                
                 getApp().request({
                     url: httpUrl,
                     method: "post",

@@ -22,13 +22,17 @@
 
 .quick_goods_info .view1 .renminbi {
     font-size: 11pt;
-    color: #999999;
+    color: #ff4544;
 }
 
 .quick_goods_info .view1 .img {
     width: 94rpx;
     height: 40rpx;
     margin-left: 16rpx;
+}
+
+.quick_goods_info .view1 .is_member {
+    color: red;
 }
 
 .quick_goods_info .view2{
@@ -52,7 +56,7 @@
 
 .quick_goods_info .goods_price {
     font-size: 16px;
-    color: #999999;
+    color: #ff4544;
 }
 
 .quick_goods_info .original_price {
@@ -138,12 +142,16 @@
 .store_goods_info .view1 .renminbi {
     font-size: 9pt;
     padding-top: 18rpx;
-    color: #999999;
+    color: #ff4544;
 }
 
 .store_goods_info .view1 .min_price {
     font-size: 16pt;
-    color: #999999;
+    color: #ff4544;
+}
+
+.store_goods_info .view1 .is_member {
+    color: red;
 }
 
 .store_goods_info .view1 .img {

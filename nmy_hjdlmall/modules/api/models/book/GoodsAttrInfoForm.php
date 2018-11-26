@@ -38,7 +38,12 @@ class GoodsAttrInfoForm extends ApiModel
             return new ApiResponse(1, '商品不存在');
         }
 
-        $res = CommonGoods::currentGoodsAttr($goods, $this->attr_list);
+        $goodsData = [
+            'attr' => $goods['attr'],
+            'price' => $goods['price'],
+            'is_level' => $goods['is_level']
+        ];
+        $res = CommonGoods::currentGoodsAttr($goodsData, $this->attr_list);
 
         return new ApiResponse(0, 'success', $res);
     }

@@ -8,8 +8,10 @@
 
 namespace app\modules\mch\models;
 
+use app\models\ActivityMsgTpl;
 use app\models\Coupon;
 use app\models\User;
+use app\models\WechatTplMsgSender;
 
 class CouponSendForm extends MchModel
 {
@@ -54,6 +56,9 @@ class CouponSendForm extends MchModel
             if ($res) {
                 $count++;
             }
+
+            $msgTpl = new ActivityMsgTpl($u->id, 'COUPON');
+            $msgTpl->activitySuccessMsg('优惠券发放', $coupon->name, '您有新的优惠券待查收！');
         }
         return [
             'code' => 0,

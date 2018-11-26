@@ -5,7 +5,7 @@
  * author: wxf
  */
 $urlManager = Yii::$app->urlManager;
-$singleAttr = isset($attr) ? Yii::$app->serializer->decode($attr) : [];
+$singleAttr = isset($attr) && !empty($attr) ? Yii::$app->serializer->decode($attr) : [];
 ?>
 
 <div class="attr_share_price">
@@ -242,7 +242,7 @@ $singleAttr = isset($attr) ? Yii::$app->serializer->decode($attr) : [];
                                 </tr>
                             </table>
                             <div>
-                                <label style="color: red;">批量设置</label>
+                                <label style="color: red;">批量设置(0.01 ~ N)</label>
                                 <div>
                                     <label>一级佣金</label>
                                     <input type="number"  class="share_price_one">

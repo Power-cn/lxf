@@ -8,6 +8,7 @@
 
 namespace app\modules\api\models;
 
+use app\models\ActivityMsgTpl;
 use app\models\MsOrder;
 use app\models\Order;
 use app\models\User;
@@ -66,6 +67,9 @@ class OrderClerkForm extends ApiModel
         if ($order->save()) {
             $printer_order = new PinterOrder($this->store_id, $order->id, 'confirm', $type);
             $res = $printer_order->print_order();
+
+            $msgTpl = new ActivityMsgTpl($order->user_id, 'ORDER_CLERK');
+            $msgTpl->orderClerkTplMsg($order->order_no, '订单已核销');
             return [
                 'code' => 0,
                 'msg' => '成功'

@@ -6,22 +6,27 @@
         <view class="quick_goods_info">
             <view class='view1'>
                 <view a:if='{{__is_member_price && goods.min_member_price > 0 && goods.is_negotiable != 1 && __user_info.level > -1}}' class="flex-grow-0 flex-y-center">
-                    <text class='renminbi'>￥</text>
-                    <text class='goods_price'>{{goods.min_member_price}}</text>
-                    <image class='img' src='{{__wxapp_img.store.member_price.url}}'></image>
+                    <text class='renminbi is_member'>￥</text>
+                    <text class='goods_price is_member'>{{goods.min_member_price}}</text>
+                    <image a:if='{{goods.is_level === true}}' class='img' src='{{__wxapp_img.store.member_price.url}}'></image>
                 </view>
                 <view a:else class="flex-grow-0 flex-y-center">
-                    <text class='renminbi'>￥</text>
-                    <text class='goods_price'>{{goods.min_price}}</text>
+                    <text class='renminbi {{__user_info.level != -1 || goods.is_level === false ? "is_member" : ""}}'>￥</text>
+                    <text class='goods_price {{__user_info.level != -1 || goods.is_level === false ? "is_member" : ""}}'>{{goods.min_price > 0 ? goods.min_price : goods.price}}</text>
                 </view>
 
-                <view class="flex-row flex-y-center">
-
+                <view style='margin-top:14rpx;' class="flex-row flex-y-center">
                     <view class="flex-grow-0 view2">
-                        <text class='original_price' a:if="{{__user_info.level > -1 || !goods.min_member_price}}">￥{{goods.original_price}}</text>
+                        <text class='original_price' a:if="{{__user_info.level > -1 || !goods.min_member_price || goods.is_level === false}}">￥{{goods.original_price}}</text>
                         <view class='member_price_box' a:else="{{goods.min_member_price}}">
-                            <text class='member_price_title'>会员价</text>
-                            <text>￥{{goods.min_member_price > 0 ? goods.min_member_price : goods.price}}</text>
+                            <!-- 商城全局会员价显示开关 -->
+                            <block a:if="{{__is_member_price === 1}}">
+                                <text class='member_price_title'>会员价</text>
+                                <text>￥{{goods.min_member_price > 0 ? goods.min_member_price : goods.price}}</text>
+                            </block>
+                            <block a:else>
+                                <text class='original_price'>￥{{goods.price}}</text>
+                            </block>
                         </view>
                     </view>
 
@@ -56,41 +61,73 @@
     <block a:else>
         <view class="flex-row flex-y-center store_goods_info">
             <view class="flex-grow-1 flex-col">
-
                 <view a:if='{{__is_member_price && goods.min_member_price > 0 && goods.is_negotiable != 1 && __user_info.level > -1}}' class="flex-grow-0 flex-y-center view1">
-                    <text a:if="{{!goods.is_negotiable}}" class='renminbi'>￥</text>
-                    <text class='min_price'>{{goods.min_member_price}}</text>
-                    <image class='img' src='{{__wxapp_img.store.member_price.url}}'></image>
+                    <block a:if="{{pageType === 'INTEGRAL'}}">
+                        <text style='font-size:16pt;color:red;'>{{goods.integral}}积分 + </text>
+                    </block>
+                    <text a:if="{{!goods.is_negotiable}}" class='renminbi is_member'>￥</text>
+                    <block a:if='{{goods.mch}}'>
+                        <text class='min_price is_member'>{{goods.min_price}}</text>
+                    </block>
+                    <block a:else>
+                        <text class='min_price is_member'>{{goods.min_member_price}}</text>
+                        <image a:if='{{goods.is_level === true}}' class='img' src='{{__wxapp_img.store.member_price.url}}'></image>
+                    </block>
                 </view>
                 <view a:else class="flex-grow-0 flex-y-center view1">
-                    <text a:if="{{!goods.is_negotiable}}" class='renminbi'>￥</text>
-                    <text class='min_price'>{{goods.min_price}}</text>
+                    <block a:if="{{pageType === 'INTEGRAL'}}">
+                        <text style='font-size:16pt;color:red;'>{{goods.integral}}积分 + </text>
+                    </block>
+                    <block a:if="{{!goods.is_negotiable}}">
+                        <text class='renminbi {{__user_info.level != -1 || goods.is_level === false ? "is_member" : ""}}'>￥</text>
+                        <text class='min_price {{__user_info.level != -1 || goods.is_level === false ? "is_member" : ""}}'>{{goods.min_price > 0 ? goods.min_price : goods.price}}</text>
+                    </block>
+                    <block a:else>
+                        <text class='min_price'>{{goods.min_price}}</text>
+                    </block>
                 </view>
 
-                <view a:if='{{pageType !== "PINTUAN"}}' class="flex-row flex-y-center">
+                <view style='margin-top:14rpx;' a:if='{{pageType !=="PINTUAN"}}' class="flex-row flex-y-center">
 
                     <view a:if="{{!goods.is_negotiable}}" class="flex-grow-0 view2">
-                        <text class='original_price' a:if="{{__user_info.level > -1 || !goods.min_member_price}}">￥{{goods.original_price}}</text>
-                        <view class='member_price_box' a:else="{{goods.min_member_price}}">
-                            <text class='member_price_title'>会员价</text>
-                            <text>￥{{goods.min_member_price > 0 ? goods.min_member_price : goods.price}}</text>
+                        <text class='original_price' a:if="{{__user_info.level > -1 || !goods.min_member_price || goods.is_level === false}}">￥{{goods.original_price}}</text>
+                        <view class='member_price_box' a:else>
+                            <!-- 多商户 -->
+                            <block a:if="{{goods.mch}}">
+                                <text>￥{{goods.price}}</text>
+                            </block>
+                            <block a:else>
+                                <!-- 商城全局会员价显示开关 -->
+                                <block a:if="{{__is_member_price === 1}}">
+                                    <text class='member_price_title'>会员价</text>
+                                    <text>￥{{goods.min_member_price > 0 ? goods.min_member_price : goods.price}}</text>
+                                </block>
+                                <block a:else>
+                                    <text class='original_price'>￥{{goods.price}}</text>
+                                </block>
+                            </block>
                         </view>
                     </view>
-
-                    <view a:if='{{__is_sales && pageType !== "INTEGRAL"}}' class="flex-grow-0 view2">
-                        <text class='sales' a:if="{{pageType === 'MIAOSHA'}}">已抢：</text>
+                    <view a:if='{{(__is_sales) && (pageType !=="INTEGRAL") && (goods.is_negotiable !=1)}}' class="flex-grow-0 view2">
+                        <text class='sales' a:if="{{pageType ==='MIAOSHA'}}">已抢：</text>
                         <text class='sales' a:else>销量：</text>
                         <text class='sales'>{{goods.sales_volume}} {{goods.unit}}</text>
                     </view>
                 </view>
 
                 <!-- 拼团 -->
-                <view a:if="{{pageType === 'PINTUAN'}}" class="flex-row flex-y-center" style="margin-top:14rpx;height:60rpx;">
+                <view a:if="{{pageType ==='PINTUAN'}}" class="flex-row flex-y-center" style="margin-top:14rpx;height:60rpx;">
                     <view class='flex-grow-0 flex-row original-price'>
-                        <view a:if="{{__user_info.level > -1 || !goods.min_member_price}}" style='text-decoration: line-through;' class='flex-grow-0'>¥ {{goods.original_price}}</view>
+                        <view a:if="{{__user_info.level > -1 || !goods.min_member_price || goods.is_level === false}}" style='text-decoration: line-through;' class='flex-grow-0'>¥ {{goods.original_price}}</view>
                         <view class='member_price_box' a:else="{{goods.min_member_price}}">
-                            <text class='member_price_title'>会员价</text>
-                            <text>￥{{goods.min_member_price > 0 ? goods.min_member_price : goods.price}}</text>
+                            <!-- 商城全局会员价显示开关 -->
+                            <block a:if="{{__is_member_price === 1}}">
+                                <text class='member_price_title'>会员价</text>
+                                <text>￥{{goods.min_member_price > 0 ? goods.min_member_price : goods.price}}</text>
+                            </block>
+                            <block a:else>
+                                <text class='original_price'>￥{{goods.price}}</text>
+                            </block>
                         </view>
                     </view>
                     <view class='flex-row flex-grow-0 group-descount' style="margin-left:16rpx">
@@ -106,7 +143,7 @@
                 </view>
             </view>
 
-            <view a:if="{{pageType !== 'INTEGRAL'}}" class="flex-grow-0">
+            <view a:if="{{pageType !=='INTEGRAL'}}" class="flex-grow-0">
                 <button onTap="showShareModal" class="share_btn" plain="true">
                     <image class='img' src="{{__wxapp_img.share.share.url}}" />
                     <view class='share'>分享</view>
@@ -162,7 +199,7 @@
     <view class="share-modal-body">
         <view class="flex-row">
             <view class="flex-grow-1 flex-x-center">
-                <button open-type="share" class="share-bottom" style='height:100%; s'>
+                <button open-type="share" class="share-bottom" style='height:100%;'>
                     <image src="{{__wxapp_img.share.friend.url}}"></image>
                     <view>分享给朋友</view>
                 </button>
@@ -198,7 +235,7 @@
                             <view style="color: #888">海报生成中</view>
                         </view>
                     </view>
-                    <image onTap="goodsQrcodeClick" mode="aspectFill" class="goods-qrcode {{goods_qrcode?'active':''}}" data-src="{{goods_qrcode}}" src="{{goods_qrcode}}"></image>
+                    <image onTap="goodsQrcodeClick" mode="aspectFit" class="goods-qrcode {{goods_qrcode?'active':''}}" data-src="{{goods_qrcode}}" src="{{goods_qrcode}}"></image>
                 </view>
             </view>
         </view>

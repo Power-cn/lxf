@@ -185,6 +185,7 @@ class PtGoodsForm extends ApiModel
         $info['service'] = $info['service'] ? explode(',', $info['service']) : [];
         $attr_group_list = $goods->getAttrGroupList();
 
+
         $attr_group_num = $goods->getAttrGroupListnum();
 
         $groupList = PtOrderDetail::find()
@@ -258,6 +259,8 @@ class PtGoodsForm extends ApiModel
         $info['limit_time_ms'] = explode('-', date('Y-m-d-H-i-s', $info['limit_time']));
         // 销量
         $info['virtual_sales'] += $goods->getSalesVolume();
+        $info['sales_volume'] = $info['virtual_sales'];
+
 
         // 获取拼团规则id
         $groupRuleId = Article::find()->andWhere([
@@ -329,10 +332,10 @@ class PtGoodsForm extends ApiModel
             if ($v['price'] > 0) {
                 $price[] = $v['price'];
             } else {
-                $price[] = number_format((float)$info['price'], 2, '.', '');
+                $price[] = $info['price'];
 
             }
-            $single_price[] = number_format((float)$v['single'], 2, '.', '');
+            $single_price[] = sprintf('%.2f', $v['single']);
         };
 
         // 获取最高分销价 、最低会员价、当前会员价
@@ -344,16 +347,27 @@ class PtGoodsForm extends ApiModel
             'share_commission_first' => $goodsShare['share_commission_first'],
             'price' => $goods['price'],
             'individual_share' => $goodsShare['individual_share'],
-        ]);
+            'is_level' => $goods['is_level'],
+        ],['type' => 'PINTUAN']);
 
-        $info['max_price'] = number_format(max($price), 2);
-        $info['min_price'] = number_format(min($price), 2);
-        $info['max_share_price'] = number_format($res['max_share_price'], 2, '.', '');
-        $info['min_member_price'] = number_format($res['min_member_price'], 2, '.', '');
+        $attr = json_decode($goods['attr'], true);
+        $goodsPrice = $goods->price;
+        $isMemberPrice = false;
+        if ($res['user_is_member'] === true && count($attr) === 1 && $attr[0]['attr_list'][0]['attr_name'] == '默认') {
+            $goodsPrice = $res['min_member_price'] ? $res['min_member_price'] : $goods->price;
+            $isMemberPrice = true;
+        }
+
+        $info['max_price'] = sprintf('%.2f', max($price));
+        $info['min_price'] = sprintf('%.2f', min($price));
+        $info['max_share_price'] = sprintf('%.2f', $res['max_share_price']);
+        $info['min_member_price'] = sprintf('%.2f', $res['min_member_price']);
         $info['num'] = $goods->getNum(json_decode($goods->attr, true));
-        $info['single_price'] = number_format(min($single_price), 2, '.', '') > 0 ? number_format(min($single_price), 2, '.', '') : number_format($goods->original_price, 2, '.', '');
-        $info['group_price'] = $res['min_member_price'] > 0 ? $res['min_member_price'] : $info['min_price'];
+        $info['single_price'] = sprintf('%.2f', min($single_price)) > 0 ? sprintf('%.2f', min($single_price)) : $goods->original_price;
+        $info['group_price'] = sprintf('%.2f', $goodsPrice);
         $info['is_share'] = $res['is_share'];
+        $info['is_level'] = $res['is_level'];
+        $info['is_member_price'] = $isMemberPrice;
 
         return [
             'code' => 0,
@@ -428,6 +442,6 @@ class PtGoodsForm extends ApiModel
         $strlen = mb_strlen($user_name, 'utf-8');
         $firstStr = mb_substr($user_name, 0, 1, 'utf-8');
         $lastStr = mb_substr($user_name, -1, 1, 'utf-8');
-        return $strlen == 2 ? $firstStr . str_repeat('*', mb_strlen($user_name, 'utf-8') - 1) : $firstStr . str_repeat("*", $strlen - 2) . $lastStr;
+        return $strlen <= 2 ? $firstStr . '*' : $firstStr . str_repeat("*", $strlen - 2) . $lastStr;
     }
 }

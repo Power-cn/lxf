@@ -286,6 +286,17 @@ class IndexForm extends ApiModel
     public function getMiaoshaData()
     {
         $ms_next = false;
+        $miaosha = Miaosha::findOne([
+            'store_id' => $this->store_id,
+        ]);
+        if (!$miaosha) {
+            return [
+                'code' => 1,
+                'msg' => '暂无秒杀安排',
+            ];
+        }
+        $miaosha->open_time = json_decode($miaosha->open_time, true);
+
         $list = MiaoshaGoods::find()->alias('mg')
             ->select('mg.id,g.name,g.cover_pic AS pic,g.original_price AS price,mg.attr,mg.start_time')
             ->leftJoin(['g' => MsGoods::tableName()], 'mg.goods_id=g.id')
@@ -299,6 +310,7 @@ class IndexForm extends ApiModel
                     'mg.start_time' => date('H'),
                     'mg.store_id' => $this->store_id,
                 ],
+                ['in','mg.start_time', $miaosha->open_time],
             ])
             ->orderBy('g.sort ASC,g.addtime DESC')
             ->limit(10)
@@ -345,6 +357,7 @@ class IndexForm extends ApiModel
                         'mg.start_time' => $next->start_time,
                         'mg.store_id' => $this->store_id,
                     ],
+                    ['in','mg.start_time', $miaosha->open_time],
                 ])
                 ->orderBy('mg.open_date asc,mg.start_time asc')
                 ->limit(10)

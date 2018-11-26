@@ -69,7 +69,15 @@ class CommonWx
             [
                 'url' => 'pages/integral-mall/index/index',
                 'title' => '积分商城',
-            ]
+            ],
+            [
+                'url' => 'pages/topic-list/topic-list',
+                'title' => '专题',
+            ],
+            [
+                'url' => 'pages/topic/topic',
+                'title' => '专题详情',
+            ],
         ];
     }
 }

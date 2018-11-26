@@ -281,7 +281,7 @@ if (!$returnUrl) {
                                     <div class="copy-error text-danger fs-sm" hidden></div>
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row" hidden>
                                 <div class="col-3 text-right">
                                     <label class=" col-form-label">京东一键采集</label>
                                 </div>
@@ -1388,11 +1388,11 @@ if (!$returnUrl) {
         var val = $($(this).parent().prev('input')).val();
         for (var i in page.checked_attr_list) {
             if (type == 0) {
-                page.checked_attr_list[i].num = val
+                val >= 0 ? page.checked_attr_list[i].num = parseInt(val) : page.checked_attr_list[i].num = 1;
             } else if (type == 1) {
-                page.checked_attr_list[i].price = val
+                val >= 0.01 ? page.checked_attr_list[i].price = val : page.checked_attr_list[i].price = 0.01;
             } else if (type == 2) {
-                page.checked_attr_list[i].single = val
+                val >= 0.01 ? page.checked_attr_list[i].single = val : page.checked_attr_list[i].single = 0.01;
             } else if (type == 3) {
                 page.checked_attr_list[i].no = val
             }

@@ -69,8 +69,8 @@ class DetailsForm extends ApiModel
                 }
             }
         }
-        if($this->goods_id){
-            $this->miaosha_goods = MiaoshaGoods::find()->where(['goods_id' => $this->goods_id, 'is_delete' => 0, 'store_id'=> $this->store_id])
+        if ($this->goods_id) {
+            $this->miaosha_goods = MiaoshaGoods::find()->where(['goods_id' => $this->goods_id, 'is_delete' => 0, 'store_id' => $this->store_id])
                 ->andWhere(['or', ['and', ['open_date' => date('Y-m-d')], ['>=', 'start_time', intval(date('H'))]], ['>', 'open_date', date('Y-m-d')]])
                 ->orderBy(['open_date' => SORT_ASC, 'start_time' => SORT_ASC])->one();
             if (!$this->miaosha_goods) {
@@ -86,6 +86,8 @@ class DetailsForm extends ApiModel
             'status' => 1,
             'store_id' => $this->store_id,
         ]);
+
+        $msGoods = $goods;
         if (!$goods)
             return [
                 'code' => 1,
@@ -107,7 +109,7 @@ class DetailsForm extends ApiModel
         $miaosha = $this->getMiaoshaData($goods->id);
         $miaosha_data = $miaosha['miaosha_data'];
         if ($miaosha_data) {
-            $miaosha_data['miaosha_price'] = number_format($miaosha_data['miaosha_price'], 2, '.', '');
+            $miaosha_data['miaosha_price'] = sprintf('%.2f', $miaosha_data['miaosha_price']);
             $miaosha_data['rest_num'] = min((int)$goods->getNum(), (int)$miaosha_data['miaosha_num']) - $miaosha_data['sell_num'];
         }
         $miaosha['miaosha_data'] = $miaosha_data;
@@ -133,10 +135,10 @@ class DetailsForm extends ApiModel
             }
         };
 
-        $miaosha['old_small_price'] = number_format(min($old), 2, '.', '');
-        $miaosha['old_big_price'] = number_format(max($old), 2, '.', '');
-        $miaosha['new_small_price'] = number_format(min($new), 2, '.', '');
-        $miaosha['new_big_price'] = number_format(max($new), 2, '.', '');
+        $miaosha['old_small_price'] = sprintf('%.2f', min($old));
+        $miaosha['old_big_price'] = sprintf('%.2f', max($old));
+        $miaosha['new_small_price'] = sprintf('%.2f', min($new));
+        $miaosha['new_big_price'] = sprintf('%.2f', max($new));
 
         // 获取最高分销价 、最低会员价、当前会员价
         $goodsShare = GoodsShare::find()->where(['type' => GoodsShare::SHARE_GOODS_TYPE_MS, 'relation_id' => $this->miaosha_goods->id])->one();
@@ -147,7 +149,19 @@ class DetailsForm extends ApiModel
             'share_commission_first' => $goodsShare['share_commission_first'],
             'price' => $goods['original_price'],
             'individual_share' => $goodsShare['individual_share'],
-        ]);
+//            'is_level' => $goods['is_discount'],
+            'is_level' => $this->miaosha_goods->is_level,
+        ], ['type' => 'MIAOSHA']);
+
+        $attr = json_decode($goods['attr'], true);
+        $goodsPrice = $goods->original_price;
+        $isMemberPrice = false;
+        // 秒杀特殊
+        if (count($attr) === 1 && $attr[0]['attr_list'][0]['attr_name'] == '默认') {
+            $goodsPrice = $res['user_is_member'] ? $res['min_member_price'] : $miaosha['new_small_price'];
+            $isMemberPrice = $res['user_is_member'];
+        }
+
 
         return [
             'code' => 0,
@@ -158,21 +172,23 @@ class DetailsForm extends ApiModel
                 'cover_pic' => $goods->cover_pic,
                 'attr_pic' => $pic_list[0]['pic_url'],
                 'name' => $goods->name,
-                'price' => number_format(floatval($goods->original_price), 2, '.', ''),
+                'price' => sprintf('%.2f', $goodsPrice),
                 'detail' => $goods->detail,
                 'sales_volume' => $goods->getSalesVolume() + $goods->virtual_sales,
                 'attr_group_list' => $goods->getAttrGroupList(),
                 'num' => $goods->getNum(),
                 'is_favorite' => $is_favorite,
                 'service_list' => $new_service_list,
-                'original_price' => number_format(floatval($goods->original_price), 2, '.', ''),
+                'original_price' => sprintf('%.2f', $goods->original_price),
                 'video_url' => $goods->video_url,
                 'unit' => $goods->unit,
                 'miaosha' => $miaosha,
                 'use_attr' => intval($goods->use_attr),
-                'max_share_price' => number_format($res['max_share_price'], 2, '.', ''),
-                'min_member_price' => number_format($res['min_member_price'], 2, '.', ''),
+                'max_share_price' => sprintf('%.2f', $res['max_share_price']) > 0 ? sprintf('%.2f', $res['max_share_price']) : 0,
+                'min_member_price' => sprintf('%.2f', $res['min_member_price']) > 0 ? sprintf('%.2f', $res['min_member_price']) : $goods['original_price'],
                 'is_share' => $res['is_share'],
+                'is_level' => $res['is_level'],
+                'is_member_price' => $isMemberPrice,
             ]
         ];
     }

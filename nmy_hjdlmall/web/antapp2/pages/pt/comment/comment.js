@@ -141,13 +141,6 @@ Page({
             }
         });
   },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function (options) { getApp().page.onShareAppMessage(this);
-  
-  } ,
   /**
    * 图片放大
    */

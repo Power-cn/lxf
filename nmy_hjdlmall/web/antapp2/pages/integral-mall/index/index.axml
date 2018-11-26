@@ -104,11 +104,11 @@
                         <view style="height:120rpx;border-top:1rpx solid #e2e2e2;border-bottom:1rpx solid #e2e2e2;">
                             <scroll-view scroll-x="true" class="scroll-view-x" scroll-with-animation="true">
                                 <view class='flex-row'>
-                                    <view class="scroll-view flex-grow-0" onTap="goodsAll" data-index="{{-1}}" id="{{cat_checked?'cat_name_active':''}}">
+                                    <view class="scroll-view flex-grow-0" onTap="catGoods" data-cat-id='0' data-index="{{-1}}" id="{{cat_checked?'cat_name_active':''}}">
                                         <image src="{{__wxapp_img.integral.all.url}}" class="item-image"></image>
                                         <view>全部</view>
                                     </view>
-                                    <block a:for="{{goods_list}}" a:key="{{item.id}}">
+                                    <block a:for="{{catList}}" a:key="{{item.id}}">
                                         <view class="scroll-view flex-grow-0" id="{{item.cat_checked?'cat_name_active':''}}" onTap="catGoods" data-index="{{index}}" data-cat-id="{{item.id}}">
                                             <image src="{{item.pic_url}}" class="item-image"></image>
                                             <view>{{item.name}}</view>
@@ -118,7 +118,7 @@
                             </scroll-view>
                         </view>
                         <view class='flex-row' style='flex-wrap:wrap;justify-content:space-between;background-color:#f7f7f7;margin-left:-10rpx;'>
-                            <block a:for="{{index_goods}}" a:key="{{item.id}}">
+                            <block a:for="{{goods_list}}" a:key="{{item.id}}">
                                 <view class="goods" onTap='goodsInfo' data-goods-id="{{item.id}}">
                                     <image src="{{item.cover_pic}}" class="goods-img"></image>
                                     <view class="goods-name text-more-2">{{item.name}}</view>

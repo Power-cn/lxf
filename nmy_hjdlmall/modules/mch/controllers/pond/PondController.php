@@ -43,7 +43,7 @@ class PondController extends Controller
 
         $list = Pond::find()
             ->where([
-                'store_id' => $this->store->id,
+                'store_id' => $this->store->id, 
             ])->with(['gift' => function ($query) {
                 $query->where([
                     'store_id' => $this->store->id,
@@ -67,15 +67,16 @@ class PondController extends Controller
     public function actionSearchGoods($keyword)
     {
         $keyword = trim($keyword);
-        $query = Goods::find()->alias('u')->where([
+        $query = Goods::find()->select('id,name,cat_id,price,attr')->where([
             'AND',
-            ['LIKE', 'u.name', $keyword],
+            ['LIKE', 'name', $keyword],
             ['mch_id' => 0],
             ['type' => 0],
             ['store_id' => $this->store->id],
             ['is_delete' => 0],
+            ['status' => 1],
         ]);
-        $list = $query->orderBy('u.name')->limit(30)->asArray()->select('id,name,cat_id,price,attr')->all();
+        $list = $query->orderBy('id desc')->limit(30)->asArray()->all();
         return [
             'code' => 0,
             'msg' => 'success',
@@ -214,6 +215,7 @@ class PondController extends Controller
             $form->stock = $v['stock'];
             $form->coupon_id = $v['coupon_id'];
             $form->num = $v['num'];
+            $form->name = $v['name'];
             $form->attr =  \Yii::$app->serializer->encode($v['attr']);
        // $form->attr =  $v['attr'];
             $form->gift_id = $v['gift_id'];

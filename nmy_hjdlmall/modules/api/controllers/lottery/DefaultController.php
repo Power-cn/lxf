@@ -3,12 +3,10 @@ namespace app\modules\api\controllers\lottery;
 
 use app\hejiang\ApiResponse;
 use app\hejiang\BaseApiResponse;
-
 use app\modules\api\models\lottery\IndexForm;
 use app\modules\api\models\ShareQrcodeForm;
 use app\modules\api\models\lottery\LotteryLogForm;
 use app\modules\api\models\OrderSubmitForm;
-use app\modules\api\models\bargain\GoodsForm;
 
 class DefaultController extends Controller
 {
@@ -31,6 +29,24 @@ class DefaultController extends Controller
         return new BaseApiResponse($form->search());
     }
 
+    public function actionLuckyCode()
+    {
+        $form = new LotteryLogForm();
+        $form->attributes = \Yii::$app->request->get();
+        $form->user = \Yii::$app->user->identity;
+        $form->store_id = $this->store->id;
+        return new BaseApiResponse($form->luckyCode());
+    }
+
+    public function actionClerk()
+    {
+        $form = new LotteryLogForm();
+        $form->attributes = \Yii::$app->request->get();
+        $form->user = \Yii::$app->user->identity;
+        $form->store_id = $this->store->id;
+        return new BaseApiResponse($form->clerk());
+    }
+
     public function actionDetail()
     {
         $form = new LotteryLogForm();
@@ -47,20 +63,6 @@ class DefaultController extends Controller
         $form->attributes = \Yii::$app->request->get();
         $form->user = \Yii::$app->user->identity;
         return new BaseApiResponse($form->goods()); 
-    }
-
-
-
-    public function actionGoodsUser()
-    {
-        $form = new GoodsForm();
-        $form->attributes = \Yii::$app->request->get();
-        $form->limit = 3;
-        $form->store = $this->store;
-        $form->user = \Yii::$app->user->identity;
-        return new ApiResponse(0,'',[
-            'bargain_info'=>$form->getUserInfo()
-        ]);
     }
 
     //海报

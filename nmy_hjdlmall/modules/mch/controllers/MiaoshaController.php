@@ -16,6 +16,7 @@ use app\models\MiaoshaGoods;
 use app\models\MsGoods;
 use app\models\MsSetting;
 use app\modules\mch\models\LevelListForm;
+use app\modules\mch\models\miaosha\GoodsDetailEditForm;
 use app\modules\mch\models\MiaoshaCalendar;
 use app\modules\mch\models\MiaoshaDateForm;
 use app\modules\mch\models\MiaoshaGoodsEditForm;
@@ -281,6 +282,60 @@ class MiaoshaController extends Controller
         }
         return $this->render('setting', [
             'setting' => $setting,
+        ]);
+    }
+
+    /**
+     * 商品会员价、分销价详情（每个秒杀场次的信息）
+     */
+    public function actionGoodsDetailEdit()
+    {
+        $id = \Yii::$app->request->get('id');
+        $levelForm = new LevelListForm();
+        $levelList = $levelForm->getAllLevel();
+
+
+        // 当前场次的秒杀商品
+        $miaoshaGoods = MiaoshaGoods::find()->where(['id' => $id])->one();
+        // 秒杀商品分销设置
+        $goods_share = GoodsShare::findOne(['store_id' => $this->store->id, 'relation_id' => $id, 'type' => GoodsShare::SHARE_GOODS_TYPE_MS]);
+        $msGoods = MsGoods::find()->where(['id' => $miaoshaGoods['goods_id']])->one();//秒杀商品
+
+        if (\Yii::$app->request->isPost) {
+            $modelData = \Yii::$app->request->post('model');
+            $model = new GoodsDetailEditForm();
+            $model->attributes = \Yii::$app->request->post();
+            $model->is_level = $modelData['is_level'];
+            $model->individual_share = $modelData['individual_share'];
+            $model->attr_setting_type = $modelData['attr_setting_type'];
+            $model->share_type = $modelData['share_type'];
+            $model->share_commission_first = $modelData['share_commission_first'];
+            $model->share_commission_second = $modelData['share_commission_second'];
+            $model->share_commission_third = $modelData['share_commission_third'];
+            $model->miaoshaGoods = $miaoshaGoods;
+            $model->goodsShare = $goods_share;
+            $model->msGoods = $msGoods;
+
+            $res = $model->save();
+
+            return $res;
+        }
+
+        // 前端字段需要统一
+        $attr = json_decode($miaoshaGoods['attr'], true);
+        foreach ($attr as &$item) {
+            $item['price'] = $item['miaosha_price'];
+            $item['num'] = $item['miaosha_num'];
+        }
+
+        $msGoods->attr = json_encode($attr); //规格要用设置设置的规格
+        isset($goods_share) ? $goods_share->is_level = $miaoshaGoods['is_level'] : ''; //是否开启会员
+
+
+        return $this->render('goods-detail-edit', [
+            'levelList' => $levelList,
+            'goods' => $msGoods,
+            'goods_share' => $goods_share
         ]);
     }
 }

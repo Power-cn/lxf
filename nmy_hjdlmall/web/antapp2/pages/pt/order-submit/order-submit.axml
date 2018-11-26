@@ -14,7 +14,7 @@
                 </view>
             </view>
         </block>
-        <!-- 送货上门 -->
+        <!-- 送货上门 --> 
         <block a:if="{{offline==1}}">
             <view style='height:16rpx;'></view>
             <navigator url="/pages/address-picker/address-picker" class='user-address flex-col'>
@@ -111,6 +111,8 @@
                             <view class="flex-grow-1 num">×{{item.num}}</view>
                             <view class="flex-grow-0 price">￥:{{item.price}}</view>
                         </view>
+
+                        <view a:if="{{type !== 'ONLY_BUY' && item.is_level === true}}" style='color:#ff4544;text-align:right;margin-bottom:22rpx;'>会员折扣价：￥{{item.level_price}}</view>
                     </view>
                 </view>
             </view>

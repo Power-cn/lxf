@@ -57,7 +57,7 @@ class LevelListForm extends MchModel
     public function getAllLevel()
     {
         $list = Level::find()->where(['store_id' => $this->getCurrentStoreId(), 'is_delete' => Model::IS_DELETE_FALSE])
-            ->select('id, level, name')
+            ->select('id, level, name, discount')
             ->orderBy('level')
             ->asArray()->all();
 

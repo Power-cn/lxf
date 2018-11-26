@@ -1,8 +1,8 @@
-<view class="page">
+<view class="page" style='height:100%;'>
     <include src="/components/common/common" />
     <include src="/components/header/header" />
-    <view class="body after-navber">
-        <view class="after-navber" style="height: 100%">
+    <view class="body after-navber" style='height:100%;'>
+        <!-- <view class="after-navber" > -->
             <view style="display: flex;flex-direction: column;height:100%;width: 100%">
                 <view style="flex-grow: 0">
                     <form>
@@ -29,7 +29,7 @@
                         </view>
                     </form>
                 </view>
-                <view style="flex-grow: 1;position: relative">
+                <view style="flex-grow: 3;position: relative">
                     <block a:if="{{show_history && history_list && history_list.length>0}}">
                         <view class="search-history">
                             <view>
@@ -72,7 +72,7 @@
                     </block>
                 </view>
             </view>
-        </view>
+        <!-- </view> -->
     </view>
     <include src="/components/footer/footer" />
 </view>

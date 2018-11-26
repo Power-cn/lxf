@@ -35,6 +35,7 @@ let api = {
         search: _api_root + "default/search",
         cats: _api_root + "default/cats",
         topic_qrcode: _api_root + "default/topic-qrcode",
+        form_id: _api_root + "default/form-id",
     },
     cart: {
         list: _api_root + 'cart/list',
@@ -259,6 +260,7 @@ let api = {
         exchange: _api_root + 'integralmall/integralmall/exchange',
         register: _api_root + 'integralmall/integralmall/register',
         integral_detail: _api_root + 'integralmall/integralmall/integral-detail',
+        goods_list: _api_root + 'integralmall/integralmall/goods-list',
     },
     pond: {
         index: _api_root + 'pond/pond/index',
@@ -296,6 +298,9 @@ let api = {
         goods: _api_root + 'lottery/default/goods',
         submit: _api_root + 'lottery/default/submit',
         qrcode: _api_root + 'lottery/default/qrcode',
+        setting: _api_root + 'lottery/default/setting',
+        lucky_code: _api_root + 'lottery/default/lucky-code',
+        clerk: _api_root + 'lottery/default/clerk',
     },
 };
 module.exports = api;

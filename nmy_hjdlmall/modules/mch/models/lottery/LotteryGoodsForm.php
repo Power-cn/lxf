@@ -1,7 +1,6 @@
 <?php
 namespace app\modules\mch\models\lottery;
 
-use app\models\BargainOrder;
 use app\models\Goods;
 use app\models\LotteryGoods;
 use app\modules\mch\models\MchModel;
@@ -20,15 +19,13 @@ class LotteryGoodsForm extends MchModel
     public $goods_id;
     public $attr;
 
-    public $freight;
-
     public function rules()
     {
         return [
             [['store_id', 'goods_id', 'start_time', 'end_time', 'stock' ,'status'], 'required'],
-            [['store_id', 'goods_id', 'start_time', 'end_time', 'stock', 'sort', 'status', 'freight'], 'integer'],
+            [['store_id', 'goods_id', 'start_time', 'end_time', 'stock', 'sort', 'status'], 'integer'],
             [['attr'], 'required'],
-            [['sort', 'freight'], 'default', 'value' => 0],
+            [['sort'], 'default', 'value' => 0],
             [['attr'], 'trim'],
         ];
     }
@@ -70,7 +67,7 @@ class LotteryGoodsForm extends MchModel
         $count = $query->count();
         $pagination = new Pagination(['totalCount' => $count]);
 
-        $list = $query->limit($pagination->limit)->offset($pagination->offset)->orderBy(['create_time' => SORT_ASC, 'id' => SORT_DESC])->asArray()->all();
+        $list = $query->limit($pagination->limit)->offset($pagination->offset)->orderBy(['type' => 0, 'create_time' => SORT_DESC, 'sort' => SORT_ASC])->asArray()->all();
 
 
 
@@ -99,6 +96,7 @@ class LotteryGoodsForm extends MchModel
         }
         $this->model->attributes = $this->attributes;
         $this->model->store_id = $this->store_id;
+        $this->model->create_time = time();
         if ($this->model->save()) {
             return [
                 'code' => 0,

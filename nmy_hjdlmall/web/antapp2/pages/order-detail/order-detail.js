@@ -8,6 +8,7 @@ Page({
      * 页面的初始数据
      */
     data: {
+        isPageShow: false,
         order: null,
         getGoodsTotalPrice: function() {
             return this.data.order.total_price;
@@ -35,6 +36,7 @@ Page({
                 if (res.code == 0) {
                     self.setData({
                         order: res.data,
+                        isPageShow: true
                     });
                 }
             },

@@ -46,6 +46,7 @@ class GoodsController extends Controller
         };
 
         $cat_list = PtCat::find()->select('id,name')->andWhere(['store_id' => $this->store->id, 'is_delete' => 0])->orderBy('sort ASC')->asArray()->all();
+
         return $this->render('index', [
             'list' => $arr[0],
             'pagination' => $arr[1],
@@ -222,6 +223,7 @@ class GoodsController extends Controller
                 'relation_id' => $goods_detail['id'],
                 'type' => GoodsShare::SHARE_GOODS_TYPE_PT_STANDARD,
             ])->one();
+
         }
 
         if ($goods_detail != '') {
@@ -267,6 +269,9 @@ class GoodsController extends Controller
         if ($goods_id) {
             $goods_detail['name'] = $goods->name;
         }
+
+        isset($goodsShare) ? $goodsShare->is_level = $goods_detail['is_level'] : '';
+
 
         return $this->render('standard-edit', [
             'td' => $td,
@@ -335,6 +340,7 @@ class GoodsController extends Controller
             $goods[$index] = str_replace("\"", "&quot;", $value);
         }
 
+        isset($goods_share) ? $goods_share->is_level = $goods->is_level : '';
         return $this->render('goods-edit', [
             'goods' => $goods,
             'cat' => $ptCat,

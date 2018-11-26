@@ -13,11 +13,13 @@ namespace app\modules\api\models\bargain;
 
 
 use app\hejiang\ApiResponse;
+use app\models\ActivityMsgTpl;
 use app\models\BargainGoods;
 use app\models\BargainOrder;
 use app\models\BargainSetting;
 use app\models\BargainUserOrder;
 use app\models\Goods;
+use app\models\WechatTplMsgSender;
 use app\modules\api\models\ApiModel;
 
 /**
@@ -70,6 +72,11 @@ class ActivityForm extends ApiModel
         if ($moneyPerT > 464) {
             $moneyPerT = 464;
         }
+        $bargainSetting = BargainSetting::findOne(['store_id' => $this->store->id]);
+        $shareTitle = $bargainSetting->share_title;
+        $shareTitle = str_replace("\r\n", "\n", $shareTitle);
+        $shareTitles = explode("\n", $shareTitle);
+        $shareTitle = $shareTitles[mt_rand(0, (count($shareTitles) - 1))];
         $data = [
             'goods_id' => $goods->id,
             'goods_name' => $goods->name,
@@ -87,6 +94,7 @@ class ActivityForm extends ApiModel
             'money_per' => $moneyPer,
             'money_per_t' => $moneyPerT,
             'is_owner' => $bargainOrder->user_id == $this->user->id, // 是否是订单发起人
+            'share_title' => $shareTitle
         ];
 
         return new ApiResponse(0, '成功', $data);
@@ -94,15 +102,16 @@ class ActivityForm extends ApiModel
     }
 
     // 获取砍价剩余时间
+
     /**
      * @param $bargainOrder BargainOrder
      * @return int
      */
     private function getTime($bargainOrder)
     {
-        if($bargainOrder->status != 0){
+        if ($bargainOrder->status != 0) {
             return 0;
-        }else{
+        } else {
             $addtime = $bargainOrder->addtime;
             $time = $bargainOrder->time;
             $second = time() - $addtime;
@@ -153,54 +162,64 @@ class ActivityForm extends ApiModel
             $totalPrice = BargainUserOrder::getPriceCount($this->store->id, $bargainOrder->id);
 
             // 商品可砍价金额
-            $price = round($bargainOrder->original_price - $bargainOrder->min_price,2);
+            $price = round($bargainOrder->original_price - $bargainOrder->min_price, 2);
 
             if ($totalPrice == $price) {
                 return new ApiResponse(0, '已砍至最低价', $data);
             }
 
-            $t = \Yii::$app->db->beginTransaction();
-            $userOrder = new BargainUserOrder();
-            $userOrder->store_id = $this->store->id;
-            $userOrder->order_id = $this->order_id;
-            $userOrder->user_id = $this->user->id;
-            $userOrder->is_delete = 0;
-            $userOrder->addtime = time();
-            $userOrder->price = $this->intToFloat($this->getPrice($price, $totalPrice));
-            $userOrder->save();
-            $totalPrice = BargainUserOrder::getPriceCount($this->store->id, $bargainOrder->id);
-            if (floatval($totalPrice) > $price) {
-                $t->rollBack();
-            } else {
-                $t->commit();
+            $userOrderPrice = $this->intToFloat($this->getPrice($price, $totalPrice));
+
+            //当前已砍总价
+            $totalPrice = $totalPrice + $userOrderPrice;
+
+            if (floatval($totalPrice) <= $price) {
+                $userOrder = new BargainUserOrder();
+                $userOrder->store_id = $this->store->id;
+                $userOrder->order_id = $this->order_id;
+                $userOrder->user_id = $this->user->id;
+                $userOrder->price = $userOrderPrice;
+                $userOrder->is_delete = 0;
+                $userOrder->addtime = time();
+                $userOrder->save();
                 $ok = false;
             }
+
+            if ($totalPrice == $price) {
+//                $msg_sender = new WechatTplMsgSender($this->getCurrentStoreId(), $bargainOrder->id, $this->getWechat(), 'BARGAIN');
+//                $msg_sender->activitySuccessMsg('砍价', $this->goods->name, '商品已砍至最低价，赶快购买吧！');
+                $msg_sender = new ActivityMsgTpl($this->getCurrentUserId(), 'BARGAIN');
+                $msg_sender->activitySuccessMsg('砍价', $this->goods->name, '商品已砍至最低价，赶快购买吧！');
+            }
         }
+
         $bargainPrice = round($userOrder->price, 2);
+
         $data = [
             'bargain_status' => true,
             'bargain_price' => $bargainPrice,
         ];
+
         return new ApiResponse(0, '砍价成功', $data);
     }
 
     // 砍价算法
     private function getPrice($price, $totalPrice)
     {
-        if($this->bargainOrder->status_data){
+        if ($this->bargainOrder->status_data) {
             $data = \Yii::$app->serializer->decode($this->bargainOrder->status_data);
-        }else{
+        } else {
             $data = \Yii::$app->serializer->decode($this->bargain->status_data);
         }
         $people = $this->userCount;
-        if(isset($data->people)){
+        if (isset($data->people)) {
             $dataPeople = intval($data->people);
-            if($data->people != 0){
-                if($people == $dataPeople - 1){
+            if ($data->people != 0) {
+                if ($people == $dataPeople - 1) {
                     $money = ($price - $totalPrice) * 100;
                     return $money;
                 }
-                if($people == $dataPeople){
+                if ($people == $dataPeople) {
                     return 0;
                 }
             }
@@ -214,10 +233,10 @@ class ActivityForm extends ApiModel
             $max = max($data->second_min_money, $data->second_max_money);
             $money = $this->getRand($min * 100, $max * 100);
         }
-        if($money > ($price - $totalPrice) * 100){
+        if ($money > ($price - $totalPrice) * 100) {
             $money = ($price - $totalPrice) * 100;
         }
-        return $money;
+        return intval($money);
     }
 
     // 随机数

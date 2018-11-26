@@ -35,6 +35,12 @@ module.exports = {
                 _this.goodNumChange(e);
             }
         }
+
+        if(typeof self.buynow === 'undefined') {
+            self.buynow = function (e) {
+                _this.buynow(e);
+            }
+        }
     },
 
 
@@ -133,7 +139,9 @@ module.exports = {
             goods_num: 0,
 
         });
-        self.shoppingCartListModel();
+        self.setData({
+            shoppingCartModel: false
+        });
         getApp().core.removeStorageSync(getApp().const.ITEM)
     },
 
@@ -430,5 +438,39 @@ module.exports = {
                 }
             }
         }
+    },
+
+    buynow: function (e) {
+        var self = this.currentPage;
+        var carGoods = self.data.carGoods;
+        var goodsModel = self.data.goodsModel;
+        self.setData({
+            goodsModel: false
+        });
+
+        var length = carGoods.length;
+        var cart_list = [];
+        var cart_list_goods = [];
+        for (var a = 0; a < length; a++) {
+            if (carGoods[a].num != 0) {
+                cart_list_goods = {
+                    'goods_id': carGoods[a].goods_id,
+                    'num': carGoods[a].num,
+                    'attr': carGoods[a].attr
+                }
+                cart_list.push(cart_list_goods)
+            }
+        }
+
+        var mch_list = [];
+        mch_list.push({
+            mch_id: 0,
+            goods_list: cart_list
+        });
+        getApp().core.navigateTo({
+            url: '/pages/new-order-submit/new-order-submit?mch_list=' + JSON.stringify(mch_list),
+        });
+
+        this.clearShoppingCart();
     },
 }

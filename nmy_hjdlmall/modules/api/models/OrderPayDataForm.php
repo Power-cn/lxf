@@ -10,6 +10,7 @@ namespace app\modules\api\models;
 
 use Alipay\AlipayRequestFactory;
 use app\hejiang\ApiResponse;
+use app\models\common\api\CommonOrder;
 use app\models\FormId;
 use app\models\Goods;
 use app\models\Order;
@@ -32,6 +33,8 @@ class OrderPayDataForm extends ApiModel
     public $pay_type;
     public $user;
     public $form_id;
+    public $parent_user_id;
+    public $condition;
 
     /** @var  Wechat $wechat */
     private $wechat;
@@ -43,7 +46,7 @@ class OrderPayDataForm extends ApiModel
             [['pay_type'], 'required'],
             [['pay_type'], 'in', 'range' => ['ALIPAY', 'WECHAT_PAY', 'HUODAO_PAY', 'BALANCE_PAY']],
             [['form_id', 'order_id_list'], 'string'],
-            [['order_id'], 'integer'],
+            [['order_id','parent_user_id','condition'], 'integer'],
         ];
     }
 
@@ -94,6 +97,8 @@ class OrderPayDataForm extends ApiModel
                 }
             }
 
+            $commonOrder = CommonOrder::saveParentId($this->parent_user_id);
+
             $goods_names = '';
             $goods_list = OrderDetail::find()->alias('od')->leftJoin(['g' => Goods::tableName()], 'g.id=od.goods_id')->where([
                 'od.order_id' => $this->order->id,
@@ -132,27 +137,7 @@ class OrderPayDataForm extends ApiModel
 
                 // 支付宝
                 if (\Yii::$app->fromAlipayApp()) {
-                    $request = AlipayRequestFactory::create('alipay.trade.create', [
-                        'notify_url' => pay_notify_url('/alipay-notify.php'),
-                        'biz_content' => [
-                            'body' => $goods_names, // 对一笔交易的具体描述信息。如果是多种商品，请将商品描述字符串累加
-                            'subject' => $goods_names, // 商品的标题 / 交易标题 / 订单标题 / 订单关键字等
-                            'out_trade_no' => $this->order->order_no, // 商户网站唯一订单号
-                            'total_amount' => $this->order->pay_price, // 订单总金额，单位为元，精确到小数点后两位，取值范围 [0.01,100000000]
-                            'buyer_id' => $this->user->wechat_open_id, // 购买人的支付宝用户 ID
-
-                        ],
-                    ]);
-
-                    $aop = $this->getAlipay();
-                    $res = $aop->execute($request)->getData();
-                    return [
-                        'code' => 0,
-                        'msg' => 'success',
-                        'data' => $res,
-                        'res' => $res,
-                        'body' => $goods_names,
-                    ];
+                    return $this->alipayUnifiedOrder($goods_names);
                 }
 
                 $res = $this->unifiedOrder($goods_names);
@@ -416,8 +401,19 @@ class OrderPayDataForm extends ApiModel
                 'biz_content' => $data,
             ]);
 
-            $aop = $this->getAlipay();
-            $res = $aop->execute($request)->getData();
+            try{
+                $aop = $this->getAlipay();
+                $res = $aop->execute($request)->getData();
+            }catch(\Exception $e) {
+                if($e->getCode() == 40004 || $e->getCode() == 'ACQ.CONTEXT_INCONSISTENT'){
+                    return  $this->unifiedUnionOrder($order_list, $total_pay_price);
+                }else{
+                    return [
+                        'code' => 1,
+                        'msg' => '支付失败，'. $e->getMessage()
+                    ];
+                }
+            }
 
             $order_union = new OrderUnion();
             $order_union->store_id = $this->store_id;
@@ -512,5 +508,44 @@ class OrderPayDataForm extends ApiModel
             }
         }
         return $order_no;
+    }
+
+    // 单个支付宝下单
+    private function alipayUnifiedOrder($goods_names)
+    {
+        $request = AlipayRequestFactory::create('alipay.trade.create', [
+            'notify_url' => pay_notify_url('/alipay-notify.php'),
+            'biz_content' => [
+                'body' => $goods_names, // 对一笔交易的具体描述信息。如果是多种商品，请将商品描述字符串累加
+                'subject' => $goods_names, // 商品的标题 / 交易标题 / 订单标题 / 订单关键字等
+                'out_trade_no' => $this->order->order_no, // 商户网站唯一订单号
+                'total_amount' => $this->order->pay_price, // 订单总金额，单位为元，精确到小数点后两位，取值范围 [0.01,100000000]
+                'buyer_id' => $this->user->wechat_open_id, // 购买人的支付宝用户 ID
+
+            ],
+        ]);
+
+        try{
+            $aop = $this->getAlipay();
+            $res = $aop->execute($request)->getData();
+        }catch(\Exception $e) {
+            if($e->getCode() == 40004 || $e->getCode() == 'ACQ.CONTEXT_INCONSISTENT'){ //订单号重复
+                $this->order->order_no = (new OrderSubmitForm())->getOrderNo();
+                $this->order->save();
+                return  $this->alipayUnifiedOrder($goods_names);
+            }else{
+                return [
+                    'code' => 1,
+                    'msg' => '支付失败，'. $e->getMessage()
+                ];
+            }
+        }
+        return [
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $res,
+            'res' => $res,
+            'body' => $goods_names,
+        ];
     }
 }

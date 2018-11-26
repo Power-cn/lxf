@@ -95,14 +95,6 @@ Page({
         getApp().page.onReachBottom(this);
 
     },
-
-    /**
-     * 用户点击右上角分享
-     */
-    onShareAppMessage: function(options) {
-        getApp().page.onShareAppMessage(this);
-
-    },
     /**
      * 获取提交订单信息
      */
@@ -131,16 +123,21 @@ Page({
                 success: function(res) {
                     getApp().core.hideLoading();
                     if (res.code == 0) {
+                        var level_price = 0;
+                        for (var keys in res.data.list) {
+                            level_price = res.data.list[keys]['level_price'];
+                        }
+
                         if (self.data.offline == 2) {
-                            var total_price_1 = parseFloat((res.data.total_price - res.data.colonel) > 0 ? (res.data.total_price - res.data.colonel) : 0.01);
+                            var total_price_1 = parseFloat((level_price - res.data.colonel) > 0 ? (level_price - res.data.colonel) : 0.01);
                             var express_price = 0;
                         } else {
-                            var total_price_1 = parseFloat((res.data.total_price - res.data.colonel) > 0 ? (res.data.total_price - res.data.colonel) : 0.01) + res.data.express_price;
+                            var total_price_1 = parseFloat((level_price - res.data.colonel) > 0 ? (level_price - res.data.colonel) : 0.01) + res.data.express_price;
                             var express_price = parseFloat(res.data.express_price);
                         }
+
                         var input_data = getApp().core.getStorageSync(getApp().const.INPUT_DATA);
                         getApp().core.removeStorageSync(getApp().const.INPUT_DATA);
-                        console.log(input_data)
                         if (!input_data) {
                             input_data = {
                                 address: res.data.address,
@@ -160,12 +157,14 @@ Page({
                                 input_data.shop = res.data.shop_list[0];
                             }
                         }
+                        
+
                         input_data.total_price = res.data.total_price;
+                        input_data.total_price_1 = total_price_1.toFixed(2);
                         input_data.goods_list = res.data.list;
                         input_data.goods_info = res.data.goods_info;
                         input_data.express_price = express_price;
                         input_data.send_type = res.data.send_type;
-                        input_data.total_price_1 = total_price_1.toFixed(2);
                         input_data.colonel = res.data.colonel;
                         input_data.pay_type_list = res.data.pay_type_list;
                         input_data.shop_list = res.data.shop_list;
@@ -281,7 +280,6 @@ Page({
 
         data.payment = self.data.payment;
         data.formId = e.detail.formId;
-        console.log(self.data.options.goods_info);
         self.order_submit(data, 'pt');
         return;
     },
@@ -331,32 +329,30 @@ Page({
     },
     dingwei: function() {
         var self = this;
-        getApp().core.chooseLocation({
-            success: function(e) {
-                longitude = e.longitude;
-                latitude = e.latitude;
-                self.setData({
-                    location: e.address,
-                });
-            },
-            fail: function(res) {
-                getApp().getauth({
-                    content: "需要获取您的地理位置授权，请到小程序设置中打开授权",
-                    success: function(e) {
-                        if (e) {
-                            if (e.authSetting["scope.userLocation"]) {
-                                self.dingwei();
-                            } else {
-                                getApp().core.showToast({
-                                    title: '您取消了授权',
-                                    image: "/images/icon-warning.png",
-                                })
+        getApp().getauth({
+            content: "需要获取您的地理位置授权，请到小程序设置中打开授权",
+            author: "scope.userLocation",
+            success: function (e) {
+                if (e) {
+                    if (e.authSetting["scope.userLocation"]) {
+                        getApp().core.chooseLocation({
+                            success: function (e) {
+                                longitude = e.longitude;
+                                latitude = e.latitude;
+                                self.setData({
+                                    location: e.address,
+                                });
                             }
-                        }
+                        })
+                    } else {
+                        getApp().core.showToast({
+                            title: '您取消了授权',
+                            image: "/images/icon-warning.png",
+                        })
                     }
-                });
+                }
             }
-        })
+        });
     },
     pickShop: function(e) {
         var self = this;

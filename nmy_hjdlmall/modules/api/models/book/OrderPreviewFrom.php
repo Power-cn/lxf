@@ -10,6 +10,7 @@ namespace app\modules\api\models\book;
 
 use Alipay\AlipayRequestFactory;
 use app\models\common\api\CommonOrder;
+use app\models\common\CommonGoods;
 use app\models\GoodsShare;
 use app\models\OrderShare;
 use app\models\OrderWarn;
@@ -49,18 +50,27 @@ class OrderPreviewFrom extends ApiModel
             ->andWhere(['id' => $this->goods_id, 'is_delete' => 0, 'status' => 1, 'store_id' => $this->store_id])
             ->one();
 
-        
-        if($goods['use_attr']){
-            $attr = json_decode($this->attr,true);
-            $attr_id_list = [];
-            foreach ($attr as &$v){
-                $attr_id_list[] = $v['attr_id'];
-            };
-            unset($v);
-            $goods['price'] =  $goods->getAttrInfo($attr_id_list)['price'];
-        }
+
+        $attr = json_decode($this->attr, true);
+        $attr_id_list = [];
+        foreach ($attr as &$v) {
+            $attr_id_list[] = $v['attr_id'];
+        };
+        unset($v);
+
+//            $goods['price'] =  $goods->getAttrInfo($attr_id_list)['price'];
+        $goods_attr_info = CommonGoods::currentGoodsAttr([
+            'attr' => $goods['attr'],
+            'price' => $goods['price'],
+            'is_level' => $goods['is_level'],
+        ], $attr_id_list);
+
+        $goods['price'] = $goods_attr_info['price'];
+        $goods['is_level'] = $goods_attr_info['is_level'];
+
+
         $attr_list = $goods->checkAttr($this->attr);
-        if($attr_list['num'] <=0){
+        if ($attr_list['num'] <= 0) {
             return [
                 'code' => 1,
                 'msg' => '商品库存不足'
@@ -106,6 +116,8 @@ class OrderPreviewFrom extends ApiModel
         }
         $option = Option::get('yy_payment', $this->store_id, 'admin');
         $option = json_decode($option, true);
+
+
         return [
             'code' => 0,
             'msg' => '成功',
@@ -113,6 +125,7 @@ class OrderPreviewFrom extends ApiModel
                 'goods' => $goods,
                 'form_list' => $formList,
                 'option' => $option,
+                'level_price' => sprintf('%.2f', $goods_attr_info['level_price']),
             ],
         ];
     }
@@ -135,9 +148,23 @@ class OrderPreviewFrom extends ApiModel
             ];
         }
 
-        $attr_list = $goods->checkAttr($this->attr);
+        $attr = json_decode($this->attr, true);
+        $attr_id_list = [];
+        foreach ($attr as &$v) {
+            $attr_id_list[] = $v['attr_id'];
+        };
+        unset($v);
+
+//        $attr_list = $goods->checkAttr($this->attr);
+        $attr_list = CommonGoods::currentGoodsAttr([
+            'attr' => $goods['attr'],
+            'price' => $goods['price'],
+            'is_level' => $goods['is_level'],
+        ], $attr_id_list);
+
+        $attr_list['attr'] = $this->attr;
         $price = $attr_list['price'];
-        if($attr_list['num'] <=0){
+        if ($attr_list['num'] <= 0) {
             return [
                 'code' => 1,
                 'msg' => '商品库存不足'
@@ -163,13 +190,13 @@ class OrderPreviewFrom extends ApiModel
         $order->attr = $attr_list['attr'];
         if ($order->save()) {
 
-            if($goods->use_attr){
-                $attr = json_decode($order->attr,true);
+            if ($goods->use_attr) {
+                $attr = json_decode($order->attr, true);
                 $attr_id_list = [];
-                foreach ($attr as $v){
+                foreach ($attr as $v) {
                     $attr_id_list[] = $v['attr_id'];
                 };
-                $goods->numSub($attr_id_list,1);
+                $goods->numSub($attr_id_list, 1);
             } else {
                 $goods->stock--;
             }
@@ -256,8 +283,8 @@ class OrderPreviewFrom extends ApiModel
                 $user = User::findOne(['id' => $this->order->user_id]);
                 if ($user->money < $this->order->pay_price) {
                     return [
-                        'code'=>1,
-                        'msg'=>'支付失败，余额不足'
+                        'code' => 1,
+                        'msg' => '支付失败，余额不足'
                     ];
                 }
                 $user->money -= floatval($this->order->pay_price);
@@ -269,7 +296,7 @@ class OrderPreviewFrom extends ApiModel
                 $log->price = floatval($this->order->pay_price);
                 $log->addtime = time();
                 $log->order_type = 10;
-                $log->desc = '预约购买,订单号为：'.$order->order_no;
+                $log->desc = '预约购买,订单号为：' . $order->order_no;
                 $log->order_id = $order->id;
                 $log->save();
 
@@ -312,17 +339,17 @@ class OrderPreviewFrom extends ApiModel
                             'out_trade_no' => $this->order->order_no, // 商户网站唯一订单号
                             'total_amount' => $this->order->pay_price, // 订单总金额，单位为元，精确到小数点后两位，取值范围 [0.01,100000000]
                             'buyer_id' => $this->user->wechat_open_id, // 购买人的支付宝用户 ID
-                            
+
                         ],
                     ]);
-    
+
                     $aop = $this->getAlipay();
 
                     $res = $aop->execute($request)->getData();
                     $order->form_id = $this->form_id;
                     $order->save();
                     $this->setReturnData($this->order);
-                    
+
                     $p->commit();
                     return [
                         'code' => 0,
@@ -374,7 +401,7 @@ class OrderPreviewFrom extends ApiModel
             return [
                 'code' => 0,
                 'msg' => '订单提交成功',
-                'data' => (object) $pay_data,
+                'data' => (object)$pay_data,
                 'res' => $res,
                 'body' => $goods_names,
                 'type' => 2,
@@ -477,8 +504,8 @@ class OrderPreviewFrom extends ApiModel
             $user = User::findOne(['id' => $order->user_id]);
             if ($user->money < $order->pay_price) {
                 return [
-                    'code'=>1,
-                    'msg'=>'支付失败，余额不足'
+                    'code' => 1,
+                    'msg' => '支付失败，余额不足'
                 ];
             }
             $user->money -= floatval($order->pay_price);
@@ -490,7 +517,7 @@ class OrderPreviewFrom extends ApiModel
             $log->price = floatval($order->pay_price);
             $log->addtime = time();
             $log->order_type = 10;
-            $log->desc = '预约购买,订单号为：'.$order->order_no;
+            $log->desc = '预约购买,订单号为：' . $order->order_no;
             $log->order_id = $order->id;
             $log->save();
 
@@ -540,7 +567,7 @@ class OrderPreviewFrom extends ApiModel
                         'out_trade_no' => $this->order->order_no, // 商户网站唯一订单号
                         'total_amount' => $this->order->pay_price, // 订单总金额，单位为元，精确到小数点后两位，取值范围 [0.01,100000000]
                         'buyer_id' => $this->user->wechat_open_id, // 购买人的支付宝用户 ID
-                        
+
                     ],
                 ]);
 
@@ -588,7 +615,7 @@ class OrderPreviewFrom extends ApiModel
             return [
                 'code' => 0,
                 'msg' => 'success',
-                'data' => (object) $pay_data,
+                'data' => (object)$pay_data,
                 'res' => $res,
                 'body' => $goods_names,
             ];

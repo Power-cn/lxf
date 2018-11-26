@@ -68,6 +68,18 @@ class WechatController extends Controller
                     ],
                 ], $this->store->id, 'share');
 
+                // 活动通用
+                Option::setList([
+                    [
+                        'name' => 'success_tpl',
+                        'value' => $data['activity_success_tpl'],
+                    ],
+                    [
+                        'name' => 'refund_tpl',
+                        'value' => $data['activity_refund_tpl'],
+                    ],
+                ], $this->store->id, 'activity');
+
 
                 // 拼团
                 $pintuan = new NoticeForm();
@@ -106,6 +118,7 @@ class WechatController extends Controller
                 $fxhbTplMsg->save();
 
                 $transaction->commit();
+
                 return [
                     'code' => 0,
                     'msg' => '保存成功'
@@ -119,6 +132,7 @@ class WechatController extends Controller
         } else {
             $storeTplMsg = WechatTemplateMessage::find()->where(['store_id' => $this->store->id])->asArray()->one();
             $shareTplMsg = Option::getList('cash_success_tpl,cash_fail_tpl,apply_tpl', $this->store->id, 'share', '');
+            $activityTplMsg = Option::getList('success_tpl,refund_tpl', $this->store->id, 'activity', '');
 
             $form = new NoticeForm();
             $form->store_id = $this->store->id;
@@ -127,17 +141,21 @@ class WechatController extends Controller
             $bookTplMsg = YySetting::find()->where(['store_id' => $this->store->id])->asArray()->one();
             $mchTplMsg = Option::get('mch_tpl_msg', $this->store->id, ['apply' => '', 'order' => '']);
             $fxhbTplMsg = FxhbSetting::find()->where(['store_id' => $this->store->id])->asArray()->one();
-            $lotteryTplMsg = Option::getList('lottery_success_notice', $this->store->id, 'lottery','');
+            $lotteryTplMsg = Option::getList('lottery_success_notice', $this->store->id, 'lottery', '');
 
             // 当前用户插件权限
             $userAuth = $this->getUserAuth();
+            $storeTplMsg['activity_success_tpl'] = $activityTplMsg['success_tpl'];
+            $storeTplMsg['activity_refund_tpl'] = $activityTplMsg['refund_tpl'];
+            $storeTplMsg['apply'] = $mchTplMsg['apply'];
+            $storeTplMsg['account_change_tpl'] = $fxhbTplMsg['tpl_msg_id'];
+
             $tplMsg = [
                 'store' => $storeTplMsg,
                 'share' => $shareTplMsg,
                 'pintuan' => $ptTplMsg,
                 'book' => $bookTplMsg,
                 'mch' => $mchTplMsg,
-                'fxhb' => $fxhbTplMsg,
                 'lottery' => $lotteryTplMsg,
             ];
 
@@ -146,8 +164,8 @@ class WechatController extends Controller
                 if (in_array($k, $userAuth) || $k === 'store') {
                     $tplMsg[$k]['is_show'] = true;
                     continue;
-
                 }
+
                 $tplMsg[$k]['is_show'] = false;
             }
 

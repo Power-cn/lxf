@@ -37,6 +37,7 @@ use Yii;
  * @property string $use_attr
  * @property string $one_buy_limit
  * @property string $payment
+ * @property int $is_level
  */
 class PtGoods extends \yii\db\ActiveRecord
 {
@@ -99,6 +100,7 @@ class PtGoods extends \yii\db\ActiveRecord
             'use_attr' => '是否使用规格：0=不使用，1=使用',
             'one_buy_limit' => '商品单次购买数量',
             'payment' => '支付方式',
+            'is_level' => '是否享受会员折扣 0-不享受 1--享受',
         ];
     }
 

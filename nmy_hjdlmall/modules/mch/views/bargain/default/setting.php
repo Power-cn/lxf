@@ -121,6 +121,15 @@ $this->title = '基础设置';
                     </div>
                 </div>
                 <div class="form-group row">
+                    <div class="form-group-label col-sm-2 text-right">
+                        <label class="col-form-label">分享标题</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <textarea class="form-control short-row" name="model[share_title]" style="min-height: 100px;;"><?=$setting['share_title']?></textarea>
+                        <div>多个标题请换行，多个标题随机选一个标题显示</div>
+                    </div>
+                </div>
+                <div class="form-group row">
                     <div class="form-group-label col-3 text-right">
                     </div>
                     <div class="col-9">

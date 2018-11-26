@@ -87,7 +87,7 @@ class StoreConfigForm extends ApiModel
             'cat_style' => $store->cat_style,
             'address' => $store->address,
             'is_offline' => $store->is_offline,
-            'is_coupon' => $store->is_coupon,
+            'is_coupon' => 1,
             'is_comment' => $store->is_comment,
             'is_share_price' => $store->is_share_price,
             'is_member_price' => $store->is_member_price,
@@ -101,7 +101,8 @@ class StoreConfigForm extends ApiModel
             'quick_navigation' => $option['quick_navigation'],
             'good_negotiable' => $option['good_negotiable'],
             'buy_member' => $store->buy_member,
-            'logo'  => $store->logo
+            'logo'  => $store->logo,
+            'is_official_account' => $store->is_official_account
         ];
         return $data;
     }

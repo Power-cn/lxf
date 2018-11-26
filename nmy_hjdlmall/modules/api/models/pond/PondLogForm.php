@@ -51,13 +51,13 @@ class PondLogForm extends ApiModel
             $v['create_time'] = date('Y:m:d H:i:s',$v['create_time']);
             switch ($v['type']) {
                 case 1:
-                    $v['name'] = $v['price'] + '元红包';
+                    $v['name'] = $v['price'].'元红包';
                     break;
                 case 2:
                     $v['name'] = $v['coupon']['name'];
                     break;
                 case 3:
-                    $v['name'] = $v['num'] + '积分';
+                    $v['name'] = $v['num'].'积分';
                     break;
                 case 4:
                     $v['name'] = $v['gift']['name'];

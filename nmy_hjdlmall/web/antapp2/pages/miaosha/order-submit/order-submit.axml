@@ -199,7 +199,7 @@
                             </view>
                             <view class="flex-grow-0 flex-row">
                                 <view class="flex-grow-1 num">×{{item.num}}</view>
-                                <view class="flex-grow-0 price">￥:{{item.price}}</view>
+                                <view class="flex-grow-0 price">￥{{item.price}}</view>
                             </view>
                         </view>
                     </view>
@@ -212,9 +212,9 @@
             </view>
 
             <view class="flex-row" style="background: #fff;padding: 32rpx 24rpx;margin-bottom:20rpx;" a:if='{{level && is_discount==1}}'>
-                <view class="flex-grow-1">会员折扣</view>
+                <view class="flex-grow-1">会员折扣价</view>
                 <view class="flex-grow-0">
-                    <view style="color:#ff4544">{{level.discount}}折</view>
+                    <view style="color:#ff4544">￥{{level_price}}</view>
                 </view>
             </view>
 

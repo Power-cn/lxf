@@ -40,7 +40,7 @@ view {
 
 .cart-nav {
     position: fixed;
-    top: 32rpx;
+    top: 180rpx;
     right: 24rpx;
     background: rgba(255, 255, 255, 0.5);
     font-size: 0;

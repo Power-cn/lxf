@@ -10,6 +10,7 @@ namespace app\modules\mch\models;
 
 use app\models\Level;
 use app\models\Store;
+use app\models\User;
 
 /**
  * @property \app\models\Level $model;
@@ -87,6 +88,15 @@ class LevelForm extends MchModel
                 return [
                     'code'=>1,
                     'msg'=>'等级名称重复'
+                ];
+            }
+        }
+        if($this->model->id && $this->model->level != $this->level) {
+            $count = User::find()->where(['store_id' => $this->store->id, 'level' => $this->model->level])->count();
+            if($count > 0) {
+                return [
+                    'code'=>1,
+                    'msg'=>'当前会员等级下有会员，禁止修改会员等级'
                 ];
             }
         }

@@ -149,6 +149,9 @@ $this->params['active_nav_group'] = 7;
                         </div>
                         <div v-else style="color: #ddd;">请输入昵称/ID查找用户</div>
                     </div>
+                    <div class="fs-sm text-danger">
+                        搜索结果为 已参与用户
+                    </div>
                 </div>
             </div>
 

@@ -21,7 +21,7 @@ $this->title = '小程序标题设置';
             <div class="form-group row">
                 <div class="form-group-label col-sm-2 text-right"></div>
                 <div class="col-sm-6">
-                    <span style="color: red;">保存后需删除小程序重新登录、或者等小程序缓存自动失效(时间不确定)</span>
+                    <span style="color: red;">保存后在小程序端使用 清除缓存 功能刷新数据</span>
                 </div>
             </div>
             <div class="form-group row">

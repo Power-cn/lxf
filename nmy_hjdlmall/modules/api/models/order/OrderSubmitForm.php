@@ -569,15 +569,6 @@ class OrderSubmitForm extends OrderForm
                 ];
             }
         }
-
-        FormId::addFormId([
-            'store_id' => $this->store_id,
-            'user_id' => $this->user->id,
-            'wechat_open_id' => $this->user->wechat_open_id,
-            'form_id' => $this->formId,
-            'type' => 'form_id',
-            'order_no' => $order->order_no,
-        ]);
         
         return [
             'code' => 0,

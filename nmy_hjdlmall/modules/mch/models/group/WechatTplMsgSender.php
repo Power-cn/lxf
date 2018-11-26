@@ -56,6 +56,11 @@ class WechatTplMsgSender
         }
         $this->user = User::findOne($this->order->user_id);
         $this->form_id = FormId::find()->where(['order_no' => $this->order->order_no])->orderBy('id DESC')->one();
+
+        if (!$this->form_id) {
+            return;
+        }
+
         $this->is_alipay = $this->user->platform == 1;
         if ($this->is_alipay) {
             $this->wechat_template_message = TplMsgForm::get($this->store_id);

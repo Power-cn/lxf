@@ -8,6 +8,7 @@
 
 namespace app\modules\api\models;
 
+use app\models\ActivityMsgTpl;
 use app\models\common\CommonGoods;
 use app\models\Goods;
 use app\models\GoodsShare;
@@ -65,16 +66,23 @@ class ShareMoneyForm extends ApiModel
         }
         $order = $this->order;
 
+
+        $cParent1 = -1;
+        $cParent2 = -1;
+        $cParent3 = -1;
         if ($this->order_type == 1 || $this->order_type == 0) {
             /* @var $orderShare Order */
             $orderShare = $this->order;
-            $orderShare->parent_id = $user->parent_id;
+            $cParent1 = $user->parent_id;
+            $orderShare->parent_id = $cParent1;
             if ($user->parent_id) {
                 $parent = User::findOne($user->parent_id);//上级
-                $orderShare->parent_id_1 = $parent->parent_id;
+                $cParent2 = $parent->parent_id;
+                $orderShare->parent_id_1 = $cParent2;
                 if ($parent->parent_id) {
                     $parent_1 = User::findOne($parent->parent_id);//上上级
-                    $orderShare->parent_id_2 = $parent_1->parent_id;
+                    $cParent3 = $parent_1->parent_id;
+                    $orderShare->parent_id_2 = $cParent3;
                 } else {
                     $orderShare->parent_id_2 = -1;
                 }
@@ -99,13 +107,13 @@ class ShareMoneyForm extends ApiModel
             $orderShare->version = hj_core_version();
             $orderShare->type = $type;
 
-            $orderShare->parent_id_1 = $user->parent_id;
+            $orderShare->parent_id_1 = $cParent1 = $user->parent_id;
             if ($user->parent_id) {
                 $parent = User::findOne($user->parent_id);//上级
-                $orderShare->parent_id_2 = $parent->parent_id;
+                $orderShare->parent_id_2 = $cParent2 = $parent->parent_id;
                 if ($parent->parent_id) {
                     $parent_1 = User::findOne($parent->parent_id);//上上级
-                    $orderShare->parent_id_3 = $parent_1->parent_id;
+                    $orderShare->parent_id_3 = $cParent3 = $parent_1->parent_id;
                 } else {
                     $orderShare->parent_id_3 = -1;
                 }
@@ -145,7 +153,12 @@ class ShareMoneyForm extends ApiModel
             }
         }
 
+        // 如果开启自购返利 一级是自己
         if ($setting->is_rebate == 1 && $user->is_distributor == 1) {
+            $cParent1 = $user->id;
+            $cParent2 = $user->parent_id;
+            $cParent3 = $parent ? $parent->parent_id : -1;
+
             $orderShare->rebate = $share_commission_money_first < 0.01 ? 0 : $share_commission_money_first;
             $orderShare->first_price = $share_commission_money_second < 0.01 ? 0 : $share_commission_money_second;
             $orderShare->second_price = $share_commission_money_third < 0.01 ? 0 : $share_commission_money_third;
@@ -156,6 +169,23 @@ class ShareMoneyForm extends ApiModel
             $orderShare->second_price = $share_commission_money_second < 0.01 ? 0 : $share_commission_money_second;
             $orderShare->third_price = $share_commission_money_third < 0.01 ? 0 : $share_commission_money_third;
         }
+
+        // 发送佣金模板消息
+        if ($cParent1 > 0 && $share_commission_money_first >= 0.01) {
+            $tplMsg = new ActivityMsgTpl($cParent1, 'SHARE');
+            $tplMsg->accountChangeMsg('有用户下单，预计可得佣金' . sprintf('%.2f', $share_commission_money_first), '分销佣金');
+        }
+        if ($cParent2 > 0 && $share_commission_money_second >= 0.01) {
+            $tplMsg = new ActivityMsgTpl($cParent2, 'SHARE');
+            $tplMsg->accountChangeMsg('有用户下单，预计可得佣金' . sprintf('%.2f', $share_commission_money_second), '分销佣金');
+        }
+
+        if ($cParent3 > 0 && $share_commission_money_third >= 0.01) {
+            $tplMsg = new ActivityMsgTpl($cParent3, 'SHARE');
+            $tplMsg->accountChangeMsg('有用户下单，预计可得佣金' . sprintf('%.2f', $share_commission_money_third), '分销佣金');
+        }
+
+
         return $orderShare->save();
     }
 
@@ -193,7 +223,12 @@ class ShareMoneyForm extends ApiModel
                     $attrIdArr2[] = $attrListItem2['attr_id'];
                 }
 
-                $res = CommonGoods::currentGoodsAttr($goods, $attrIdArr2);
+                $goodsData = [
+                    'attr' => $goods['attr'],
+                    'price' => $goods['price'],
+                    'is_level' => $goods['is_level'],
+                ];
+                $res = CommonGoods::currentGoodsAttr($goodsData, $attrIdArr2);
 
                 $newItem = [
                     'individual_share' => $goods['individual_share'],
@@ -257,7 +292,16 @@ class ShareMoneyForm extends ApiModel
                 $attrIdArr2[] = $attrListItem2['attr_id'];
             }
 
-            $res = CommonGoods::currentGoodsAttr($miaoshaGoods, $attrIdArr2);
+            $goodsData = [
+                'attr' => $miaoshaGoods['attr'],
+                'price' => $msGoods['original_price'],
+                // 'is_level' => $msGoods['is_discount'],
+                'is_level' => $miaoshaGoods['is_level'],
+            ];
+            $res = CommonGoods::currentGoodsAttr($goodsData, $attrIdArr2, [
+                'type' => 'MIAOSHA',
+                'original_price' => $msGoods['original_price']
+            ]);
 
             $newItem = [
                 'individual_share' => $goodsShare['individual_share'],
@@ -315,6 +359,7 @@ class ShareMoneyForm extends ApiModel
 
             if ($share['attr_setting_type'] === 1) {
                 $goods = $value->goods;
+                $ptGoods = $value->goods;
                 if ($classGroupId > 0) {
                     $goods = PtGoodsDetail::findOne($classGroupId);
                 }
@@ -324,7 +369,18 @@ class ShareMoneyForm extends ApiModel
                     $attrIdArr2[] = $attrListItem2['attr_id'];
                 }
 
-                $res = CommonGoods::currentGoodsAttr($goods, $attrIdArr2);
+                $goodsData = [
+                    'attr' => $goods['attr'],
+                    'price' => $ptGoods['price'],
+                    'is_level' => $ptGoods['is_level'],
+                ];
+
+                $otherData = [
+                    'type' => 'PINTUAN',
+                    'single_price' => $ptGoods['original_price'],
+                    'order_type' => $order->is_group == 0 ? 'ONLY_BUY' : ''
+                ];
+                $res = CommonGoods::currentGoodsAttr($goodsData, $attrIdArr2, $otherData);
 
                 $newItem = [
                     'individual_share' => $share['individual_share'],
@@ -375,7 +431,12 @@ class ShareMoneyForm extends ApiModel
                 $attrIdArr2[] = $attrListItem2['attr_id'];
             }
 
-            $res = CommonGoods::currentGoodsAttr($yyGoods, $attrIdArr2);
+            $goodsData = [
+                'attr' => $yyGoods['attr'],
+                'price' => $yyGoods['price'],
+                'is_level' => $yyGoods['is_level'],
+            ];
+            $res = CommonGoods::currentGoodsAttr($goodsData, $attrIdArr2);
 
             $newItem = [
                 'individual_share' => $share['individual_share'],

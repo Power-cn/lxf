@@ -22,9 +22,9 @@ class KdOrder
         $EBusinessID = $store->kdniao_mch_id;
         $AppKey = $store->kdniao_api_key;
         //测试接口
-        $ReqUrl = 'http://testapi.kdniao.cc:8081/api/EOrderService ';
+        $ReqUrl = 'http://testapi.kdniao.com:8081/api/EOrderService ';
         //正式接口
-        $ReqUrl = 'http://api.kdniao.cc/api/EOrderService';
+        $ReqUrl = 'http://api.kdniao.com/api/EOrderService';
         $datas = array(
             'EBusinessID' => $EBusinessID,
             'RequestType' => '1007',

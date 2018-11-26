@@ -12,8 +12,10 @@
 namespace app\behaviors;
 
 
+use app\models\ActivityMsgTpl;
 use app\models\BargainOrder;
 use app\models\Goods;
+use app\models\WechatTplMsgSender;
 use yii\base\Behavior;
 
 class BargainBehavior extends BaseBehavior
@@ -74,6 +76,12 @@ class BargainBehavior extends BaseBehavior
                 $goods->save();
                 $item->status = 2;
                 $item->save();
+
+//                $wechat = \Yii::$app->controller->wechat;
+//                $msgTpl = new WechatTplMsgSender($this->store->id, $item->id, $wechat, 'BARGAIN');
+//                $msgTpl->activityRefundMsg('砍价', $goods->name, '砍价活动已过期');
+                $msgTpl = new ActivityMsgTpl(\Yii::$app->user->id, 'BARGAIN');
+                $msgTpl->activityRefundMsg('砍价', $goods->name, '砍价活动已过期');
             }
         }
     }

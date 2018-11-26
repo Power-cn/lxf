@@ -221,8 +221,8 @@ class ShareQrcodeForm extends ApiModel
                 if($attr_data_item['price']>0){
                    $price[] = (float)$attr_data_item['price'];
                 }else{
-                    $price[] = (float)$goods->original_price; 
-                } 
+                    $price[] = (float)$goods->original_price;
+                }
             }
 
             // if ($miaosha_price == 0) {
@@ -406,7 +406,7 @@ class ShareQrcodeForm extends ApiModel
         }
         foreach(json_decode($goods->attr) as $v){
             if($v->price > 0){
-                $price[] = (float)$v->price; 
+                $price[] = (float)$v->price;
             }else{
                 $price[] = (float)$goods->price;
             }
@@ -524,7 +524,7 @@ class ShareQrcodeForm extends ApiModel
 
         //加商城名称
         //$editor->text($goods_qrcode, $store->name, 20, 40, 1170, new Color('#888888'), $font_path, 0);
-    
+
         //调整标识图片
         $editor->resizeExact($pt_qrcode, 120,110);
         //附加标识图片
@@ -534,7 +534,7 @@ class ShareQrcodeForm extends ApiModel
         $editor->resizeFit($wxapp_qrcode, 160, 160);
         //附加小程序码图片
         $editor->blend($goods_qrcode, $wxapp_qrcode, 'normal', 1.0, 'top-left', 536, 948);
-   
+
 
         //保存图片
         $editor->save($goods_qrcode, $goods_pic_save_path . $goods_pic_save_name, 'jpeg', 85);
@@ -789,14 +789,16 @@ class ShareQrcodeForm extends ApiModel
         //将小程序码添加到背景图
         $qrcode_x = $qrcode_position['x'] * $percent;
         $qrcode_y = $qrcode_position['y'] * $percent;
-        $editor->blend($qrcode_bg_dst, $wxapp_qrcode_dst, 'normal', 1.0, 'top-left', $qrcode_x, $qrcode_y);
+        if($qrcode_x >= 0 && $qrcode_x <= 750 && $qrcode_y >= 0 && $qrcode_y <= 1200){
+            $editor->blend($qrcode_bg_dst, $wxapp_qrcode_dst, 'normal', 1.0, 'top-left', $qrcode_x, $qrcode_y);
+        }
         if ($avatar_size['w'] > 0) {
             //获取头像
             $avatar_w = $avatar_size['w'] * $percent;
             $avatar_h = $avatar_size['h'] * $percent;
             $avatar_x = $avatar_position['x'] * $percent;
             $avatar_y = $avatar_position['y'] * $percent;
-            if ($avatar_x < $qrcode_bg_w || $avatar_y < $qrcode_bg_h) {
+            if($avatar_x >= 0 && $avatar_x <= 750 && $avatar_y >= 0 && $avatar_y <= 1200){
                 list($w, $h) = getimagesize($user_avatar);
                 $user_avatar = $this->test($user_avatar, $save_root, $w, $h);
                 $editor->open($avatar_dst, $user_avatar);
@@ -812,7 +814,7 @@ class ShareQrcodeForm extends ApiModel
             $font = $font_size['size'] * $percent * 0.74;
             $font_x = $font_position['x'] * $percent;
             $font_y = $font_position['y'] * $percent + 1;
-            if ($font_x < $qrcode_bg_w || $font_y < $qrcode_bg_h) {
+            if($font_x >= 0 && $font_x <= 750 && $font_y >= 0 && $font_y <= 1200){
                 $editor->text($qrcode_bg_dst, $this->user->nickname, $font, $font_x, $font_y, new Color($color['color']), $font_path, 0);
             }
         }
@@ -1054,11 +1056,11 @@ class ShareQrcodeForm extends ApiModel
         //专题标题
         $name = $this->autowrap($name_size, 0, $font_path, $goods->title, $name_width, 2);
         $editor->text($goods_qrcode, $name, 25, 40, 48, new Color('#353535'), $font_path, 0);
- 
+
         //专题图片
         $editor->resizeFill($goods_pic, 670, 394);
         $editor->blend($goods_qrcode, $goods_pic, 'normal', 1.0, 'top-center', 0, 178);
-        
+
         //专题浏览
         $read = $goods->virtual_read_count + $goods->read_count;
         if($read > 10000){
@@ -1070,12 +1072,13 @@ class ShareQrcodeForm extends ApiModel
 
         //专题内容
         $content = strip_tags($goods->content);
+        $content = str_replace(array("\r\n","\r","\n","&nbsp;"," "),"",$content);
         $content = $this->autowrap($name_size, 0, $font_path, $content, $name_width, 2);
         $editor->text($goods_qrcode, $content, $name_size, 40, 660, new Color('#353535'), $font_path, 0);
         //
         $bs = '打开小程序阅读全文';
         $editor->text($goods_qrcode, $bs, $name_size, 230, 768, new Color('#f87c21'), $font_path, 0);
-       
+
         //调整小程序码图片
         $editor->resizeFit($goods_down, 24, 40);
         //附加小程序码图片
@@ -1112,7 +1115,7 @@ class ShareQrcodeForm extends ApiModel
 
         if (!$goods) {
             return [
-                'code' => 1, 
+                'code' => 1,
                 'msg' => '商品不存在',
             ];
         }
@@ -1172,6 +1175,8 @@ class ShareQrcodeForm extends ApiModel
 
         $lottery_qrcode = \Yii::$app->basePath . '/web/statics/images/lottery_qrcode.png';
         $lottery_free = \Yii::$app->basePath . '/web/statics/images/lottery_free.png';
+        $lottery_line = \Yii::$app->basePath . '/web/statics/images/lottery_line.png';
+        $editor->open($lottery_line, $lottery_line);
         $editor->open($lottery_qrcode, $lottery_qrcode);
         $editor->open($lottery_free, $lottery_free);
 
@@ -1219,15 +1224,18 @@ class ShareQrcodeForm extends ApiModel
         //加商品名称
         $editor->text($goods_qrcode, $name, $name_size, 30, 844, new Color('#353535'), $font_path, 0);
 
-
-
         $attr = json_decode($lottery->attr,true);
         $attr_id_list = array_reduce($attr, create_function('$v,$w', '$v[]=$w["attr_id"];return $v;'));
         $original_price = '￥'.$goods->getAttrInfo($attr_id_list)['price'];
-        $len = 260 + (strlen($original_price)-3)*12.5;
+        $len = 60 + (strlen($original_price)-3)*12.5;
+
         // 商品价格
         $editor->text($goods_qrcode, $original_price, $name_size, 182, 965, new Color('#999999'), $font_path, 0);
-        $editor->draw($goods_qrcode, Grafika::createDrawingObject('Line', array(180, 978), array($len, 978), 1, new Color('#999999')));
+
+        //调整免费标识图片
+        $editor->resizeExact($lottery_line, $len,2);
+        //附加免费标识图片
+        $editor->blend($goods_qrcode, $lottery_line, 'normal', 1.0, 'top-left', 180, 977);
 
         //调整免费标识图片
         $editor->resizeExact($lottery_free, 120,56);

@@ -54,6 +54,11 @@ module.exports = {
                 _this.numberBlur(e);
             }
         }
+        if (typeof self.selectDefaultAttr === 'undefined') {
+            self.selectDefaultAttr = function (e) {
+                _this.selectDefaultAttr(e);
+            }
+        }
     },
 
     previewImage: function(e) {
@@ -83,140 +88,6 @@ module.exports = {
         });
     },
 
-    // TODO 暂时未用
-    groupCheck: function() {
-        var self = this;
-        var attr_group_num = self.data.attr_group_num;
-        var attr_list = self.data.attr_group_num.attr_list;
-        for (var i in attr_list) {
-            attr_list[i].checked = false;
-        }
-        attr_group_num.attr_list = attr_list;
-
-        var goods = self.data.goods;
-        self.setData({
-            group_checked: 0,
-            attr_group_num: attr_group_num,
-        });
-
-        var attr_group_list = self.data.attr_group_list;
-        var check_attr_list = [];
-        var check_all = true;
-        for (var i in attr_group_list) {
-            var group_checked = false;
-            for (var j in attr_group_list[i].attr_list) {
-                if (attr_group_list[i].attr_list[j].checked) {
-                    check_attr_list.push(attr_group_list[i].attr_list[j].attr_id);
-                    group_checked = true;
-                    break;
-                }
-            }
-            if (!group_checked) {
-                check_all = false;
-                break;
-            }
-        }
-        if (!check_all)
-            return;
-        getApp().core.showLoading({
-            title: "正在加载",
-            mask: true,
-        });
-
-        getApp().request({
-            url: getApp().api.group.goods_attr_info,
-            data: {
-                goods_id: self.data.goods.id,
-                group_id: self.data.group_checked,
-                attr_list: JSON.stringify(check_attr_list),
-            },
-            success: function(res) {
-                getApp().core.hideLoading();
-                if (res.code == 0) {
-                    var goods = self.data.goods;
-                    goods.price = res.data.price;
-                    goods.num = res.data.num;
-                    goods.attr_pic = res.data.pic;
-                    goods.original_price = res.data.single;
-
-                    self.setData({
-                        goods: goods,
-                    });
-                }
-            }
-        });
-    },
-
-    // TODO 暂时未用
-    attrNumClick: function(e) {
-        var self = this.currentPage;
-        var attr_id = e.target.dataset.id;
-
-        var attr_group_num = self.data.attr_group_num;
-        var attr_list = attr_group_num.attr_list;
-
-        for (var i in attr_list) {
-            if (attr_list[i].id == attr_id) {
-                attr_list[i].checked = true;
-            } else {
-                attr_list[i].checked = false;
-            }
-        }
-        attr_group_num.attr_list = attr_list;
-
-        self.setData({
-            attr_group_num: attr_group_num,
-            group_checked: attr_id,
-        });
-
-        var attr_group_list = self.data.attr_group_list;
-        var check_attr_list = [];
-        var check_all = true;
-        for (var i in attr_group_list) {
-            var group_checked = false;
-            for (var j in attr_group_list[i].attr_list) {
-                if (attr_group_list[i].attr_list[j].checked) {
-                    check_attr_list.push(attr_group_list[i].attr_list[j].attr_id);
-                    group_checked = true;
-                    break;
-                }
-            }
-            if (!group_checked) {
-                check_all = false;
-                break;
-            }
-        }
-        if (!check_all)
-            return;
-        getApp().core.showLoading({
-            title: "正在加载",
-            mask: true,
-        });
-
-        getApp().request({
-            url: getApp().api.group.goods_attr_info,
-            data: {
-                goods_id: self.data.goods.id,
-                group_id: self.data.group_checked,
-                attr_list: JSON.stringify(check_attr_list),
-            },
-            success: function(res) {
-                getApp().core.hideLoading();
-                if (res.code == 0) {
-                    var goods = self.data.goods;
-                    goods.price = res.data.price;
-                    goods.num = res.data.num;
-                    goods.attr_pic = res.data.pic;
-                    goods.original_price = res.data.single;
-                    self.setData({
-                        goods: goods,
-                    });
-                }
-            }
-        });
-
-    },
-
     /**
      * 选择规格
      */
@@ -225,8 +96,10 @@ module.exports = {
         var _this = this;
         var attr_group_id = e.target.dataset.groupId;
         var attr_id = parseInt(e.target.dataset.id);
-        var attr_group_list = self.data.attr_group_list;
+        var attr_group_list = JSON.parse(JSON.stringify(self.data.attr_group_list));
         var attrs = self.data.goods.attr;
+
+        var checkedAttr = [];
         if (typeof attrs == 'string') {
             attrs = JSON.parse(attrs);
         }
@@ -236,14 +109,6 @@ module.exports = {
                 continue;
             }
 
-            // 如果库存为0 则不往下执行
-            for (var j in attr_group_list[i].attr_list) {
-                var aGList = attr_group_list[i].attr_list[j];
-
-                if (aGList.attr_id === attr_id && aGList.attr_num_0) {
-                    return;
-                }
-            }
             // TODO 重新写个for循环是为了解决bug,如有更好方案再修改
             for (var j in attr_group_list[i].attr_list) {
                 var aGList = attr_group_list[i].attr_list[j];
@@ -256,19 +121,7 @@ module.exports = {
             }
         }
 
-        // 无库存规格样式 start
-        var attrNum_0 = [];
-        for (var i in attrs) {
-            if (attrs[i].num === 0) {
-                var arr = [];
-                for (var i2 in attrs[i].attr_list) {
-                    arr.push(attrs[i].attr_list[i2].attr_id);
-                }
-                attrNum_0.push(arr)
-            }
-        }
 
-        var checkedAttr = [];
         for (var i in attr_group_list) {
             for (var j in attr_group_list[i].attr_list) {
                 if (attr_group_list[i].attr_list[j].checked) {
@@ -277,13 +130,46 @@ module.exports = {
             }
         }
 
+        for (var i in attr_group_list) {
+            // 如果库存为0 则不往下执行
+            for (var j in attr_group_list[i].attr_list) {
+                var aGList = attr_group_list[i].attr_list[j];
+                if (aGList.attr_id === attr_id && aGList.attr_num_0 === true) {
+                    return;
+                }
+            }
+        }
+
+        // 无库存规格样式 start
+        var attrNum_0 = [];
+        for (var i in attrs) {
+            var arr = [];
+            var sign = 0;
+            for (var j in attrs[i].attr_list) {
+                if (!getApp().helper.inArray(attrs[i].attr_list[j].attr_id, checkedAttr)) {
+                    sign += 1;
+                }
+
+                arr.push(attrs[i].attr_list[j].attr_id);
+            }
+
+            if (attrs[i].num === 0 && sign <= 1) {
+                attrNum_0.push(arr)
+            }
+        }
+
+        var checkedAttrLength = checkedAttr.length;
+        var attrGroupListLength = attr_group_list.length;
+
         var newAttrNum_0 = [];
-        for (var i in checkedAttr) {
-            for (var j in attrNum_0) {
-                if (getApp().helper.inArray(checkedAttr[i], attrNum_0[j])) {
-                    for (var k in attrNum_0[j]) {
-                        if (attrNum_0[j][k] !== checkedAttr[i]) {
-                            newAttrNum_0.push(attrNum_0[j][k])
+        if (attrGroupListLength - checkedAttrLength <= 1) {
+            for (var i in checkedAttr) {
+                for (var j in attrNum_0) {
+                    if (getApp().helper.inArray(checkedAttr[i], attrNum_0[j])) {
+                        for (var k in attrNum_0[j]) {
+                            if (attrNum_0[j][k] !== checkedAttr[i]) {
+                                newAttrNum_0.push(attrNum_0[j][k])
+                            }
                         }
                     }
                 }
@@ -294,13 +180,18 @@ module.exports = {
         for (var i in attr_group_list) {
             for (var j in attr_group_list[i].attr_list) {
                 var cAttr = attr_group_list[i].attr_list[j];
-                cAttr.attr_num_0 = getApp().helper.inArray(cAttr.attr_id, newAttrNum_0);
+                if (getApp().helper.inArray(cAttr.attr_id, newAttrNum_0) && !getApp().helper.inArray(cAttr.attr_id, checkedAttr)) {
+                    cAttr.attr_num_0 = true;
+                } else {
+                    cAttr.attr_num_0 = false;
+                }
             }
         }
 
         self.setData({
             attr_group_list: attr_group_list,
         });
+
 
         var check_attr_list = [];
         var check_all = true;
@@ -380,7 +271,7 @@ module.exports = {
                 group_id: self.data.group_checked, // TODO 商城没有该字段
                 attr_list: JSON.stringify(check_attr_list),
                 type: pageType === 'MIAOSHA' ? 'ms' : '',
-                group_checked: group_checked,// 区分拼团和阶梯团，用于计算佣金
+                group_checked: group_checked, // 区分拼团和阶梯团，用于计算佣金
             },
             success: function(res) {
                 getApp().core.hideLoading();
@@ -396,7 +287,9 @@ module.exports = {
                     if (pageType === 'MIAOSHA') {
                         var miaosha = res.data.miaosha;
                         goods.price = miaosha.price;
+                        goods.num = miaosha.miaosha_num;
                         goods.is_member_price = miaosha.is_member_price;
+                        goods.attr_pic = miaosha.pic;
                         self.setData({
                             miaosha_data: miaosha,
                         });
@@ -406,7 +299,7 @@ module.exports = {
                         goods: goods,
                     });
 
-                    
+
                 }
             }
         });
@@ -477,29 +370,6 @@ module.exports = {
         });
 
     },
-
-    /**
-     * TODO 预约规格选择，需要优化合并 ====已合并，先预留
-     */
-    // bookAttrGoodsClick: function(check_attr_list) {
-    //     var self = this.currentPage;
-    //     var goods = self.data.goods;
-    //     goods.attr.forEach(function(item, index, array) {
-    //         var attr_list = [];
-    //         item['attr_list'].forEach(function(itema, indexa, arraya) {
-    //             attr_list.push(itema['attr_id']);
-    //         });
-
-    //         if (check_attr_list.sort().toString() == attr_list.sort().toString()) {
-    //             goods['attr_pic'] = item['pic'];
-    //             goods['num'] = item['num'];
-    //             goods['price'] = item['price'];
-    //             self.setData({
-    //                 goods: goods
-    //             })
-    //         }
-    //     });
-    // },
 
     /**
      * TODO 积分商城规格选择,需要合并优化
@@ -626,6 +496,24 @@ module.exports = {
             form: {
                 number: num,
             }
+        });
+    },
+
+    /**
+     * 无规格、默认选中
+     */
+    selectDefaultAttr: function () {
+        var self = this.currentPage;
+        if (!self.data.goods || self.data.goods.use_attr != 0)
+            return;
+        for (var i in self.data.attr_group_list) {
+            for (var j in self.data.attr_group_list[i].attr_list) {
+                if (i == 0 && j == 0)
+                    self.data.attr_group_list[i].attr_list[j]['checked'] = true;
+            }
+        }
+        self.setData({
+            attr_group_list: self.data.attr_group_list,
         });
     },
 }

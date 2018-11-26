@@ -95,6 +95,8 @@ class OrderSubmitPreviewForm extends ApiModel
         $goods['cover_pic'] = $goods_item['cover_pic'];
         $goods['name'] = $goods_item['name'];
         $attr_info = $goods_item->getAttrInfo($attr_id_list);
+        $goods_item['integral'] = intval($goods_item['integral']);
+        $attr_info['integral'] = intval($attr_info['integral']);
         if($goods_item['use_attr'] == 1){
             $total_price = $attr_info['price'];
             $integral = $attr_info['integral'];
@@ -142,7 +144,7 @@ class OrderSubmitPreviewForm extends ApiModel
                 'express_price' => $express_price,
                 'send_type' => $store->send_type,
                 'total_price'=>$total_price,
-                'integral'=>$integral
+                'integral'=>intval($integral)
             ],
         ];
     }
@@ -287,6 +289,13 @@ class OrderSubmitPreviewForm extends ApiModel
         }else{
             $this->type = 1;
         }
+        $integral = intval($integral);
+        if($user->integral < $integral) {
+            return [
+                'code' => 1,
+                'msg' => '积分不足，无法兑换'
+            ];
+        }
 
         $attr_list = Attr::find()->alias('a')
             ->select('a.id attr_id,ag.attr_group_name,a.attr_name')
@@ -369,13 +378,13 @@ class OrderSubmitPreviewForm extends ApiModel
             $order_detail->is_delete = 0;
             $order_detail->attr = \Yii::$app->serializer->encode($attr_list);
             $order_detail->pic = $goods_pic;
-            $order_detail->pay_integral = $goods_info->attr_integral;
+            $order_detail->pay_integral = $integral;
             $order_detail->user_id = $this->user->id;
             $order_detail->store_id = $this->store_id;
             $order_detail->goods_name = $goods->name;
             if ($order_detail->save()) {
                 if ($this->type == 1) {
-                    $user->integral -= $goods_info->attr_integral;
+                    $user->integral -= $integral;
                     $register = new Register();
                     $register->store_id = $this->store_id;
                     $register->user_id = $user->id;
@@ -383,7 +392,7 @@ class OrderSubmitPreviewForm extends ApiModel
                     $register->addtime = time();
                     $register->continuation = 0;
                     $register->type = 11;
-                    $register->integral = '-' . $goods_info->attr_integral;
+                    $register->integral = '-' . $integral;
                     $register->order_id = $order->id;
                     $register->save();
                     if ($user->save()) {

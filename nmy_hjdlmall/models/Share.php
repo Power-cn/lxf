@@ -75,7 +75,7 @@ class Share extends \yii\db\ActiveRecord
     public function getFirstChildren()
     {
         return $this->hasMany(User::className(), ['parent_id'=>'user_id'])
-            ->alias('f')->andWhere(['f.is_delete'=>0])->select(['f.id','f.nickname','f.parent_id','f.addtime']);
+            ->alias('f')->andWhere(['f.is_delete'=>0,'f.type' => 1])->select(['f.id','f.nickname','f.parent_id','f.addtime']);
     }
     public static function getChildren($index)
     {

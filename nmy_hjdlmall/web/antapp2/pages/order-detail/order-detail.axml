@@ -2,7 +2,7 @@
 <view class="page">
     <include src="/components/common/common" />
     <include src="/components/header/header" />
-    <view class="body after-navber">
+    <view a:if="{{isPageShow}}" class="body after-navber">
         <view style="overflow-x: hidden">
             <view class="status-bar">
                 <image src="{{__wxapp_img.store.order_status_bar.url}}" mode="aspectFill"></image>
@@ -140,10 +140,13 @@
                 </view>
             </view>
 
-            <view class='order-footer flex-y-center flex-x-right flex-row'>
-                <view class="play-btn" a:if="{{order.is_send==0}}">
-                    <view a:if="{{order.apply_delete==1}}">退款申请中</view>
-                    <view a:else onTap="orderRevoke" data-id="{{order.order_id}}">申请退款
+            <view a:if="{{order.is_send==0 && order.apply_delete==1}}" class='order-footer flex-y-center flex-x-right flex-row'>
+                <view>取消申请中</view>
+            </view>
+
+            <view a:if="{{order.is_send==0 && order.is_pay == 1 && order.apply_delete == 0}}" class='order-footer flex-y-center flex-x-right flex-row'>
+                <view class="play-btn">
+                    <view onTap="orderRevoke" data-id="{{order.order_id}}">申请取消
                     </view>
                 </view>
             </view>

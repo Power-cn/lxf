@@ -72,7 +72,7 @@ class OrderListForm extends MchModel
             'o.mch_id' => 0
         ])->leftJoin(['u' => User::tableName()], 'u.id = o.user_id')
             ->leftJoin(['od' => OrderDetail::tableName()], 'od.order_id=o.id')
-            ->leftJoin(['g' => Goods::tableName()], 'g.id=od.goods_id');
+            ->leftJoin(['g' => Goods::tableName()], 'g.id=od.goods_id')->groupBy('o.id');
 
         switch ($this->status) {
             case 0:
@@ -164,6 +164,7 @@ class OrderListForm extends MchModel
 
         $listArray = ArrayHelper::toArray($list);
         foreach ($listArray as $i => &$item) {
+
             $item['goods_list'] = $this->getOrderGoodsList($item['id']);
 
             //此处考虑将 Order 和 Shop 模型使用 hasOne 关联，查询时使用 with 预查询 -- wi1dcard
@@ -269,30 +270,9 @@ class OrderListForm extends MchModel
             ->where([
                 'od.is_delete' => 0,
                 'od.order_id' => $order_id,
-            ])->select(['od.*', 'g.name', 'g.attr_setting_type', 'g.attr AS attrs', 'g.unit', 'goods_pic' => $picQuery])->asArray()->all();
-
-        $order = Order::find(['id' => $order_id])->select('user_id')->one();
-        $user = User::find()->where(['id' => $order->user_id])->select('level')->one();
-
-//        $new_total_price = 0;
-        foreach ($orderDetailList as $i => &$item) {
-            $item['attr_list'] = json_decode($item['attr']);
-//            $attrs = json_decode($item['attr']);
-//            $attrIds = [];
-//            foreach ($attrs as $attr) {
-//                $attrIds[] = $attr->attr_id;
-//            }
-//            $item['attr_ids'] = $attrIds;
-//            $oldAttr = $item['attr'];
-//            $item['attr'] = $item['attrs'];
-//
-//            $res = CommonGoods::currentGoodsAttr($item, $item['attr_ids'], [
-//                'user_level' => $user->level
-//            ]);
-//
-//            $item['member_price'] = $res['price'];
-//            $item['attr'] = $oldAttr;
-//            $new_total_price = $new_total_price + $item['total_price'];
+            ])->select(['od.num', 'od.total_price', 'od.attr', 'od.is_level', 'g.name', 'g.unit', 'goods_pic' => $picQuery])->asArray()->all();
+        foreach ($orderDetailList as &$item) {
+            $item['attr_list'] = json_decode($item['attr'], true);
         }
 
         return $orderDetailList;

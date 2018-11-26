@@ -74,13 +74,4 @@ class Shop extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ShopPic::className(), ['shop_id'=>'id'])->where(['is_delete'=>0]);
     }
-
-    public function beforeSave($insert)
-    {
-        $this->name = \yii\helpers\Html::encode($this->name);
-        $this->shop_time = \yii\helpers\Html::encode($this->shop_time);
-        $this->content = \yii\helpers\Html::encode($this->content);
-        $this->address = \yii\helpers\Html::encode($this->address);
-        return parent::beforeSave($insert);
-    }
 }

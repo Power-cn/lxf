@@ -147,13 +147,14 @@ class OrderForm extends ApiModel
             $mch['plugin_type'] = 0;
             foreach ($mch['goods_list'] as $_goods) {
                 $total_price += doubleval($_goods['price']);
-                $level_price += doubleval($_goods['level_price']);
+                $level_price += doubleval($_goods['level_price']) > 0 ? doubleval($_goods['level_price']) : doubleval($_goods['price']);
                 $integral['forehead'] += doubleval($_goods['resIntegral']['forehead']);
                 $integral['forehead_integral'] += doubleval($_goods['resIntegral']['forehead_integral']);
                 if (isset($_goods['bargain_order_id'])) {
                     $mch['plugin_type'] = 2;
                 }
             }
+
             $mch['total_price'] = sprintf('%.2f', $total_price);
             $mch['level_price'] = sprintf('%.2f', $level_price);
             $mch['integral'] = $integral;
@@ -163,6 +164,7 @@ class OrderForm extends ApiModel
             $mch['offer_rule'] = $this->getOfferRule($mch);
             $mch['is_area'] = $this->getTerritorialLimitation($mch);
         }
+
         return $this->mch_list;
     }
 
@@ -244,6 +246,7 @@ class OrderForm extends ApiModel
             $item['mch_id'] = $goods->mch_id;
             $item['goods_name'] = $goods->name;
             $item['goods_pic'] = $goods->cover_pic;
+            // bargain_price 砍价
             if (isset($item['bargain_price'])) {
                 $item['price'] = sprintf('%.2f', ($item['bargain_price'] * $item['num']));
                 $item['single_price'] = sprintf('%.2f', $item['bargain_price']);
@@ -257,27 +260,58 @@ class OrderForm extends ApiModel
             $item['full_cut'] = $goods->full_cut;
             $item['goods_cat_id'] = $goods->cat_id;
             $item['id'] = $goods->id;
-            if ($goods->is_level == 1 && $this->level && $this->level['discount'] < 10 && $goods->mch_id == 0) {
 
-                // 当前选择的规格
-                $attrIdArr = [];
-                foreach ($item['attr_list'] as $attrListItem) {
-                    $attrIdArr[] = $attrListItem['attr_id'];
-                }
+            // 当前选择的规格
+            $attrIdArr = [];
+            foreach ($item['attr_list'] as $attrListItem) {
+                $attrIdArr[] = $attrListItem['attr_id'];
+            }
 
-                $res = CommonGoods::currentGoodsAttr($goods, $attrIdArr);
+            $res = CommonGoods::currentGoodsAttr([
+                'attr' => $goods['attr'],
+                'price' => $goods['price'],
+                'is_level' => $goods['is_level'],
+                'mch_id' => $goods['mch_id'],
+            ], $attrIdArr);
 
-                if ($res['is_member_price'] === true) {
-                    $item['level_price'] = $res['price'];
-                } else {
-                    $item['level_price'] = sprintf('%.2f', ($item['price'] * floatval($this->level['discount']) / 10));
-                }
+//            if ($goods->is_level == 1 && $this->level && $this->level['discount'] < 10 && $goods->mch_id == 0) {
+//
+//                // 当前选择的规格
+//                $attrIdArr = [];
+//                foreach ($item['attr_list'] as $attrListItem) {
+//                    $attrIdArr[] = $attrListItem['attr_id'];
+//                }
+//
+//                $res = CommonGoods::currentGoodsAttr([
+//                    'attr' => $goods['attr'],
+//                    'price' => $goods['price'],
+//                    'is_level' => $goods['is_level'],
+//                ], $attrIdArr);
 
-                $item['is_level'] = 1;
-            } else {
+
+//                if ($res['is_member_price'] === true) {
+//                    $item['level_price'] = $res['price'];
+//                } else {
+//                    $item['level_price'] = sprintf('%.2f', ($item['price'] * floatval($this->level['discount']) / 10));
+//                }
+
+
+                $item['level_price'] = sprintf('%.2f', ($res['level_price'] * $item['num']));
+//                if ($res['level_price'] > 0 && $res['level_price'] < 0.01) {
+//                    $item['level_price'] = sprintf('%.2f', 0.01);
+//                }
+                $item['is_level'] = $res['is_level'];
+
+            // 砍价不享受会员折扣
+            if(isset($item['bargain_price'])) {
                 $item['level_price'] = $item['price'];
                 $item['is_level'] = 0;
             }
+//            } else {
+//                $item['level_price'] = sprintf('%.2f', ($item['single_price'] * $item['num']));
+//                $item['is_level'] = 0;
+//            }
+
             $integralArr = $this->getIntegral((object)$item, $this->store->integral, $goodsIds);
             $item['give'] = $integralArr['give'];
             $item['resIntegral'] = $integralArr['resIntegral'];
@@ -434,13 +468,11 @@ class OrderForm extends ApiModel
             2 => '购物返券',
             3 => '领券中心',
         ];
-        
-        $price = [];
-        foreach($mch['goods_list'] as $v){
-            $price[] = $v['price'];
+
+        $max_price = 0;
+        foreach ($mch['goods_list'] as $v) {
+            $max_price += $v['price'];
         }
-        $min_price = min($price);
-        $max_price = max($price);
 
         $new_list = [];
         foreach ($list as $i => $item) {
@@ -474,21 +506,19 @@ class OrderForm extends ApiModel
                 $list[$i]['cat_id_list'] = json_decode($list[$i]['cat_id_list']);
                 if ($list[$i]['cat_id_list'] != null) {
                     $current = array_intersect($list[$i]['cat_id_list'], $cat_ids);
-                    if($current) {
-                        $sentinel = false;
-                        foreach($current as $v){
-                            $price = 0;
-                            foreach($mch['goods_list'] as $v2){
-                                if(in_array($v,$v2['cat_id'])){
-                                     $price += $v2['price'];
+                    if ($current) {
+                        $goodsAdd = [];
+                        $price = 0;
+                        foreach ($current as $v) {
+                            foreach ($mch['goods_list'] as $v2) {
+                                if (in_array($v, $v2['cat_id']) && !in_array($v2['goods_id'], $goodsAdd)) {
+                                    $price += $v2['price'];
+                                    array_push($goodsAdd, $v2['goods_id']);
                                 }
                             };
-
-                            if($price<$list[$i]['min_price']){
-                                $sentinel = true;
-                            }
                         }
-                        if($sentinel) {
+
+                        if ($price < $list[$i]['min_price']) {
                             unset($list[$i]);
                             continue;
                         }
@@ -502,31 +532,27 @@ class OrderForm extends ApiModel
                 $list[$i]['goods_id_list'] = json_decode($list[$i]['goods_id_list']);
                 if ($list[$i]['goods_id_list'] != null) {
                     $current = array_intersect($list[$i]['goods_id_list'], $coupon_goods_id);
-                    if($current){
-                        $sentinel = false;
-                        foreach($current as $v){
-                            $price = 0;
-                            foreach($mch['goods_list'] as $v2){
-                                if($v==$v2['goods_id']){
+                    if ($current) {
+                        $goodsAdd = [];
+                        $price = 0;
+                        foreach ($current as $v) {
+                            foreach ($mch['goods_list'] as $v2) {
+                                if ($v == $v2['goods_id'] && !in_array($v2['goods_id'], $goodsAdd)) {
                                     $price += $v2['price'];
                                 }
                             }
-                            if($price<$list[$i]['min_price']){
-                                $sentinel = true;
-                            }
                         }
-                        if($sentinel) {
+                        if ($price < $list[$i]['min_price']) {
                             unset($list[$i]);
                             continue;
                         }
                     } else {
                         unset($list[$i]);
-                        continue;                        
+                        continue;
                     }
                 }
             } else {
-                if($max_price<$list[$i]['min_price'])
-                {
+                if ($max_price < $list[$i]['min_price']) {
                     unset($list[$i]);
                     continue;
                 }

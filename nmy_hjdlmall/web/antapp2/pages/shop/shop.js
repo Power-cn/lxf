@@ -147,6 +147,7 @@ Page({
                         getApp().getauth({
                             content: '需要获取您的地理位置授权，请到小程序设置中打开授权！',
                             cancel: false,
+                            author: 'scope.userLocation',
                             success: function(res) {
                                 if (res.authSetting['scope.userLocation']) {
                                     self.location(e);
@@ -261,6 +262,7 @@ Page({
      * 用户点击右上角分享
      */
     onShareAppMessage: function(options) {
+        getApp().page.onShareAppMessage(this);
         var user_info = getApp().core.getStorageSync(getApp().const.USER_INFO);
         return {
             path: "/pages/shop/shop?user_id=" + user_info.id,

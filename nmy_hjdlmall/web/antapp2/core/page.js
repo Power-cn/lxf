@@ -55,6 +55,23 @@ module.exports = {
             if (!self.options)
                 self['options'] = options;
             getApp().core.setStorageSync('last_page_options', options);
+        };
+
+        if (self.route == 'lottery/goods/goods' && options.user_id) {
+            var user_id = options.user_id;
+            var lottery_id = options.id;
+            getApp().request({
+                data: {
+                    user_id: user_id,
+                    lottery_id: lottery_id
+                },
+                url: getApp().api.lottery.clerk,
+                success: function(res) {
+                    if (res.code == 0) {
+
+                    }
+                }
+            });
         }
         self.navigatorClick = function(e) {
             _this.navigatorClick(e, self);
@@ -123,8 +140,20 @@ module.exports = {
             }
         }
         if (typeof self.closeCouponBox === 'undefined') {
-            self.closeCouponBox = function(e){
+            self.closeCouponBox = function(e) {
                 _this.closeCouponBox(e);
+            }
+        }
+
+        if (typeof self.relevanceSuccess === 'undefined') {
+            self.relevanceSuccess = function(e) {
+                _this.relevanceSuccess(e);
+            }
+        }
+
+        if (typeof self.relevanceError === 'undefined') {
+            self.relevanceError = function(e) {
+                _this.relevanceError(e);
             }
         }
     },
@@ -177,7 +206,9 @@ module.exports = {
      */
     onShareAppMessage: function(self) {
         this.currentPage = self;
-        getApp().shareSendCoupon(self);
+        setTimeout(function() {
+            getApp().shareSendCoupon(self);
+        }, 1000);
     },
 
     imageClick: function(e) {
@@ -239,6 +270,10 @@ module.exports = {
 
     setParentId: function(options) {
         var self = this.currentPage;
+        var _this = this;
+        if (self.route == '/pages/index/index') {
+            _this.setOfficalAccount();
+        }
         if (options) {
             var parent_id = 0;
             if (options.user_id) {
@@ -253,8 +288,11 @@ module.exports = {
                         }
                     }
                 } else {
-                    parent_id = options.scene;
+                    if (self.route.indexOf('clerk') == -1) {
+                        parent_id = options.scene;
+                    }
                 }
+                _this.setOfficalAccount();
             } else if (getApp().query !== null) {
                 var query = getApp().query;
                 parent_id = query.uid;
@@ -357,9 +395,22 @@ module.exports = {
 
         function setNavbar(navbar) {
             var in_navs = false;
-            var route = self.route || (self.__route__ || null);
             for (var i in navbar.navs) {
-                if (navbar.navs[i].url === "/" + route) {
+                var url = navbar.navs[i].url;
+                var route = self.route || (self.__route__ || null);
+                if (navbar.navs[i].params) {
+                    url = navbar.navs[i].new_url;
+                    for (var key in self.options) {
+                        if (route.indexOf('?') == -1) {
+                            route += '?';
+                        } else {
+                            route += '&';
+                        }
+                        route += key + '=' + self.options[key];
+                    }
+                }
+                console.log(route)
+                if (url === "/" + route) {
                     navbar.navs[i].active = true;
                     in_navs = true;
                 } else {
@@ -581,7 +632,6 @@ module.exports = {
             return;
         }
         self._formIdSubmit = function(e) {
-            console.log('_formIdSubmit e -->', e);
             let dataset = e.currentTarget.dataset;
             let form_id = e.detail.formId;
             let bind = dataset.bind || null;
@@ -591,16 +641,25 @@ module.exports = {
             // 保存formId
             {
                 let form_id_list = getApp().core.getStorageSync(getApp().const.FORM_ID_LIST);
-                if (!form_id_list || !form_id_list.length)
+                if (!form_id_list || !form_id_list.length) {
                     form_id_list = [];
-                form_id_list.push({
-                    time: getApp().helper.time(),
-                    form_id: form_id,
-                });
-                getApp().core.setStorageSync(getApp().const.FORM_ID_LIST, form_id_list);
-            }
+                }
 
-            console.log('self[bindtap]-->', self[bind]);
+                var oldFormId = [];
+                for (var wf in form_id_list) {
+                    oldFormId.push(form_id_list[wf]['form_id']);
+                }
+
+                //重复的formId不添加
+                if ('the formId is a mock one' !== form_id && !getApp().helper.inArray(form_id, oldFormId)) {
+                    form_id_list.push({
+                        time: getApp().helper.time(),
+                        form_id: form_id,
+                    });
+
+                    getApp().core.setStorageSync(getApp().const.FORM_ID_LIST, form_id_list);
+                }
+            }
 
             // 调用自定义事件function
             if (self[bind] && typeof self[bind] === 'function') {
@@ -694,7 +753,7 @@ module.exports = {
 
     //支付宝小程序登录
     myLogin: function() {
-        var page = this;
+        var _this = this;
         if (getApp().platform !== 'my')
             return;
         console.log(getApp().login_complete)
@@ -705,8 +764,14 @@ module.exports = {
         my.getAuthCode({
             scopes: 'auth_user',
             success: function(res) {
-                page.unionLogin({
+                _this.unionLogin({
                     code: res.authCode
+                });
+            },
+            fail: function(res) {
+                getApp().login_complete = false;
+                getApp().core.redirectTo({
+                    url: '/pages/index/index'
                 });
             }
         });
@@ -733,18 +798,14 @@ module.exports = {
                     getApp().trigger.run(getApp().trigger.events.login);
                     var store = getApp().core.getStorageSync(getApp().const.STORE);
                     if (res.data.binding || (!store.option.phone_auth) || (store.option.phone_auth && store.option.phone_auth == 0)) {
-                        getApp().core.redirectTo({
-                            url: '/' + self.route + '?' + getApp().helper.objectToUrlParams(self.options),
-                        });
+                        _this.loadRoute();
                     } else {
                         if (typeof wx === 'undefined') {
-                            getApp().core.redirectTo({
-                                url: '/' + self.route + '?' + getApp().helper.objectToUrlParams(self.options),
-                            });
+                            _this.loadRoute();
                         }
                         _this.setPhone();
-                        _this.setUserInfoShowFalse();
                     }
+                    _this.setUserInfoShowFalse();
                 } else {
                     getApp().login_complete = false;
                     getApp().core.showModal({
@@ -798,9 +859,7 @@ module.exports = {
                                         binding: true,
                                         binding_num: res.data.dataObj
                                     });
-                                    getApp().core.redirectTo({
-                                        url: '/' + self.route + '?' + getApp().helper.objectToUrlParams(self.options),
-                                    });
+                                    _this.loadRoute();
                                 } else {
                                     getApp().core.showToast({
                                         title: '授权失败,请重试'
@@ -846,10 +905,37 @@ module.exports = {
         });
     },
 
-    closeCouponBox: function (e) {
+    closeCouponBox: function(e) {
         var self = this.currentPage;
         self.setData({
             get_coupon_list: ""
         });
     },
+
+    // 关联公众号组件加载成功
+    relevanceSuccess: function(e) {
+        console.log(e)
+    },
+
+    // 关联公众号组件加载失败
+    relevanceError: function(e) {
+        console.log(e)
+    },
+
+    setOfficalAccount: function(e) {
+        var self = this.currentPage;
+        self.setData({
+            __is_offical_account: true
+        });
+    },
+    loadRoute: function() {
+        var self = this.currentPage;
+        var _this = this;
+        if (self.route == 'pages/index/index') {} else {
+            getApp().core.redirectTo({
+                url: '/' + self.route + '?' + getApp().helper.objectToUrlParams(self.options),
+            });
+        }
+        _this.setUserInfoShowFalse();
+    }
 };

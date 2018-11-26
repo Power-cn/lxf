@@ -42,7 +42,6 @@ $this->params['active_nav_group'] = 1;
         display: none;
     }
 </style>
-<link href="./css/sample-default.css" rel="stylesheet">
 <script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp"></script>
 <script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77"></script>
 <div class="panel mb-3" id="app">
@@ -70,7 +69,7 @@ $this->params['active_nav_group'] = 1;
                     </div>
                 </div>
 
-                <div class="form-group row">
+                <div class="form-group row" hidden>
                     <div class="form-group-label col-sm-2 text-right">
                         <label class="col-form-label">商城logo</label>
                     </div>
@@ -215,7 +214,7 @@ $this->params['active_nav_group'] = 1;
                                value="<?= $store->kdniao_api_key ?>">
                     </div>
                 </div>
-
+<!--
                 <div class="form-group row">
                     <div class="form-group-label col-sm-2 text-right">
                         <label class="col-form-label">开启领券中心</label>
@@ -237,7 +236,7 @@ $this->params['active_nav_group'] = 1;
                         </label>
                     </div>
                 </div>
-
+-->
                 <div class="form-group row">
                     <div class="form-group-label col-sm-2 text-right">
                         <label class="col-form-label">发货方式</label>
@@ -326,28 +325,6 @@ $this->params['active_nav_group'] = 1;
                                   placeholder="请填写积分使用规则"
                                   name="integration"><?= $store->integration ?></textarea>
                         <div class="text-muted fs-sm">积分使用规则用于用户结算页说明显示，为了更好体验字数最好不要超过80字</div>
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <div class="form-group-label col-sm-2 text-right">
-                        <label class="col-form-label">购买会员状态</label>
-                    </div>
-                    <div class="col-sm-6">
-                        <label class="radio-label">
-                            <input id="radio1" <?= $store->buy_member == 1 ? 'checked' : null ?>
-                                   value="1"
-                                   name="buy_member" type="radio" class="custom-control-input">
-                            <span class="label-icon"></span>
-                            <span class="label-text">开启</span>
-                        </label>
-                        <label class="radio-label">
-                            <input id="radio2" <?= $store->buy_member == 0 ? 'checked' : null ?>
-                                   value="0"
-                                   name="buy_member" type="radio" class="custom-control-input">
-                            <span class="label-icon"></span>
-                            <span class="label-text">关闭</span>
-                        </label>
                     </div>
                 </div>
 
@@ -975,6 +952,28 @@ $this->params['active_nav_group'] = 1;
 
                 <div class="form-group row">
                     <div class="form-group-label col-sm-2 text-right">
+                        <label class="col-form-label">购买会员状态</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="radio-label">
+                            <input id="radio1" <?= $store->buy_member == 1 ? 'checked' : null ?>
+                                   value="1"
+                                   name="buy_member" type="radio" class="custom-control-input">
+                            <span class="label-icon"></span>
+                            <span class="label-text">开启</span>
+                        </label>
+                        <label class="radio-label">
+                            <input id="radio2" <?= $store->buy_member == 0 ? 'checked' : null ?>
+                                   value="0"
+                                   name="buy_member" type="radio" class="custom-control-input">
+                            <span class="label-icon"></span>
+                            <span class="label-text">关闭</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="form-group-label col-sm-2 text-right">
                         <label class="col-form-label required">推荐商品显示数量</label>
                     </div>
                     <div class="col-sm-6">
@@ -1092,6 +1091,29 @@ $this->params['active_nav_group'] = 1;
                             <span class="label-icon"></span>
                             <span class="label-text">关闭</span>
                         </label>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="form-group-label col-sm-2 text-right">
+                        <label class="col-form-label">关联公众号组件</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="radio-label">
+                            <input id="radio1" <?= $store['is_official_account'] == 1 ? 'checked' : null ?>
+                                   value="1"
+                                   name="is_official_account" type="radio" class="custom-control-input">
+                            <span class="label-icon"></span>
+                            <span class="label-text">开启</span>
+                        </label>
+                        <label class="radio-label">
+                            <input id="radio2" <?= $store['is_official_account'] == 0 ? 'checked' : null ?>
+                                   value="0"
+                                   name="is_official_account" type="radio" class="custom-control-input">
+                            <span class="label-icon"></span>
+                            <span class="label-text">关闭</span>
+                        </label>
+                        <div style="color: red;">注意：该功能需要 ->微信小程序后台->设置->接口设置 开启并设置关联(同一主体下)的公众号</div>
                     </div>
                 </div>
             </div>

@@ -183,7 +183,7 @@ class PrintForm extends MchModel
             $desc = "";
             foreach ($good['attr_list'] as $key => $value) {
                 $desc .= ',';
-                $desc .= $value->attr_group_name . ':' . $value->attr_name;
+                $desc .= $value['attr_group_name'] . ':' . $value['attr_name'];
             }
             $commodityOne["GoodsName"] = $good['name'] . '，数量：' . intval($good['num']) . $desc;
             $commodityOne["GoodsCode"] = "";

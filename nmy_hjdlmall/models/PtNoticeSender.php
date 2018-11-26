@@ -427,8 +427,10 @@ class PtNoticeSender
             $this->wechat->curl->post($api, $data);
             $res = json_decode($this->wechat->curl->response, true);
 
-            $this->form_id->send_count = $this->form_id->send_count + 1;
-            $this->form_id->save();
+            if ($this->form_id) {
+                $this->form_id->send_count = $this->form_id->send_count + 1;
+                $this->form_id->save();
+            }
 
             if (!empty($res['errcode']) && $res['errcode'] != 0) {
                 \Yii::warning("模板消息发送失败：\r\ndata=>{$data}\r\nresponse=>" . json_encode($res, JSON_UNESCAPED_UNICODE));

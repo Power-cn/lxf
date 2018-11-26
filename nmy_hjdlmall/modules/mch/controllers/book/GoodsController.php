@@ -162,6 +162,7 @@ class GoodsController extends Controller
             $goods[$index] = str_replace("\"", "&quot;", $value);
         }
 
+        $goods_share->is_level = $goods['is_level'];
         return $this->render('goods-edit', [
             'goods' => $goods,
             'cat' => $ptCat,

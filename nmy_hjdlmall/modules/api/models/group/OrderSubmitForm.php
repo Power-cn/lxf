@@ -13,21 +13,15 @@ use app\models\common\CommonGoods;
 use app\models\FormId;
 use app\models\Model;
 use app\utils\PinterOrder;
-use app\utils\PrinterPtOrder;
 use app\models\Address;
 use app\models\Attr;
 use app\models\AttrGroup;
 use app\models\FreeDeliveryRules;
-use app\models\Goods;
 use app\models\Order;
 use app\models\PostageRules;
-use app\models\PrinterSetting;
 use app\models\PtGoods;
 use app\models\PtOrder;
 use app\models\PtOrderDetail;
-use app\models\Store;
-use app\models\User;
-use app\models\UserCoupon;
 use app\modules\api\models\ApiModel;
 use app\models\PtGoodsDetail;
 use app\models\TerritorialLimitation;
@@ -59,15 +53,15 @@ class OrderSubmitForm extends ApiModel
     public function rules()
     {
         return [
-            [['goods_info', 'content', 'address_name', 'address_mobile','formId'], 'string'],
+            [['goods_info', 'content', 'address_name', 'address_mobile', 'formId'], 'string'],
             [['type',], 'required'],
             [['shop_id', 'use_integral'], 'integer'],
             [['parent_id', 'payment'], 'default', 'value' => 0],
             [['address_id',], 'required', 'on' => "EXPRESS"],
             [['address_name', 'address_mobile'], 'required', 'on' => "OFFLINE"],
             [['offline'], 'default', 'value' => 1],
-            [['payment'],'integer','message'=>'请选择支付方式'],
-            [['address_mobile'],'match','pattern' =>Model::MOBILE_PATTERN , 'message'=>'手机号错误']
+            [['payment'], 'integer', 'message' => '请选择支付方式'],
+            [['address_mobile'], 'match', 'pattern' => Model::MOBILE_PATTERN, 'message' => '手机号错误']
         ];
     }
 
@@ -244,11 +238,12 @@ class OrderSubmitForm extends ApiModel
             }
         }
         $total_price_1 = $total_price + $express_price; // 总价
-        
+
+        $level_price = $data['level_price'];
         if ($this->type == 'GROUP_BUY') { // 团长购买
-            $total_price_2 = (($total_price - $colonel) > 0.01 ? ($total_price - $colonel) : 0.01) + $express_price; // 实际付款价
+            $total_price_2 = (($level_price - $colonel) > 0.01 ? ($level_price - $colonel) : 0.01) + $express_price; // 实际付款价
         } else {
-            $total_price_2 = $total_price + $express_price; // 实际付款价
+            $total_price_2 = $level_price + $express_price; // 实际付款价
         }
 
         $order->store_id = $this->store_id;
@@ -362,6 +357,7 @@ class OrderSubmitForm extends ApiModel
             'store_id' => $this->store_id,
             'status' => 1,
         ]);
+        $ptGoods = $goods;
         if (!$goods) {
             return [
                 'total_price' => 0,
@@ -393,19 +389,19 @@ class OrderSubmitForm extends ApiModel
 //                ->andWhere(['od.goods_id'=>$goods->id])
 //                ->andWhere(['!=','o.order_no','robot'])
 //                ->count();
-            $orderNum = PtOrder::getCount($goods->id,$this->user_id);
+            $orderNum = PtOrder::getCount($goods->id, $this->user_id);
             if ($orderNum >= $goods->buy_limit) {
                 return [
-                    'code'  => 1,
-                    'msg'   => '您已超过该商品购买次数',
+                    'code' => 1,
+                    'msg' => '您已超过该商品购买次数',
                 ];
             }
         }
         if ($goods->one_buy_limit > 0) {
             if ($goods_info->num > $goods->one_buy_limit) {
                 return [
-                    'code'=>1,
-                    'msg'=>'您已超过该商品可购买数量'
+                    'code' => 1,
+                    'msg' => '您已超过该商品可购买数量'
                 ];
             }
         }
@@ -418,12 +414,20 @@ class OrderSubmitForm extends ApiModel
         }
         $total_price = 0;
 //        $goods_attr_info = $goods->getAttrInfo($attr_id_list, $goods_info->group_id);
-        $ptGoods = $goods;
+
         if ($goods_info->group_id) {
-            $goods = PtGoodsDetail::find()->where(['store_id'=>$this->store_id, 'id' => $goods_info->group_id])->one();
+            $goods = PtGoodsDetail::find()->where(['store_id' => $this->store_id, 'id' => $goods_info->group_id])->one();
         }
-        $goods_attr_info = CommonGoods::currentGoodsAttr($goods, $attr_id_list, [
-            'type' => 'PINTUAN'
+
+        $goodsData = [
+            'attr' => $goods->attr,
+            'price' => $ptGoods->price,
+            'is_level' => $ptGoods['is_level'],
+        ];
+        $goods_attr_info = CommonGoods::currentGoodsAttr($goodsData, $attr_id_list, [
+            'type' => 'PINTUAN',
+            'single_price' => $ptGoods['original_price'],
+            'order_type' => $this->type
         ]);
 
         $attr_list = Attr::find()->alias('a')
@@ -438,11 +442,16 @@ class OrderSubmitForm extends ApiModel
         unset($i);
         $goods_pic = isset($goods_attr_info['pic']) ? $goods_attr_info['pic'] ?: $ptGoods->cover_pic : $ptGoods->cover_pic;
         if ($this->type == 'GROUP_BUY' || $this->type == 'GROUP_BUY_C') {      // 拼团
-            $price = doubleval(empty($goods_attr_info['price']) ? $ptGoods->price : $goods_attr_info['price']) * $goods_info->num;
+            $price = doubleval(empty($goods_attr_info['goods_price']) ? $ptGoods->price : $goods_attr_info['goods_price']) * $goods_info->num;
+            $levelPrice = doubleval(empty($goods_attr_info['level_price']) ? $ptGoods->price : $goods_attr_info['level_price']) * $goods_info->num;
+
         } elseif ($this->type == 'ONLY_BUY') {  // 单独购买
 //            $price = $goods->original_price * $goods_info->num;
             $price = doubleval(empty($goods_attr_info['single']) ? $ptGoods->original_price : $goods_attr_info['single']) * $goods_info->num;
+            $levelPrice = doubleval(empty($goods_attr_info['single']) ? $ptGoods->original_price : $goods_attr_info['single']) * $goods_info->num;
         }
+
+
         $goods_item = (object)[
             'goods_id' => $ptGoods->id,
             'goods_name' => $ptGoods->name,
@@ -455,6 +464,8 @@ class OrderSubmitForm extends ApiModel
         return [
             'total_price' => $total_price,
             'list' => [$goods_item],
+//            'level_price' => $goods_attr_info['level_price']
+            'level_price' => $levelPrice
         ];
     }
 

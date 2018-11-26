@@ -52,6 +52,11 @@ class LoNoticeSender
         }
 
         foreach ($order_list as $order) {
+            if(!$order['form_id']){
+                $order['form_id'] = LotteryLog::find()->select('form_id')
+                ->where(['store_id' => $this->store_id,'child_id' => 0,'user_id' => $order['user_id'],'lottery_id' => $order['lottery_id']])->column()[0];
+            }
+
             if (!$order['form_id']) {
                 \Yii::warning("抽奖记录(id={$order['id']})未发送模板消息，form_id不存在");
                 continue;
@@ -65,13 +70,10 @@ class LoNoticeSender
             }
 
             $name = $order['gname'];
-            if (strlen($name) > 50) {
-                $name = substr_replace($name, '...', 50);
-            };
             $data = [
                 'touser' => $order['wechat_open_id'],
                 'template_id' => $is_alipay ? $tpl_id_alipay : $tpl_id,
-                'page' => '/lottery/detail/detail?id='.$order['id'],
+                'page' => 'lottery/detail/detail?id='.$order['id'],
                 'form_id' => $order['form_id'],
                 'data' => [
                     'keyword1' => [
@@ -116,8 +118,6 @@ class LoNoticeSender
             $data = json_encode($data, JSON_UNESCAPED_UNICODE);
             $this->wechat->curl->post($api, $data);
             $res = json_decode($this->wechat->curl->response, true);
-            $this->form_id->send_count = $this->form_id->send_count + 1;
-            $this->form_id->save();
 
             if (!empty($res['errcode']) && $res['errcode'] != 0) {
 

@@ -96,7 +96,7 @@ $this->title = '发送模板消息';
                             <span class="label-icon"></span>
                             <span class="label-text">所有用户</span>
                         </label>
-                        <span class="text-muted">（所发送给所有已关注公众号的用户）</span>
+                        <span class="text-muted">（发送给所有近期活跃的商城用户）</span>
                     </div>
                     <template v-if="send_all">
                         <div class="input-group">
@@ -129,7 +129,11 @@ $this->title = '发送模板消息';
                                             <span class="mr-3">ID:{{user.id}}</span>
                                             <span>昵称:{{user.nickname}}</span>
                                         </div>
-                                        <div class="fs-sm text-muted">公众号OpenID：{{user.wechat_platform_open_id}}</div>
+                                        <div v-if="user.form_id" class="fs-sm text-muted">
+                                            用户FormId：{{user.form_id}}
+                                        </div>
+                                        <div v-else class="fs-sm text-muted"><span style="color: red;">FormId为空，用户无法接收模板消息</span>
+                                        </div>
                                     </div>
                                 </div>
                             </template>
@@ -150,9 +154,11 @@ $this->title = '发送模板消息';
                         <div>
                             <div>
                                 <span class="mr-3">ID:{{user.id}}</span>
-                                <span>昵称:{{user.nickname}}</span>
+                                <span>FormId:{{user.form_id}}</span>
                             </div>
-                            <div class="fs-sm text-muted">公众号OpenID：{{user.wechat_platform_open_id}}</div>
+                            <div v-if='user.form_id' class="fs-sm text-muted">FomrId：{{user.form_id}}</div>
+                            <div v-else class="fs-sm text-muted"><span style="color: red;">FormId为空，用户无法接收模板消息</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -172,7 +178,7 @@ $this->title = '发送模板消息';
                                 <li class="list-group-item">
                                     <div class="w-100" flex="dir:left box:last">
                                         <div>
-                                            <div>{{tpl.name}}</div>
+                                            <div>{{tpl.name}}{{tpl.title_style == 1 ? "（首行大标题）" : '（首行小标题）'}}</div>
                                             <div class="fs-sm text-muted">{{tpl.tpl_id}}</div>
                                         </div>
                                         <div class="float-right">
@@ -203,30 +209,30 @@ $this->title = '发送模板消息';
                                                 </div>
                                             </template>
                                         </div>
+<!--                                        <div class="my-2" flex="dir:left box:first">-->
+<!--                                            <div class="col-form-label">网址：</div>-->
+<!--                                            <div>-->
+<!--                                                <input class="form-control" v-model="tpl.url"-->
+<!--                                                       placeholder="输入网址">-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+<!--                                        <div class="my-2" flex="dir:left box:first">-->
+<!--                                            <div class="col-form-label">小程序AppId：</div>-->
+<!--                                            <div>-->
+<!--                                                <input class="form-control" v-model="tpl.miniprogram.appid"-->
+<!--                                                       placeholder="输入小程序AppId">-->
+<!--                                            </div>-->
+<!--                                        </div>-->
                                         <div class="my-2" flex="dir:left box:first">
-                                            <div class="col-form-label">网址：</div>
-                                            <div>
-                                                <input class="form-control" v-model="tpl.url"
-                                                       placeholder="输入网址">
-                                            </div>
-                                        </div>
-                                        <div class="my-2" flex="dir:left box:first">
-                                            <div class="col-form-label">小程序AppId：</div>
-                                            <div>
-                                                <input class="form-control" v-model="tpl.miniprogram.appid"
-                                                       placeholder="输入小程序AppId">
-                                            </div>
-                                        </div>
-                                        <div class="my-2" flex="dir:left box:first">
-                                            <div class="col-form-label">小程序AppId：</div>
+                                            <div class="col-form-label">小程序页面：</div>
                                             <div>
                                                 <input class="form-control" v-model="tpl.miniprogram.pagepath"
                                                        placeholder="小程序页面，如：pages/index/index?id=1">
                                             </div>
                                         </div>
-                                        <div class="my-2 text-muted">
-                                            网址跳转和小程序跳转只能二选一，两者都填会优先跳转小程序，该小程序appid必须与发模板消息的公众号是绑定关联关系。
-                                        </div>
+<!--                                        <div class="my-2 text-muted">-->
+<!--                                            网址跳转和小程序跳转只能二选一，两者都填会优先跳转小程序，该小程序appid必须与发模板消息的公众号是绑定关联关系。-->
+<!--                                        </div>-->
                                     </div>
                                 </li>
                             </ul>
@@ -289,7 +295,7 @@ $this->title = '发送模板消息';
 
                     <div class="form-group row">
                         <div class="form-group-label col-sm-3">
-                            <label class="col-form-label">模板名称</label>
+                            <label class="col-form-label required">模板名称</label>
                         </div>
                         <div class="col-sm-9">
                             <input class="form-control" v-model="edit_tpl.name">
@@ -297,10 +303,33 @@ $this->title = '发送模板消息';
                     </div>
                     <div class="form-group row">
                         <div class="form-group-label col-sm-3">
-                            <label class="col-form-label">模板ID</label>
+                            <label class="col-form-label required">模板ID</label>
                         </div>
                         <div class="col-sm-9">
                             <input class="form-control" v-model="edit_tpl.tpl_id">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="form-group-label col-sm-3">
+                            <label class="col-form-label">首行样式</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="radio-label">
+                                <input id="radio2"
+                                       value="0"
+                                       v-model="edit_tpl.title_style"
+                                       name="title_style" type="radio" class="custom-control-input">
+                                <span class="label-icon"></span>
+                                <span class="label-text">小标题</span>
+                            </label>
+                            <label class="radio-label">
+                                <input id="radio2"
+                                       value="1"
+                                       v-model="edit_tpl.title_style"
+                                       name="title_style" type="radio" class="custom-control-input">
+                                <span class="label-icon"></span>
+                                <span class="label-text">大标题</span>
+                            </label>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -309,14 +338,10 @@ $this->title = '发送模板消息';
                         </div>
                         <div class="col-sm-9">
                             <div class="mb-1 fs-sm" flex="dir:left">
-                                <div class="pr-1 w-50">字段:<br>如first/keyword1/remark</div>
                                 <div class="w-50">字段名:<br>如标题/时间/内容</div>
                             </div>
                             <template v-for="(map,i) in edit_tpl.maps">
                                 <div class="mb-1 map-row" flex="dir:left">
-                                    <div class="pr-1">
-                                        <input class="form-control" v-model="map.key">
-                                    </div>
                                     <div>
                                         <input class="form-control" v-model="map.name">
                                     </div>
@@ -348,6 +373,7 @@ $this->title = '发送模板消息';
             open_id_list: [{value: ''}],
             user_list: [],
             edit_tpl: {
+                title_style: 0,
                 name: '',
                 tpl_id: '',
                 url: '',
@@ -356,11 +382,6 @@ $this->title = '发送模板消息';
                     pagepath: '',
                 },
                 maps: [
-                    {
-                        key: 'first',
-                        name: '标题',
-                        value: '',
-                    },
                     {
                         key: 'keyword1',
                         name: '字段1',
@@ -372,8 +393,13 @@ $this->title = '发送模板消息';
                         value: '',
                     },
                     {
-                        key: 'remark',
-                        name: '备注',
+                        key: 'keyword3',
+                        name: '字段3',
+                        value: '',
+                    },
+                    {
+                        key: 'keyword4',
+                        name: '字段4',
                         value: '',
                     },
                 ],
@@ -483,6 +509,19 @@ $this->title = '发送模板消息';
     //添加模板
     $(document).on('click', '.add-tpl-btn', function () {
         var btn = $(this);
+        var tpl = app.edit_tpl;
+        if (!tpl.name) {
+            $.toast({
+                content: '请填写模板名称',
+            });
+            return;
+        }
+        if (!tpl.tpl_id) {
+            $.toast({
+                content: '请填写模板ID',
+            });
+            return;
+        }
         btn.btnLoading();
         $.ajax({
             url: '<?=Yii::$app->urlManager->createUrl(['mch/wechat-platform/add-tpl'])?>',
@@ -544,7 +583,10 @@ $this->title = '发送模板消息';
         var btn = $(this);
         var open_id_list = [];
         for (var i in app.user_list) {
-            open_id_list.push(app.user_list[i].wechat_platform_open_id);
+            open_id_list.push({
+                'wechat_open_id': app.user_list[i].wechat_open_id,
+                'form_id': app.user_list[i].form_id
+            });
         }
         if (open_id_list.length === 0 && !app.send_all) {
             $.alert({
@@ -558,6 +600,7 @@ $this->title = '发送模板消息';
             });
             return;
         }
+
         btn.btnLoading();
         $.ajax({
             type: 'post',

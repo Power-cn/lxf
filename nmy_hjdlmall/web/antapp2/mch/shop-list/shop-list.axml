@@ -47,10 +47,12 @@
                 </view>
                 <view class="goods-list">
                     <block a:if="{{item.goods_list && item.goods_list.length}}">
-                        <navigator a:for="{{item.goods_list}}" a:key="{{item.id}}" class="goods-item" url="/pages/goods/goods?id={{item.id}}">
-                            <image src="{{item.cover_pic}}" style="width: 220rpx;height: 220rpx;"></image>
-                            <view>￥{{item.price}}</view>
-                        </navigator>
+                        <scroll-view scroll-x style="width:100%;white-space: nowrap;">
+                            <navigator a:for="{{item.goods_list}}" a:key="{{item.id}}" class="goods-item" url="/pages/goods/goods?id={{item.id}}">
+                                <image src="{{item.cover_pic}}" style="width: 220rpx;height: 220rpx;"></image>
+                                <view>￥{{item.price}}</view>
+                            </navigator>
+                        </scroll-view>
                     </block>
                     <view a:else style="padding: 24rpx;color: #888;font-size: 9pt;text-align: center;">暂无商品</view>
                 </view>

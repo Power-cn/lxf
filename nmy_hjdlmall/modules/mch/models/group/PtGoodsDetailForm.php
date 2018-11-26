@@ -35,6 +35,7 @@ class PtGoodsDetailForm extends MchModel
     public $single_share_commission_first;
     public $single_share_commission_second;
     public $single_share_commission_third;
+    public $is_level;
 
     /**
      * @inheritdoc
@@ -51,7 +52,7 @@ class PtGoodsDetailForm extends MchModel
     {
         return [
             [['store_id', 'group_num', 'group_time', 'colonel'], 'required'],
-            [['store_id', 'group_num', 'goods_id', 'group_time'], 'integer'],
+            [['store_id', 'group_num', 'goods_id', 'group_time', 'is_level'], 'integer'],
             [['colonel'], 'number', 'min' => 0],
             [['group_num',], 'integer', 'min' => 2, 'max' => 10000],
             [['group_time',], 'integer', 'min' => 0, 'max' => 10000],
@@ -84,6 +85,7 @@ class PtGoodsDetailForm extends MchModel
             'single_share_commission_first' => '一级佣金',
             'single_share_commission_second' => '二级佣金',
             'single_share_commission_third' => '三级佣金',
+            'is_level' => '会员折扣'
         ];
     }
 
@@ -123,6 +125,7 @@ class PtGoodsDetailForm extends MchModel
         $this->model->colonel = $this->colonel;
         $this->model->group_num = $this->group_num;
         $this->model->group_time = $this->group_time;
+        $this->model->is_level = $this->is_level;
 
         if ($this->goods_id) {
             $this->model->goods_id = $this->goods_id;
@@ -239,6 +242,7 @@ class PtGoodsDetailForm extends MchModel
                 'attr_list' => [],
                 'num' => intval($item['num']),
                 'price' => doubleval($item['price']),
+                'single' => doubleval($item['single']),
                 'pic' => $item['pic'] ? $item['pic'] : '',
                 'share_commission_first' => $item['share_commission_first'] ? $item['share_commission_first'] : '',
                 'share_commission_second' => $item['share_commission_second'] ? $item['share_commission_second'] : '',

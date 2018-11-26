@@ -197,6 +197,7 @@ Page({
             fail: function (res) {
                 getApp().getauth({
                     content: "需要获取您的地理位置授权，请到小程序设置中打开授权",
+                    author:'scope.userLocation',
                     success: function (e) {
                         if (e) {
                             if (e.authSetting["scope.userLocation"]) {

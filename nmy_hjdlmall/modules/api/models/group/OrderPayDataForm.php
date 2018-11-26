@@ -8,29 +8,20 @@
 
 namespace app\modules\api\models\group;
 
+use app\models\common\api\CommonOrder;
 use app\utils\PayNotify;
-use app\utils\PrinterPtOrder;
-use app\utils\SendMail;
-use app\utils\Sms;
 use app\models\FormId;
-use app\models\Goods;
 use app\models\GoodsShare;
-use app\models\Order;
-use app\models\OrderDetail;
-use app\models\OrderMessage;
 use app\models\OrderShare;
 use app\models\OrderWarn;
-use app\models\PrinterSetting;
 use app\models\PtGoods;
 use app\models\PtOrder;
 use app\models\PtOrderDetail;
 use app\models\PtSetting;
 use app\models\Setting;
 use app\models\User;
-use app\models\UserAccountLog;
 use app\modules\api\models\ApiModel;
 use app\modules\api\models\ShareMoneyForm;
-use yii\helpers\VarDumper;
 use app\models\PtGoodsDetail;
 use Alipay\AlipayRequestFactory;
 
@@ -48,28 +39,30 @@ class OrderPayDataForm extends ApiModel
 
     private $wechat;
     private $order;
+    public $parent_user_id;
 
     public function rules()
     {
         return [
             [['order_id', 'pay_type',], 'required'],
             [['pay_type'], 'in', 'range' => ['ALIPAY', 'WECHAT_PAY', 'HUODAO_PAY', 'BALANCE_PAY']],
-            [['form_id'],'string']
+            [['form_id'], 'string'],
+            [['parent_user_id'], 'integer']
         ];
     }
 
     public function search()
     {
         $order = PtOrder::findOne(['id' => $this->order_id, 'store_id' => $this->store_id]);
-        $orderDetail = PtOrderDetail::find()->where(['order_id'=>$order->id])->with('goods')->one();
-        /* @var \app\models\ptGoods $goods*/
+        $orderDetail = PtOrderDetail::find()->where(['order_id' => $order->id])->with('goods')->one();
+        /* @var \app\models\ptGoods $goods */
         $goods = $orderDetail->goods;
-        if($goods->buy_limit > 0){
-            $orderNum = PtOrder::getCount($goods->id,$order->user_id);
+        if ($goods->buy_limit > 0) {
+            $orderNum = PtOrder::getCount($goods->id, $order->user_id);
             if ($orderNum >= $goods->buy_limit) {
                 return [
-                    'code'  => 1,
-                    'msg'   => '您已超过该商品购买次数',
+                    'code' => 1,
+                    'msg' => '您已超过该商品购买次数',
                 ];
             }
         }
@@ -123,7 +116,7 @@ class OrderPayDataForm extends ApiModel
                         'out_trade_no' => $this->order->order_no, // 商户网站唯一订单号
                         'total_amount' => $this->order->pay_price, // 订单总金额，单位为元，精确到小数点后两位，取值范围 [0.01,100000000]
                         'buyer_id' => $this->user->wechat_open_id, // 购买人的支付宝用户 ID
-                        
+
                     ],
                 ]);
 
@@ -138,7 +131,7 @@ class OrderPayDataForm extends ApiModel
                     'body' => $goods_names,
                 ];
             }
-            
+
             $res = $this->unifiedOrder($goods_names);
             if (isset($res['code']) && $res['code'] == 1) {
                 return $res;
@@ -153,6 +146,8 @@ class OrderPayDataForm extends ApiModel
                 'type' => 'prepay_id',
                 'order_no' => $this->order->order_no,
             ]);
+
+            $commonOrder = CommonOrder::saveParentId($this->parent_user_id);
 
             $pay_data = [
                 'appId' => $this->wechat->appId,
@@ -215,12 +210,12 @@ class OrderPayDataForm extends ApiModel
 
 
                 if ($order->class_group) {
-                    $group = PtGoodsDetail::findOne(['id'=>$order->class_group,'store_id'=>$this->store_id]);
-                    $order->limit_time = (time() + (int)$group->group_time*3600);
+                    $group = PtGoodsDetail::findOne(['id' => $order->class_group, 'store_id' => $this->store_id]);
+                    $order->limit_time = (time() + (int)$group->group_time * 3600);
                 } else {
-                    $order->limit_time = (time() + (int)$goods->grouptime*3600);
+                    $order->limit_time = (time() + (int)$goods->grouptime * 3600);
                 }
-            } elseif ($order->is_group==1) {
+            } elseif ($order->is_group == 1) {
                 // 团购-参团
                 $pid = $order->parent_id;
                 $parentOrder = PtOrder::findOne([
@@ -366,7 +361,7 @@ class OrderPayDataForm extends ApiModel
         if (!$user) {
             return;
         }
-        $order = OrderShare::findOne(['order_id' => $pt_order->id, 'type' => $type, 'is_delete' => 0,'store_id'=>$this->store_id]);
+        $order = OrderShare::findOne(['order_id' => $pt_order->id, 'type' => $type, 'is_delete' => 0, 'store_id' => $this->store_id]);
         if (!$order) {
             $order = new OrderShare();
             $order->order_id = $pt_order->id;
@@ -391,10 +386,10 @@ class OrderPayDataForm extends ApiModel
             $order->parent_id_3 = -1;
         }
 
-        $order_detail_list = PtOrderDetail::find()->alias('od')->leftJoin(['g' => GoodsShare::tableName()], 'od.goods_id=g.goods_id and g.type = '.$type)
+        $order_detail_list = PtOrderDetail::find()->alias('od')->leftJoin(['g' => GoodsShare::tableName()], 'od.goods_id=g.goods_id and g.type = ' . $type)
             ->where(['od.is_delete' => 0, 'od.order_id' => $pt_order->id])
             ->asArray()
-            ->select(['od.*','g.*'])
+            ->select(['od.*', 'g.*'])
             ->all();
         $share_commission_money_first = 0;//一级分销总佣金
         $share_commission_money_second = 0;//二级分销总佣金

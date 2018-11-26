@@ -9,6 +9,7 @@
 namespace app\modules\mch\models\mch;
 
 use app\models\Mch;
+use app\models\Model;
 use app\models\User;
 use app\modules\mch\models\MchModel;
 use yii\data\Pagination;
@@ -21,11 +22,12 @@ class MchListForm extends MchModel
     public $limit;
     public $keyword;
     public $platform;//所属平台
+    public $mch_id;
 
     public function rules()
     {
         return [
-            [['review_status', 'page', 'limit'], 'integer'],
+            [['review_status', 'page', 'limit', 'mch_id'], 'integer'],
             [['keyword',], 'trim'],
             [['page',], 'default', 'value' => 1,],
             [['limit',], 'default', 'value' => 20,],
@@ -70,6 +72,24 @@ class MchListForm extends MchModel
                 'pagination' => $pagination,
                 'adminUrl' => $this->getAdminUrl('mch')
             ],
+        ];
+    }
+
+    public function delete()
+    {
+        $mch = Mch::findOne($this->mch_id);
+        $mch->is_delete = Model::IS_DELETE_TRUE;
+
+        if ($mch->save()) {
+            return [
+                'code' => 0,
+                'msg' => '删除成功',
+            ];
+        }
+
+        return [
+            'code' => 1,
+            'msg' => '删除失败',
         ];
     }
 }

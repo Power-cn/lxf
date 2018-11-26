@@ -192,6 +192,7 @@ Page({
                         if (!r.authSetting['scope.writePhotosAlbum']) {
                             getApp().getauth({
                                 content: "小程序需要授权保存到相册",
+                                author:'scope.writePhotosAlbum',
                                 success: function (res) {
                                     if (res) {
                                         self.saveImg(e);

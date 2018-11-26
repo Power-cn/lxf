@@ -8,6 +8,7 @@ Page({
      * 页面的初始数据
      */
     data: {
+        isPageShow: false,
         pageType: 'STORE',
         order_refund: null,
         express_index: null,
@@ -31,6 +32,7 @@ Page({
                 if (res.code == 0) {
                     self.setData({
                         order_refund: res.data,
+                        isPageShow: true,
                     });
                 }
             },

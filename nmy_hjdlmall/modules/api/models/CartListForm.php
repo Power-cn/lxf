@@ -98,7 +98,12 @@ class CartListForm extends ApiModel
                 ->asArray()->all();
 
 //            $goods_attr_info = $goods->getAttrInfo();
-            $goods_attr_info = CommonGoods::currentGoodsAttr($goods, json_decode($item->attr, true));
+            $goodsData = [
+              'attr' => $goods->attr,
+              'price' => $goods->price,
+              'is_level' => $goods->is_level,
+            ];
+            $goods_attr_info = CommonGoods::currentGoodsAttr($goodsData, json_decode($item->attr, true));
 
             $attr_num = intval(empty($goods_attr_info['num']) ? 0 : $goods_attr_info['num']);
             $goods_pic = isset($goods_attr_info['pic']) ? $goods_attr_info['pic'] ?: $goods->getGoodsPic(0)->pic_url : $goods->getGoodsPic(0)->pic_url;

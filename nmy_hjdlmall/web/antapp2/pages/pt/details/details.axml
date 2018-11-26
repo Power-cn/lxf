@@ -7,14 +7,19 @@
         <include src="/components/goods/specifications_model.axml" />
         <view class="{{show_attr_picker?'no-scroll':''}} {{pt_detail?'pt-modal-bj':''}}">
             <include src="/components/goods/goods_banner.axml" />
-            
+
             <!-- 限时抢购 -->
             <view class='time-limit flex-row' a:if='{{goods.limit_time>0}}'>
                 <view class='flex-grow-0 flex-y-center flex-x-center'>
                     <image src='{{__wxapp_img.pt.details.url}}'></image>
                 </view>
-                <view class='flex-grow-1 time-limit-logo-text'>
-                    限时火拼・超值低价
+                <view class='flex-grow-1 flex-col flex-x-center time-limit-logo-text'>
+                    <view class='flex-grow-0'>
+                        限时火拼
+                    </view>
+                    <view style='margin-left:50rpx;' class='flex-grow-0'>
+                        超值低价
+                    </view>
                 </view>
                 <view class='flex-grow-1 flex-col flex-y-center flex-x-center'>
                     <view class='flex-grow-0 time-top-text'>
@@ -66,36 +71,36 @@
             </view>
 
             <view a:if="{{group_num > 0}}" class="friend-group" style="padding-bottom:10rpx">
-                    <view class="flex-y-center">
-                        <view class='friend-group-title flex-row  flex-grow-1'>
-                            以下小伙伴正在发起拼团，您可以直接参与:
+                <view class="flex-y-center">
+                    <view class='friend-group-title flex-row  flex-grow-1'>
+                        以下小伙伴正在发起拼团，您可以直接参与:
+                    </view>
+                    <view onTap="more" class='pt-rule-right flex-grow-0 flex-y-center'>
+                        更多
+                    </view>
+                    <view class='pt-rule-more flex-grow-0 flex-y-center'>
+                        <image src='{{__wxapp_img.share.right.url}}'></image>
+                    </view>
+                </view>
+                <view class='friend-group-item flex-row flex-y-center' a:for="{{group_list}}" a:key="{{item.id}}" a:if="{{index<3}}">
+                    <view class='friend-corver-pic flex-grow-0 flex-y-center'>
+                        <image src='{{item.avatar_url}}'></image>
+                    </view>
+                    <view class='friend-name flex-grow-1 flex-y-center'>
+                        {{item.nickname}}
+                    </view>
+                    <view class='flex-grow-0 flex-col'>
+                        <view class='flex-grow-0 group-short' style="text-align:right">
+                            还差{{item.surplus}}人成团
                         </view>
-                        <view onTap="more" class='pt-rule-right flex-grow-0 flex-y-center'>
-                            更多
-                        </view>
-                        <view class='pt-rule-more flex-grow-0 flex-y-center'>
-                            <image src='{{__wxapp_img.share.right.url}}'></image>
+                        <view class='flex-grow-0 group-short-time'>
+                            还剩 {{item.limit_time.days}}:{{item.limit_time.hours}}:{{item.limit_time.mins}}:{{item.limit_time.secs}}
                         </view>
                     </view>
-                    <view class='friend-group-item flex-row flex-y-center' a:for="{{group_list}}" a:key="{{item.id}}" a:if="{{index<3}}">
-                        <view class='friend-corver-pic flex-grow-0 flex-y-center'>
-                            <image src='{{item.avatar_url}}'></image>
-                        </view>
-                        <view class='friend-name flex-grow-1 flex-y-center'>
-                            {{item.nickname}}
-                        </view>
-                        <view class='flex-grow-0 flex-col'>
-                            <view class='flex-grow-0 group-short' style="text-align:right">
-                                还差{{item.surplus}}人成团
-                            </view>
-                            <view class='flex-grow-0 group-short-time'>
-                                还剩 {{item.limit_time.days}}:{{item.limit_time.hours}}:{{item.limit_time.mins}}:{{item.limit_time.secs}}
-                            </view>
-                        </view>
-                        <view class='flex-grow-0 go-offered flex-y-center flex-x-center' onTap='goToGroup' data-id='{{item.id}}'>
-                            去参团
-                        </view>
+                    <view class='flex-grow-0 go-offered flex-y-center flex-x-center' onTap='goToGroup' data-id='{{item.id}}'>
+                        去参团
                     </view>
+                </view>
             </view>
 
             <!--     商品评论     -->
@@ -148,7 +153,7 @@
 
             <include src="/components/goods/goods_buy" />
         </view>
-        
+
         <!-- 弹窗 pt_detail-->
         <view a:if="{{pt_detail}}" class="model-award">
             <view class="act-modal show">

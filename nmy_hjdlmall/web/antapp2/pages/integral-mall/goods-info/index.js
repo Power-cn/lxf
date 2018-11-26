@@ -61,6 +61,8 @@ Page({
                         goods: res.data.goods,
                         attr_group_list: res.data.attr_group_list,
                     });
+
+                    self.selectDefaultAttr();
                 } else {
                     getApp().core.showModal({
                         title: '提示',

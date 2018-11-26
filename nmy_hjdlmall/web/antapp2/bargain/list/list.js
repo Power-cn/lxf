@@ -159,6 +159,7 @@ Page({
      * 用户点击右上角分享
      */
     onShareAppMessage: function () {
+        getApp().page.onShareAppMessage(this);
         var self = this;
         var res = {
             path: "/bargain/list/list?user_id=" + self.data.__user_info.id,

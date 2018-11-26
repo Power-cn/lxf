@@ -41,8 +41,10 @@ class GoodsAttrInfoForm extends ApiModel
         } elseif ($this->type == 'ms') {
             $miaosha_goods = MiaoshaGoods::findOne([
                 'id' => $this->goods_id,
+                'store_id' => $this->getCurrentStoreId(),
                 'is_delete' => 0,
             ]);
+
             $goods = MsGoods::findOne($miaosha_goods->goods_id);
             $this->miaosha_goods = $miaosha_goods;
         }
@@ -52,17 +54,32 @@ class GoodsAttrInfoForm extends ApiModel
 //        $res = $goods->getAttrInfo($this->attr_list);
 
         if ($this->type == 'ms') {
-            $miaosha_data = CommonGoods::currentGoodsAttr($miaosha_goods, $this->attr_list, [
+            $goodsData = [
+                'attr' => $miaosha_goods->attr,
+                'price' => $goods->original_price,
+                // 'is_level' => $goods->is_discount,
+                'is_level' => $miaosha_goods->is_level,
+            ];
+            $otherData = [
                 'type' => 'MIAOSHA',
-                'original_price' => $goods->original_price
-            ]);
+                'original_price' => $goods->original_price,
+                'id' => $miaosha_goods->id,
+            ];
+            $miaosha_data = CommonGoods::currentGoodsAttr($goodsData, $this->attr_list, $otherData);
         } else {
-            $res = CommonGoods::currentGoodsAttr($goods, $this->attr_list);
+            $goodsData = [
+                'attr' => $goods->attr,
+                'price' => $goods->price,
+                'is_level' => $goods->is_level,
+                'mch_id' => $goods->mch_id,
+            ];
+            $res = CommonGoods::currentGoodsAttr($goodsData, $this->attr_list);
         }
+
 //        $miaosha_data = $this->getMiaoshaData($goods, $this->attr_list);
         if ($miaosha_data) {
-            $miaosha_data['miaosha_price'] = number_format($miaosha_data['miaosha_price'], 2, '.', '');
-            $miaosha_data['rest_num'] = min((int)$res['num'], ((int)$miaosha_data['miaosha_num'] - $miaosha_data['sell_num']));
+            $miaosha_data['miaosha_price'] = sprintf('%.2f', $miaosha_data['miaosha_price']);
+            $miaosha_data['rest_num'] = min((int)$miaosha_data['num'], ((int)$miaosha_data['miaosha_num'] - $miaosha_data['sell_num']));
         }
         $res['miaosha'] = $miaosha_data;
         return new ApiResponse(0, 'success', $res);

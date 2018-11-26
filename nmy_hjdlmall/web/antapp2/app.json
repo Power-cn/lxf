@@ -117,6 +117,7 @@
         "mch/shop-cat/shop-cat",
         "mch/m/cash/cash",
         "mch/m/settle_detail/settle_detail",
+        "mch/shop-summary/shop-summary",
         "pond/pond/pond",
         "pond/prize/prize",
         "pond/rule/rule",
@@ -131,7 +132,9 @@
         "lottery/index/index",
         "lottery/detail/detail",
         "lottery/goods/goods",
-        "lottery/prize/prize"
+        "lottery/prize/prize",
+        "lottery/rule/rule",
+        "lottery/lucky-code/lucky-code"
     ],
     "window": {
         "backgroundTextStyle": "light",

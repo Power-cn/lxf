@@ -57,6 +57,9 @@ $this->title = '商品管理';
                             <label class="switch-label" style="line-height: inherit">
                                 <?php if ($item->status == 1) : ?>
                                     <span class="label-text">上架</span>
+                                    <span>|</span>
+                                    <a class="goods-status-switch-0" data-id="<?= $item->id?>"
+                                       href="javascript:">下架</a>
                                 <?php else : ?>
                                     <a class="apply"
                                        href="<?= Yii::$app->urlManager->createUrl(['user/mch/goods/apply', 'id' => $item->id]) ?>">申请上架</a>
@@ -215,5 +218,29 @@ $this->title = '商品管理';
             }
         });
         return false;
+    });
+
+    $(document).on('click', '.goods-status-switch-0', function () {
+        var checkbox = $(this);
+        var id = checkbox.attr('data-id');
+        $.loading('正在处理');
+        $.ajax({
+            url: '<?=Yii::$app->urlManager->createUrl(['user/mch/goods/set-status'])?>',
+            data: {
+                id: id,
+                status: 0,
+            },
+            dataType: 'json',
+            success: function (res) {
+                $.loadingHide();
+                if (res.code != 0) {
+                } else {
+                    $.toast({
+                        content: res.msg,
+                    });
+                    location.reload();
+                }
+            }
+        });
     });
 </script>

@@ -17,6 +17,7 @@ use Yii;
  * @property integer $is_delete
  * @property integer $buy_max
  * @property string $buy_limit
+ * @property string $is_level;
  */
 class MiaoshaGoods extends \yii\db\ActiveRecord
 {
@@ -35,7 +36,7 @@ class MiaoshaGoods extends \yii\db\ActiveRecord
     {
         return [
             [['store_id', 'goods_id', 'start_time', 'open_date', 'attr'], 'required'],
-            [['store_id', 'goods_id', 'start_time', 'is_delete', 'buy_max', 'buy_limit'], 'integer'],
+            [['store_id', 'goods_id', 'start_time', 'is_delete', 'buy_max', 'buy_limit', 'is_level'], 'integer'],
             [['open_date'], 'safe'],
             [['attr'], 'string'],
         ];
@@ -56,6 +57,7 @@ class MiaoshaGoods extends \yii\db\ActiveRecord
             'is_delete' => 'Is Delete',
             'buy_max' => '限购数量，0=不限购',
             'buy_limit' => '限单',
+            'is_level' => '会员折扣',
         ];
     }
 

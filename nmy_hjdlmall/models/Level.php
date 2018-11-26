@@ -26,6 +26,16 @@ use Yii;
 class Level extends \yii\db\ActiveRecord
 {
     /**
+     * 会员禁用状态：禁用
+     */
+    const STATUS_FALSE = 0;
+
+    /**
+     * 会员禁用状态：启用
+     */
+    const STATUS_TRUE = 1;
+
+    /**
      * @inheritdoc
      */
     public static function tableName()

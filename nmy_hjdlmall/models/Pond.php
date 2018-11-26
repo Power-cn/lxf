@@ -20,6 +20,7 @@ use Yii;
  * @property integer $create_time
  * @property integer $update_time
  * @property string $attr
+ * @property string $name
  */
 class Pond extends \yii\db\ActiveRecord
 {
@@ -41,7 +42,7 @@ class Pond extends \yii\db\ActiveRecord
             [['store_id'], 'required'],
             [['store_id', 'type', 'num', 'stock', 'orderby', 'coupon_id', 'gift_id', 'create_time', 'update_time'], 'integer'],
             [['price'], 'number'],
-            [['image_url', 'attr'], 'string', 'max' => 255],
+            [['image_url', 'attr', 'name'], 'string', 'max' => 255],
         ];
     }
 
@@ -64,6 +65,7 @@ class Pond extends \yii\db\ActiveRecord
             'create_time' => 'Create Time',
             'update_time' => 'Update Time',
             'attr' => '规格',
+            'name' => '别名'
         ];
     }
     public function getCoupon()

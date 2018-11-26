@@ -121,6 +121,8 @@ $urlPlatform = Yii::$app->controller->route;
                             <a href="<?= $urlManager->createUrl(['mch/mch/index/edit', 'id' => $item['id']]) ?>">管理</a>
                             |
                             <a href="<?= $urlManager->createUrl(['mch/mch/index/mch-setting', 'id' => $item['id']]) ?>">设置</a>
+                            |
+                            <a class="del" href="<?= $urlManager->createUrl(['mch/mch/index/mch-del', 'id' => $item['id']]) ?>">删除</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -157,4 +159,22 @@ $urlPlatform = Yii::$app->controller->route;
             }
         });
     });
+
+    $(document).on('click', '.del', function () {
+        if (confirm("是否删除？")) {
+            $.ajax({
+                url: $(this).attr('href'),
+                type: 'get',
+                dataType: 'json',
+                success: function (res) {
+                    alert(res.msg);
+                    if (res.code == 0) {
+                        window.location.reload();
+                    }
+                }
+            });
+        }
+        return false;
+    });
+
 </script>

@@ -72,7 +72,7 @@ class AlipayController extends Controller
             // 根据插件权限显示
             $plugin = $this->getUserAuth();
             // 有模板消息功能的插件
-            $tplMsgPlugin = ['store', 'share', 'pintuan', 'book', 'mch', 'fxhb'];
+            $tplMsgPlugin = ['store', 'share', 'pintuan', 'book', 'mch', 'fxhb', 'lottery', 'bargain'];
             // 这里是为了防止数据库没有相应插件的数据，导致前端不显示
             foreach ($plugin as $item) {
                 if (in_array($item, $tplMsgPlugin)) {
@@ -90,6 +90,11 @@ class AlipayController extends Controller
                 } else {
                     $newData[$k]['is_show'] = false;
                 }
+            }
+
+            // 参与活动通用模板，只要有相应插件用到都应显示
+            if (in_array('bargain', $plugin)) {
+                $newData['activity']['is_show'] = true;
             }
 
             return $this->render('template-msg', [

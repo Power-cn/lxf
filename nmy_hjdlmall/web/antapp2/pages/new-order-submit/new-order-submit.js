@@ -91,33 +91,31 @@ Page({
 
     dingwei: function() {
         var self = this;
-        getApp().core.chooseLocation({
-            success: function(e) {
-                longitude = e.longitude;
-                latitude = e.latitude;
-                self.setData({
-                    location: e.address,
-                });
-                self.getOrderData(self.data.options);
-            },
-            fail: function(res) {
-                getApp().getauth({
-                    content: "需要获取您的地理位置授权，请到小程序设置中打开授权",
-                    success: function(e) {
-                        if (e) {
-                            if (e.authSetting["scope.userLocation"]) {
-                                self.dingwei();
-                            } else {
-                                getApp().core.showToast({
-                                    title: '您取消了授权',
-                                    image: "/images/icon-warning.png",
-                                })
+        getApp().getauth({
+            content: "需要获取您的地理位置授权，请到小程序设置中打开授权",
+            author: "scope.userLocation",
+            success: function (e) {
+                if (e) {
+                    if (e.authSetting["scope.userLocation"]) {
+                        getApp().core.chooseLocation({
+                            success: function (e) {
+                                longitude = e.longitude;
+                                latitude = e.latitude;
+                                self.setData({
+                                    location: e.address,
+                                });
+                                self.getOrderData(self.data.options);
                             }
-                        }
+                        })
+                    } else {
+                        getApp().core.showToast({
+                            title: '您取消了授权',
+                            image: "/images/icon-warning.png",
+                        })
                     }
-                });
+                }
             }
-        })
+        });
     },
 
     orderSubmit: function(e) {
@@ -523,7 +521,7 @@ Page({
         }
         new_total_price = new_total_price >= 0 ? new_total_price : 0;
         self.setData({
-            new_total_price: parseFloat(new_total_price.toFixed(2)),
+            new_total_price: new_total_price.toFixed(2),
             offer_rule: offer_rule,
             is_area: is_area
         });

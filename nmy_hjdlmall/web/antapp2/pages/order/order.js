@@ -91,7 +91,7 @@ Page({
             url: getApp().api.order.list,
             data: {
                 status: self.data.status,
-                self: p,
+                page: p,
             },
             success: function (res) {
                 if (res.code == 0) {

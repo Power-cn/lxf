@@ -36,6 +36,7 @@ class PtGoodsAttrInfoForm extends ApiModel
         }
         $this->attr_list = json_decode($this->attr_list, true);
         $goods = PtGoods::findOne($this->goods_id);
+        $ptGoods = $goods;
         if (!$goods) {
             return [
                 'code' => 1,
@@ -47,8 +48,21 @@ class PtGoodsAttrInfoForm extends ApiModel
 
         if ($this->group_id) {
             $goods = PtGoodsDetail::find()->where(['store_id' => $this->getCurrentStoreId(), 'id' => $this->group_id])->one();
+
         }
-        $res = CommonGoods::currentGoodsAttr($goods, $this->attr_list, ['type' => 'PINTUAN']);
+
+        $otherData = [
+            'type' => 'PINTUAN',
+            'single_price' => $ptGoods['original_price'],
+            'order_type' => $this->group_id = 0 ? 'ONLY_BUY' : ''
+        ];
+
+        $res = CommonGoods::currentGoodsAttr([
+            'attr' => $goods['attr'],
+            'price' => $ptGoods['price'],
+            'is_level' => $goods['is_level'],
+        ], $this->attr_list, $otherData);
+
         $res['single_price'] = $res['single_price'] > 0 ? $res['single_price'] : $original_price;
 
         return [

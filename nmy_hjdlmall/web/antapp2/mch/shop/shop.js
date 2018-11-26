@@ -130,7 +130,7 @@ Page({
         var self = this;
         var user_info = getApp().getUser();
         return {
-            path: "/mch/shop/shop?user_id=" + user_info.id + 'mch_id=' + self.data.mch_id,
+            path: "/mch/shop/shop?user_id=" + user_info.id + '&mch_id=' + self.data.mch_id,
             title: self.data.shop ? self.data.shop.name : '商城首页',
         };
     },

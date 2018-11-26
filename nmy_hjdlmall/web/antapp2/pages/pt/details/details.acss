@@ -20,11 +20,12 @@
 .time-limit-logo-text{
     font-size: 9pt;
     color: #ffffff;
-    margin-top: 40rpx;
+    /* margin-top: 40rpx; */
 }
 .time-top-text{
     font-size: 7pt;
     color: #ffeecc;
+    margin-bottom:5rpx;
 }
 .time-info{
     color: #ffffff;

@@ -11,7 +11,11 @@ namespace app\models;
 use Alipay\AlipayRequestFactory;
 use app\models\alipay\MpConfig;
 use app\models\tplmsg\AdminTplMsgSender;
+use app\modules\api\controllers\ShareController;
+use app\modules\api\models\BindForm;
 use app\modules\api\models\CouponPaySendForm;
+use app\modules\api\models\ShareForm;
+use app\modules\api\models\ShareMoneyForm;
 use app\utils\PinterOrder;
 use app\utils\SendMail;
 use app\utils\Sms;
@@ -132,10 +136,31 @@ class OrderWarn extends Model
 
         $this->store_id = $order->store_id;
         //发送模板消息
-        if ($order->pay_type == 1) {
+        if ($order->pay_type == 1 || $order->pay_type == 3) {
             $wechat_tpl_meg_sender = new WechatTplMsgSender($order->store_id, $order->id, $this->wechat);
             $wechat_tpl_meg_sender->payMsg();
         }
+
+        // 首次付款，绑定上下级
+        $user = User::findOne($order->user_id);
+        if ($user->parent_id == 0) {
+            $form = new BindForm();
+            $form->user_id = $order->user_id;
+            $form->store_id = $this->store_id;
+            $form->parent_id = $user->parent_user_id;
+            $form->condition = 2;
+            $bindForm = $form->save();
+
+            // 绑定上下级成功后的那个订单也算分销佣金
+            if ($bindForm['code'] == 0) {
+                $form = new ShareMoneyForm();
+                $form->order = $this->order;
+                $form->order_type = $this->order_type;
+                return $form->setData();
+            }
+
+        }
+
         //消费满指定金额自动成为分销商
         $this->autoBecomeShare($order->user_id, $order->store_id, 'STORE');
         // 购买指定或任意商品自动成为分销商
@@ -170,7 +195,7 @@ class OrderWarn extends Model
         }
         $this->store_id = $order->store_id;
         //发送模板消息
-        if ($order->pay_type == 1) {
+        if ($order->pay_type == 1 || $order->pay_type == 3) {
             $wechat_tpl_meg_sender = new MsWechatTplMsgSender($order->store_id, $order->id, $this->wechat);
             $wechat_tpl_meg_sender->payMsg();
         }

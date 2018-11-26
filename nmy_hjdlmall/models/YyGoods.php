@@ -27,6 +27,7 @@ use Yii;
  * @property string $stock
  * @property string $attr
  * @property integer $use_attr
+ * @property integer $is_level
  */
 class YyGoods extends \yii\db\ActiveRecord
 {
@@ -79,6 +80,7 @@ class YyGoods extends \yii\db\ActiveRecord
             'stock' => '库存',
             'attr' => '规格',
             'use_attr' => '是否启用规格',
+            'is_level' => '是否享受会员折扣 0-不享受 1--享受'
         ];
     }
 

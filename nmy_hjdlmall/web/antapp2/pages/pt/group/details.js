@@ -95,6 +95,7 @@ Page({
      * 用户点击右上角分享
      */
     onShareAppMessage: function(options) {
+        getApp().page.onShareAppMessage(this);
         var self = this;
         var user_info = getApp().core.getStorageSync(getApp().const.USER_INFO);
         var path = '/pages/pt/group/details?oid=' + self.data.oid + '&user_id=' + user_info.id;

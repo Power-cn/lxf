@@ -81,6 +81,9 @@ class ShopForm extends MchModel
         if (is_array($this->shop_pic)) {
             $shop->cover_url = $this->shop_pic[0];
         }
+        $shop->name = \yii\helpers\Html::encode($shop->name);
+        $shop->shop_time = \yii\helpers\Html::encode($shop->shop_time);
+        $shop->address = \yii\helpers\Html::encode($shop->address);
         if ($shop->save()) {
             ShopPic::updateAll(['is_delete' => 1], ['shop_id' => $shop->id]);
             foreach ($this->shop_pic as $pic_url) {

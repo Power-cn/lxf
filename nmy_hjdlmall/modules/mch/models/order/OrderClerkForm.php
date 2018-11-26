@@ -12,6 +12,7 @@
 namespace app\modules\mch\models\order;
 
 
+use app\models\ActivityMsgTpl;
 use app\models\Order;
 use app\models\User;
 use app\modules\mch\models\MchModel;
@@ -128,6 +129,8 @@ class OrderClerkForm extends MchModel
         }
 
         if ($order->save()) {
+            $msgTpl = new ActivityMsgTpl($order->user_id, 'ORDER_CLERK');
+            $msgTpl->orderClerkTplMsg($order->order_no, '订单已核销');
             return [
                 'code' => 0,
                 'msg' => '操作成功'
@@ -170,6 +173,8 @@ class OrderClerkForm extends MchModel
         }
 
         if ($order->save()) {
+            $msgTpl = new ActivityMsgTpl($order->user_id, 'BOOK_CLERK');
+            $msgTpl->orderClerkTplMsg($order->order_no, '订单已核销');
             return [
                 'code' => 0,
                 'msg' => '操作成功'

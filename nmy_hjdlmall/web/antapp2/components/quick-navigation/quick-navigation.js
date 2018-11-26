@@ -88,6 +88,7 @@ module.exports = {
                             getApp().getauth({
                                 content: '需要获取您的地理位置授权，请到小程序设置中打开授权！',
                                 cancel: false,
+                                author:'scope.userLocation',
                                 success: function(res) {
                                     if (res.authSetting['scope.userLocation']) {
                                         self.map_goto(map);
@@ -173,7 +174,7 @@ module.exports = {
                     x = x - 55;
                 }
 
-                if (store['option'] && store['option']['quick_map']) {
+                if (store['option'] && store['option']['quick_map']['status']==1) {
                     animationMapPlus.translateY(x).opacity(1).step();
                     x = x - 55;
                 }

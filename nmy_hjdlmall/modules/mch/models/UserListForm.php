@@ -224,7 +224,7 @@ class UserListForm extends MchModel
             ],
             [
                 'key' => 'addtime',
-                'value' => '备注',
+                'value' => '加入时间',
                 'selected' => 0,
             ],
             [

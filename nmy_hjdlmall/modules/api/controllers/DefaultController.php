@@ -14,6 +14,7 @@ use app\models\alipay\MpConfig;
 use app\models\AppNavbar;
 use app\models\Article;
 use app\models\common\CommonDistrict;
+use app\models\common\CommonFormId;
 use app\models\Option;
 use app\models\Setting;
 use app\models\StorePermission;
@@ -407,5 +408,13 @@ class DefaultController extends Controller
         $cats = $form->cats();
 
         return new ApiResponse(0, 'success', $cats);
+    }
+
+    public function actionFormId() {
+        $formIdList = \Yii::$app->request->post('formIdList');
+        $res = CommonFormId::save($formIdList);
+
+        return new ApiResponse(0, 'success', $res);
+
     }
 }

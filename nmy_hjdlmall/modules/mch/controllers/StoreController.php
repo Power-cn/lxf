@@ -120,12 +120,18 @@ class StoreController extends Controller
         if (\Yii::$app->request->isPost) {
             $post = \Yii::$app->request->post();
             $new_time = $post['time'];
+            $now_time = time();
             $new_day = [
                 'begin_date' => date('Ymd',strtotime($new_time)),
                 'end_date' => date('Ymd',strtotime($new_time)),
             ];
+            $last_day = [
+                'begin_date' => date('Ymd',strtotime("-2 day",$now_time)),
+                'end_date' => date('Ymd',strtotime("-2 day",$now_time)),
+            ];
             $data = [
                 'visitdistribution'=>$this->checkAnalysis(7,$new_day),
+                'lastvisitdistribution'=>$this->checkAnalysis(7,$last_day),
             ];
             return [
                 'code'=> 0,
@@ -139,10 +145,19 @@ class StoreController extends Controller
             'begin_date' => date('Ymd',strtotime("-1 day",$timestamp)),
             'end_date' => date('Ymd',strtotime("-1 day",$timestamp)),
         ];
+        $lastday = [
+            'begin_date' => date('Ymd',strtotime("-2 day",$timestamp)),
+            'end_date' => date('Ymd',strtotime("-2 day",$timestamp)),
+        ];
+
         //week 
         $week = [
             'begin_date' => date('Ymd',strtotime("last week Monday", $timestamp)),
             'end_date' => date('Ymd',strtotime("last week Sunday", $timestamp)),
+        ];
+        $lastweek = [
+            'begin_date' => date('Ymd',strtotime("last week Monday -7 day", $timestamp)),
+            'end_date' => date('Ymd',strtotime("last week Sunday -7 day", $timestamp)),
         ];
         //month
         $last_month = date('Y-m-01', strtotime("last month",$timestamp));
@@ -150,7 +165,60 @@ class StoreController extends Controller
             'begin_date' => date('Ymd',strtotime($last_month)),
             'end_date' => date('Ymd',strtotime("$last_month +1 month -1 seconds")),
         ];
+        $last_last_month = date('Y-m-01', strtotime("last month -1 month",$timestamp));
 
+        $lastmonth = [
+            'begin_date' => date('Ymd',strtotime($last_last_month)),
+            'end_date' => date('Ymd',strtotime("$last_last_month +1 month -1 seconds")),
+        ];
+
+
+        $data = [
+                'dailyretaininfo' => $this->checkAnalysis(0,$day),
+                'lastdailyretaininfo' => $this->checkAnalysis(0,$lastday),
+                'weeklyretaininfo' => $this->checkAnalysis(1,$week),
+                'lastweeklyretaininfo' => $this->checkAnalysis(1,$lastweek),
+                'monthlyretaininfo' => $this->checkAnalysis(2,$month),
+                'lastmonthlyretaininfo' => $this->checkAnalysis(2,$lastmonth),
+                'dailyvisittrend' => $this->checkAnalysis(3,$day),
+                'lastdailyvisittrend' => $this->checkAnalysis(3,$lastday),
+                'weeklyvisittrend' => $this->checkAnalysis(4,$week),
+                'lastweeklyvisittrend' => $this->checkAnalysis(4,$lastweek),
+                'monthlyvisittrend' => $this->checkAnalysis(5,$month),
+                'lastmonthlyvisittrend' => $this->checkAnalysis(5,$lastmonth),
+
+                // 'userportraitone'=>$this->checkAnalysis(6,$day),
+                // 'userportraitseven'=>$this->checkAnalysis(6,$sevenDay),
+                // 'userportraitthirty'=>$this->checkAnalysis(6,$thirtyDay),
+                // 'visitdistribution'=>$this->checkAnalysis(7,$day),
+
+                'dailysummarytrend'=>$this->checkAnalysis(8,$day),
+                'lastsummarytrend'=>$this->checkAnalysis(8,$lastday),
+
+                // 'thirdretaininfo' => $this->checkAnalysis(0,$thirdDay),
+                // 'thirdvisittrend' => $this->checkAnalysis(3,$thirdDay),
+                // 'fourthretaininfo' => $this->checkAnalysis(0,$fourthDay),
+                // 'fourthvisittrend' => $this->checkAnalysis(3,$fourthDay),
+                // 'fifthretaininfo' => $this->checkAnalysis(0,$fifthDay),
+                // 'fifthvisittrend' => $this->checkAnalysis(3,$fifthDay),
+                // 'sixthretaininfo' => $this->checkAnalysis(0,$sixthDay),
+                // 'sixthvisittrend' => $this->checkAnalysis(3,$sixthDay),
+                // 'seventhretaininfo' => $this->checkAnalysis(0,$seventhDay),
+                // 'seventhvisittrend' => $this->checkAnalysis(3,$seventhDay),               
+        ];
+        return [
+            'code'=> 0,
+            'data'=> $data,
+        ];
+    }
+
+    public function actionAnalyticsOne()
+    {
+        $timestamp = time();
+        $day = [
+            'begin_date' => date('Ymd',strtotime("-1 day",$timestamp)),
+            'end_date' => date('Ymd',strtotime("-1 day",$timestamp)),
+        ];
         $sevenDay =[
             'begin_date' => date('Ymd',strtotime("-7 day",$timestamp)),
             'end_date' => date('Ymd',strtotime("-1 day",$timestamp)),
@@ -161,41 +229,56 @@ class StoreController extends Controller
             'end_date' => date('Ymd',strtotime("-1 day",$timestamp)),
         ];
 
+
         $data = [
-                'dailyretaininfo' => $this->checkAnalysis(0,$day),
-                'weeklyretaininfo' => $this->checkAnalysis(1,$week),
-                'monthlyretaininfo' => $this->checkAnalysis(2,$month),
-                'dailyvisittrend' => $this->checkAnalysis(3,$day),
-                'weeklyvisittrend' => $this->checkAnalysis(4,$week),
-                'monthlyvisittrend' => $this->checkAnalysis(5,$month),
+            'userportraitone'=>$this->checkAnalysis(6,$day),
+            'userportraitseven'=>$this->checkAnalysis(6,$sevenDay),
+            'userportraitthirty'=>$this->checkAnalysis(6,$thirtyDay),
+            'visitdistribution'=>$this->checkAnalysis(7,$day),
+        ];
+        return [
+            'code'=> 0,
+            'data'=> $data,
+        ];
+    }
 
-                'userportraitone'=>$this->checkAnalysis(6,$day),
-                'userportraitseven'=>$this->checkAnalysis(6,$sevenDay),
-                'userportraitthirty'=>$this->checkAnalysis(6,$thirtyDay),
-                'visitdistribution'=>$this->checkAnalysis(7,$day),
-
-                //'dailysummarytrend'=>$this->tj(6,$new_day),
-                // 'visitdistribution'=>$this->tj(7,$new_day),
+    public function actionAnalyticsTwo()
+    {
+        $timestamp = time();
+        //day
+        $thirdDay = [
+            'begin_date' => date('Ymd',strtotime("-3 day",$timestamp)),
+            'end_date' => date('Ymd',strtotime("-3 day",$timestamp)),
+        ];
+        $fourthDay = [
+            'begin_date' => date('Ymd',strtotime("-4 day",$timestamp)),
+            'end_date' => date('Ymd',strtotime("-4 day",$timestamp)),
+        ];
+        $fifthDay = [
+            'begin_date' => date('Ymd',strtotime("-5 day",$timestamp)),
+            'end_date' => date('Ymd',strtotime("-5 day",$timestamp)),
+        ];
+        $sixthDay = [
+            'begin_date' => date('Ymd',strtotime("-6 day",$timestamp)),
+            'end_date' => date('Ymd',strtotime("-6 day",$timestamp)),
+        ];
+        $seventhDay = [
+            'begin_date' => date('Ymd',strtotime("-7 day",$timestamp)),
+            'end_date' => date('Ymd',strtotime("-7 day",$timestamp)),
         ];
 
-
-        //百分比
-        $old_day = [
-            'begin_date' => date('Ymd',strtotime("-2 day",$timestamp)),
-            'end_date' => date('Ymd',strtotime("-2 day",$timestamp)),
+        $data = [
+                'thirdretaininfo' => $this->checkAnalysis(0,$thirdDay),
+                'thirdvisittrend' => $this->checkAnalysis(3,$thirdDay),
+                'fourthretaininfo' => $this->checkAnalysis(0,$fourthDay),
+                'fourthvisittrend' => $this->checkAnalysis(3,$fourthDay),
+                'fifthretaininfo' => $this->checkAnalysis(0,$fifthDay),
+                'fifthvisittrend' => $this->checkAnalysis(3,$fifthDay),
+                'sixthretaininfo' => $this->checkAnalysis(0,$sixthDay),
+                'sixthvisittrend' => $this->checkAnalysis(3,$sixthDay),
+                'seventhretaininfo' => $this->checkAnalysis(0,$seventhDay),
+                'seventhvisittrend' => $this->checkAnalysis(3,$seventhDay),               
         ];
-
-        $oldweek = [
-            'begin_date' => date('Ymd',strtotime("monday -3 week", $timestamp)),
-            'end_date' => date('Ymd',strtotime("Sunday -2 week", $timestamp)),
-        ];
-
-        // $oldmonth = [
-        //     'begin_date' => date('Ymd',strtotime("monday -3 month", $timestamp)),
-        //     'end_date' => date('Ymd',strtotime("monday -2 month -1 day", $timestamp)),   
-        // ];
-
-
         return [
             'code'=> 0,
             'data'=> $data,
@@ -215,7 +298,7 @@ class StoreController extends Controller
             "https://api.weixin.qq.com/datacube/getweanalysisappiduserportrait?access_token={$access_token}", //活跃画像
             "https://api.weixin.qq.com/datacube/getweanalysisappidvisitpage?access_token={$access_token}", //页面
 
-            // "https://api.weixin.qq.com/datacube/getweanalysisappiddailysummarytrend?access_token={$access_token}", //访问概况
+            "https://api.weixin.qq.com/datacube/getweanalysisappiddailysummarytrend?access_token={$access_token}", //访问概况
             // "https://api.weixin.qq.com/datacube/getweanalysisappidvisitdistribution?access_token={$access_token}",//访问分布
         ];
         $api = $api[$type];

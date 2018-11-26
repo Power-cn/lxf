@@ -45,7 +45,7 @@ $this->beginPage();
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
     <title><?= $this->title ?></title>
-    <link href="//at.alicdn.com/t/font_353057_prsw3pcf1in.css" rel="stylesheet">
+    <link href="//at.alicdn.com/t/font_353057_uuvgc82rsqo.css" rel="stylesheet">
     <link href="<?= Yii::$app->request->baseUrl ?>/statics/mch/css/bootstrap.min.css" rel="stylesheet">
     <link href="<?= Yii::$app->request->baseUrl ?>/statics/mch/css/jquery.datetimepicker.min.css" rel="stylesheet">
     <link href="<?= Yii::$app->request->baseUrl ?>/statics/css/flex.css?version=<?= $version ?>" rel="stylesheet">

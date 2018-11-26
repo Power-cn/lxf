@@ -51,11 +51,17 @@ Page({
                         }
                     });
                     if (res.code == 0) {
+                        var block = {
+                            data:{
+                                pic_list:res.data.ad
+                            }
+                        }
                         self.setData({
                             banner: res.data.banner,
                             ad: res.data.ad,
                             page: res.data.goods.page,
                             page_count: res.data.goods.page_count,
+                            block: block
                         });
                     }
                 }
@@ -132,14 +138,6 @@ Page({
             })
         }
     },
-
-    /**
-     * 用户点击右上角分享
-     */
-    onShareAppMessage: function(options) {
-        getApp().page.onShareAppMessage(this);
-
-    },
     /**
      * 拼团首页加载
      */
@@ -158,6 +156,11 @@ Page({
             success: function(res) {
                 if (res.code == 0) {
                     getApp().core.hideLoading();
+                    var block = {
+                        data: {
+                            pic_list: res.data.ad
+                        }
+                    }
                     self.setData({
                         cat: res.data.cat,
                         banner: res.data.banner,
@@ -165,6 +168,7 @@ Page({
                         goods: res.data.goods.list,
                         page: res.data.goods.page,
                         page_count: res.data.goods.page_count,
+                        block:block
                     });
                     if (res.data.goods.row_count <= 0) {
                         self.setData({

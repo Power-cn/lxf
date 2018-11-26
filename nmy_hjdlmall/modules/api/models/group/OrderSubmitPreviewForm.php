@@ -11,22 +11,17 @@ namespace app\modules\api\models\group;
 use app\models\Address;
 use app\models\Attr;
 use app\models\AttrGroup;
-use app\models\Cart;
 use app\models\common\CommonGoods;
 use app\models\FreeDeliveryRules;
-use app\models\Goods;
-use app\models\Level;
-use app\models\MiaoshaGoods;
 use app\models\PostageRules;
 use app\models\PtGoods;
 use app\models\PtOrder;
 use app\models\PtOrderDetail;
 use app\models\Shop;
 use app\models\Store;
-use app\models\User;
 use app\modules\api\models\ApiModel;
 use app\modules\api\models\OrderData;
-use app\models\PtgoodsDetail;
+use app\models\PtGoodsDetail;
 use app\models\TerritorialLimitation;
 use app\models\PtSetting;
 
@@ -119,6 +114,7 @@ class OrderSubmitPreviewForm extends ApiModel
                 }
             }
         }
+
         return $res;
     }
 
@@ -229,7 +225,19 @@ class OrderSubmitPreviewForm extends ApiModel
         }
         $total_price = 0;
 //         $goods_attr_info = $goods->getAttrInfo($attr_id_list, $goods_info->group_id);
-        $goods_attr_info = CommonGoods::currentGoodsAttr($goods, $attr_id_list, ['type' => 'PINTUAN']);
+
+        $goodsData = [
+            'attr' => $goods['attr'],
+            'price' => $ptGoods['price'],
+            'is_level' => $goods['is_level']
+        ];
+
+        $goods_attr_info = CommonGoods::currentGoodsAttr($goodsData, $attr_id_list, [
+            'type' => 'PINTUAN',
+            'single_price' => $ptGoods['original_price'],
+            'order_type' => $this->type
+        ]);
+
 
         $attr_list = Attr::find()->alias('a')
             ->select('ag.attr_group_name,a.attr_name')
@@ -241,19 +249,23 @@ class OrderSubmitPreviewForm extends ApiModel
 
         $single_price = 0;
         if ($this->type == 'GROUP_BUY' || $this->type == 'GROUP_BUY_C') {      // 拼团
-            $single_price = doubleval(empty($goods_attr_info['price']) ? $ptGoods->price : $goods_attr_info['price']);
+            $single_price = doubleval(empty($goods_attr_info['goods_price']) ? $ptGoods->price : $goods_attr_info['goods_price']);
         } elseif ($this->type == 'ONLY_BUY') {  // 单独购买
             $single_price = doubleval(empty($goods_attr_info['single_price']) ? $ptGoods->original_price : $goods_attr_info['single_price']);
+            $goods_attr_info['level_price'] = $single_price;
         }
+
         $goods_item = (object)[
             'goods_id' => $ptGoods->id,
             'goods_name' => $ptGoods->name,
             'goods_pic' => $goods_pic,
             'num' => $goods_info->num,
-            'price' => number_format(floatval($single_price * $goods_info->num), 2),
-            'single_price' => number_format(floatval($single_price), 2),
+            'price' => sprintf('%.2f', ($single_price * $goods_info->num)),
+            'single_price' => sprintf('%.2f', $single_price),
             'attr_list' => $attr_list,
             'payment' => $ptGoods->payment,
+            'level_price' => sprintf('%.2f', ($goods_attr_info['level_price'] * $goods_info->num)),
+            'is_level' => $goods_attr_info['is_level'],
         ];
 
         $total_price += $goods_item->price;
@@ -326,7 +338,7 @@ class OrderSubmitPreviewForm extends ApiModel
             'code' => 0,
             'msg' => 'success',
             'data' => [
-                'total_price' => number_format(floatval($total_price), 2),
+                'total_price' => sprintf('%.2f', $total_price),
                 'goods_info' => $goods_info,
                 'list' => [
                     $goods_item

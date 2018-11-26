@@ -40,6 +40,7 @@ use yii\web\IdentityInterface;
  * @property string $wechat_platform_open_id
  * @property integer $platform
  * @property integer $blacklist
+ * @property integer $parent_user_id
  */
 class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
@@ -119,6 +120,8 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             'binding' => '授权手机号',
             'wechat_platform_open_id' => '微信公众号openid',
             'platform' => '小程序平台 微信:wx，支付宝:my',
+            'blacklist' => '黑名单 0.否 | 1.是',
+            'parent_user_id' => '可能成为上级的ID'
         ];
     }
 

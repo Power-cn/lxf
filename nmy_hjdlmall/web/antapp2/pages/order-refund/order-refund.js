@@ -8,12 +8,11 @@ Page({
      * 页面的初始数据
      */
     data: {
+        isPageShow: false,
         pageType: 'STORE',
         switch_tab_1: "active",
         switch_tab_2: "",
-        goods: {
-            goods_pic: "https://goss1.vcg.com/creative/vcg/800/version23/VCG21f302700c4.jpg",
-        },
+        goods: {},
         refund_data_1: {},
         refund_data_2: {},
     },
@@ -24,15 +23,20 @@ Page({
     onLoad: function (options) {
         getApp().page.onLoad(this, options);
         var self = this;
+        wx.showLoading({
+            title: '加载中',
+        })
         getApp().request({
             url: getApp().api.order.refund_preview,
             data: {
                 order_detail_id: options.id,
             },
             success: function (res) {
+                wx.hideLoading();
                 if (res.code == 0) {
                     self.setData({
                         goods: res.data,
+                        isPageShow: true,
                     });
                 }
                 if (res.code == 1) {

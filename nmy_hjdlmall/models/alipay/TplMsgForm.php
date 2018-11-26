@@ -23,6 +23,8 @@ class TplMsgForm extends MchModel
     public $yy_success_notice;
     public $revoke_tpl;
     public $tpl_msg_id;
+    public $activity_success_tpl;
+    public $activity_refund_tpl;
 
     public function getTplNames()
     {

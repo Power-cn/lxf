@@ -38,6 +38,16 @@ $this->params['active_nav_group'] = 10;
         background: #da3b3a;
         text-decoration: none;
     }
+
+    form .form-group .col-3 {
+        -webkit-box-flex: 0;
+        -webkit-flex: 0 0 160px;
+        -ms-flex: 0 0 160px;
+        flex: 0 0 160px;
+        max-width: 160px;
+        width: 160px;
+    }
+
 </style>
 
 <div id="one_menu_bar">
@@ -108,6 +118,9 @@ $this->params['active_nav_group'] = 10;
                                                        class="form-control form-control-sm check-goods-data"
                                                        v-model="attr_row.miaosha_num" step="1"
                                                        min="1" v-bind:max="attr_row.num"></td>
+                                            <td style="display: none"><input name="miaosha_pic[]" class="form-control form-control-sm check-goods-data"
+                                                       v-model="attr_row.pic"
+                                                       v-bind:max="attr_row.pic"></td>
                                         </tr>
                                     </table>
                                 </template>

@@ -120,6 +120,11 @@ button {
     align-items: flex-end;
 }
 
+.page > .body {
+    width: 750rpx;
+    overflow-x: hidden;
+}
+
 .spinner {
     margin: 0 auto;
     width: 100rpx;

@@ -22,6 +22,7 @@ class CouponBehavior extends BaseBehavior
         'api/order/submit',
         'api/order/submit',
         'api/coupon/*',
+        'mch/user/coupon'
     ];
 
     /**

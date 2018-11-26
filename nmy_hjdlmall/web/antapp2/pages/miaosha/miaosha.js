@@ -176,7 +176,7 @@ Page({
             }
         }
         self.setData({
-            top_bar_scroll: (index - 2) * 64,
+            top_bar_scroll: index >= 2 ? index - 2 : 0,
         });
     },
 
@@ -295,12 +295,4 @@ Page({
             return;
         self.loadGoodsList(true);
     },
-
-    /**
-     * 用户点击右上角分享
-     */
-    onShareAppMessage: function(options) {
-        getApp().page.onShareAppMessage(this);
-
-    }
 });

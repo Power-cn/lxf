@@ -40,6 +40,8 @@ class GoodsController extends Controller
     public function actionEdit($id = 0)
     {
         $goods = MsGoods::find()->andWhere(['id' => $id, 'is_delete' => 0])->one();
+        $goods->isLevel;
+
         if (!$goods) {
             $goods = new MsGoods();
         }

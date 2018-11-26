@@ -12,6 +12,7 @@ use Alipay\AlipayRequestFactory;
 use app\models\alipay\MpConfig;
 use luweiss\wechat\Wechat;
 use app\models\alipay\TplMsgForm;
+use yii\base\Theme;
 
 /**
  * @property Store $store
@@ -50,7 +51,30 @@ class MsWechatTplMsgSender
             return;
         }
         $this->user = User::findOne($this->order->user_id);
-        $this->form_id = FormId::find()->where(['order_no' => $this->order->order_no])->orderBy('id DESC')->one();
+//        $this->form_id = FormId::find()->where(['order_no' => $this->order->order_no])->orderBy('id DESC')->one();
+
+        // 先调用支付的formID
+        $this->form_id = FormId::find()->where([
+            'wechat_open_id' => $this->user->wechat_open_id,
+            'type' => 'prepay_id',
+        ])->andWhere(['>', 'addtime', time() - (7 * 24 * 60 * 60)])
+            ->andWhere(['<', 'send_count', 3])
+            ->one();
+
+        // 如果为空则调用存储的formID
+        if (!$this->form_id) {
+            $this->form_id = FormId::find()->where([
+                'wechat_open_id' => $this->user->wechat_open_id,
+                'type' => 'form_id',
+                'send_count' => 0
+            ])->andWhere(['>', 'addtime', time() - (7 * 24 * 60 * 60)])
+                ->one();
+        }
+
+        if (!$this->form_id) {
+            $this->form_id = new \stdClass();
+        }
+
         $this->is_alipay = $this->user->platform == 1;
         if ($this->is_alipay) {
             $this->wechat_template_message = TplMsgForm::get($this->store_id);
@@ -68,7 +92,7 @@ class MsWechatTplMsgSender
             if (!$this->wechat_template_message->pay_tpl) {
                 return;
             }
-            $this->form_id = FormId::find()->where(['order_no' => $this->order->order_no, 'type' => 'prepay_id'])->orderBy('id DESC')->one();
+//            $this->form_id = FormId::find()->where(['order_no' => $this->order->order_no, 'type' => 'prepay_id'])->orderBy('id DESC')->one();
 
             $goods_names = MsGoods::find()->andWhere(['id' => $this->order->goods_id])->select('name')->scalar();
             $data = [
@@ -110,7 +134,7 @@ class MsWechatTplMsgSender
             if (!$this->wechat_template_message->revoke_tpl) {
                 return;
             }
-            $this->form_id = FormId::find()->where(['order_no' => $this->order->order_no, 'type' => 'form_id'])->orderBy('id DESC')->one();
+//            $this->form_id = FormId::find()->where(['order_no' => $this->order->order_no, 'type' => 'form_id'])->orderBy('id DESC')->one();
             $goods_names = MsGoods::find()->andWhere(['id' => $this->order->goods_id])->select('name')->scalar();
             $data = [
                 'touser' => $this->user->wechat_open_id,
@@ -151,7 +175,7 @@ class MsWechatTplMsgSender
             if (!$this->wechat_template_message->send_tpl) {
                 return;
             }
-            $this->form_id = FormId::find()->where(['order_no' => $this->order->order_no, 'type' => 'form_id'])->orderBy('id DESC')->one();
+//            $this->form_id = FormId::find()->where(['order_no' => $this->order->order_no, 'type' => 'form_id'])->orderBy('id DESC')->one();
             $goods_names = MsGoods::find()->andWhere(['id' => $this->order->goods_id])->select('name')->scalar();
             $data = [
                 'touser' => $this->user->wechat_open_id,
@@ -196,7 +220,7 @@ class MsWechatTplMsgSender
                 return;
             }
 
-            $this->form_id = FormId::find()->where(['wechat_open_id' => $this->user->wechat_open_id, 'type' => 'form_id', 'send_count' => 0])->orderBy('id DESC')->one();
+//            $this->form_id = FormId::find()->where(['wechat_open_id' => $this->user->wechat_open_id, 'type' => 'form_id', 'send_count' => 0])->orderBy('id DESC')->one();
 
             $data = [
                 'touser' => $this->user->wechat_open_id,
@@ -230,6 +254,9 @@ class MsWechatTplMsgSender
 
     private function sendTplMsg($data)
     {
+        if (!$data['form_id']) {
+            return;
+        }
         if ($this->is_alipay) {
             $config = MpConfig::get($this->store_id);
             $aop = $config->getClient();

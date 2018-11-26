@@ -11,7 +11,8 @@
                         </navigator>
                     </view>
 
-                    <block a:if="{{store.option.quick_map}}" >
+                    <block a:if="{{store.option.quick_map.status==1}}" >
+
                         <view class='quick-dial quick-zfb' onTap='map_power' style="background-image:url('{{store.option.quick_map.icon}}'); background-size: 100rpx 100rpx;" animation="{{animationMapPlus}}" />
                     </block>
 
@@ -94,7 +95,7 @@
             </navigator>
         </block>
 
-        <block a:if="{{store.option.quick_map}}" >
+        <block a:if="{{store.option.quick_map.status==1}}" >
             <view class='dial' onTap='map_power' style="background-image:url('{{store.option.quick_map.icon}}'); background-size: 100rpx 100rpx;"/>
         </block>
 
