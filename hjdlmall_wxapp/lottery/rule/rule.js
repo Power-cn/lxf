@@ -1,28 +1,15 @@
 Page({
-
-  /**
-   * 页面的初始数据
-   */
-  data: {
-  
-  },
-
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad: function (options) {
-      getApp().page.onLoad(this, options);
-
-      var self = this;
-      getApp().request({
-          url: getApp().api.lottery.setting,
-          success: function (res) {
-              if(res.code==0){
-                  self.setData({
-                      rule:res.data.rule
-                  })
-              }
-          },
-      });
-  },
-})
+    data: {},
+    onLoad: function(t) {
+        getApp().page.onLoad(this, t);
+        var e = this;
+        getApp().request({
+            url: getApp().api.lottery.setting,
+            success: function(t) {
+                0 == t.code && e.setData({
+                    rule: t.data.rule
+                });
+            }
+        });
+    }
+});

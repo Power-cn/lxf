@@ -1,4 +1,3 @@
-/* pages/pond/rule/rule.wxss */
 .rule {
-	padding:30rpx;
+    padding: 30rpx;
 }
