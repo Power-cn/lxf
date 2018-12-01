@@ -17,7 +17,7 @@
                         </view>
                     </navigator>
                     <block wx:if="{{store.show_customer_service&&store.show_customer_service==1&&store.service}}">
-                        <button class="float-icon-btn" openType="contact" sessionFrom="{{__user_info.nickname}}|" style="border:0rpx solid #ffffff;padding:0px;display:inline;background-color:transparent;" wx:if="{{__platform=='wx'}}">
+                        <button class="float-icon-btn" openType="contact" session-from='{"nickName":"{{__user_info.nickname}}","avatarUrl":"{{__user_info.avatar_url}}"}' style="border:0rpx solid #ffffff;padding:0px;display:inline;background-color:transparent;" wx:if="{{__platform=='wx'}}">
                             <view animation="{{animationTranspond}}" class="quick-zfb" style="display:inline-block;top:0;">
                                 <image class="quick-dial" src="{{store.service}}"></image>
                             </view>
