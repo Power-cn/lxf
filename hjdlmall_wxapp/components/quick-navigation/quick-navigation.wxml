@@ -65,7 +65,7 @@
         <image class="dial" src="{{store.option.web_service}}"></image>
     </navigator>
     <block wx:if="{{store.show_customer_service&&store.show_customer_service==1&&store.service}}">
-        <button class="float-icon-btn" openType="contact" sessionFrom="{{__user_info.nickname}}|" style="height:100%" wx:if="{{__platform=='wx'}}">
+        <button class="float-icon-btn" openType="contact" session-from='{"nickName":"{{__user_info.nickname}}","avatarUrl":"{{__user_info.avatar_url}}"}' style="height:100%" wx:if="{{__platform=='wx'}}">
             <image class="dial" src="{{store.service}}"></image>
         </button>
         <view class="float-icon-btn" style="position: relative" wx:if="{{__platform=='my'}}">
